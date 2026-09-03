@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="referrer" content="no-referrer">
     <title>MAXMUXSIX - ข้าวหลาม หลามหร่อยเร้าใจ</title>
     <!-- Google Fonts: Prompt -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -44,7 +45,7 @@
         header {
             background: #0D2218;
             border-bottom: 4px solid var(--cream);
-            padding: 1rem 2rem;
+            padding: 0.9rem 2rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -73,7 +74,7 @@
             margin-top: 2px;
         }
         
-        .header-actions { display: flex; gap: 10px; align-items: center; }
+        .header-actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
 
         .btn-nav-action {
             background: #091D13;
@@ -116,7 +117,25 @@
         }
         .btn-add-main:hover { transform: scale(1.04); box-shadow: 0 4px 15px rgba(250, 163, 7, 0.4); }
 
-        /* Promo Alert Banner */
+        .user-nav-box {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: #143525;
+            padding: 6px 14px;
+            border-radius: 30px;
+            border: 1.5px solid var(--flame-yellow);
+        }
+        .user-nav-name { font-size: 0.9rem; font-weight: 700; color: var(--flame-yellow); }
+        .btn-logout {
+            background: none;
+            border: none;
+            color: #FCA5A5;
+            font-size: 0.8rem;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+
         .promo-banner {
             background: linear-gradient(90deg, #D00000, #E85D04);
             color: #FFF;
@@ -135,7 +154,6 @@
             margin: 0 4px;
         }
 
-        /* Large Emblem Hero */
         .hero { text-align: center; padding: 4rem 1.5rem 2.5rem; position: relative; }
         .emblem-badge {
             display: inline-flex;
@@ -186,7 +204,6 @@
             white-space: nowrap;
         }
 
-        /* Filtering & Controls */
         .controls-wrapper {
             max-width: 1200px;
             margin: 2rem auto 1.5rem;
@@ -232,7 +249,6 @@
             border-color: var(--flame-yellow);
         }
 
-        /* Products Grid with Real Images */
         .container { max-width: 1200px; margin: 0 auto; padding: 1rem 1.5rem 4rem; }
         .grid {
             display: grid;
@@ -258,7 +274,7 @@
         .card-img-wrapper {
             position: relative;
             width: 100%;
-            height: 190px;
+            height: 210px;
             overflow: hidden;
             background: #07150E;
             border-bottom: 3.5px solid var(--cream);
@@ -344,7 +360,6 @@
         .btn-act.edit:hover { background: var(--flame-yellow); color: #000; }
         .btn-act.delete:hover { background: var(--danger); border-color: var(--danger); color: white; }
 
-        /* Storage Footer Bar */
         .storage-bar {
             background: #0D2218;
             border: 3px solid var(--cream);
@@ -375,7 +390,6 @@
         .btn-db.reset { border-color: rgba(239, 68, 68, 0.4); color: #FCA5A5; }
         .btn-db.reset:hover { background: var(--danger); color: white; }
 
-        /* Modals Common Style */
         .modal {
             display: none;
             position: fixed;
@@ -415,7 +429,6 @@
         .modal-head h3 { font-size: 1.4rem; font-weight: 700; color: var(--flame-yellow); }
         .btn-close { background: none; border: none; color: var(--cream); font-size: 1.8rem; cursor: pointer; }
 
-        /* Forms */
         .form-row { margin-bottom: 1rem; }
         .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
         label { display: block; font-size: 0.85rem; font-weight: 600; color: var(--cream); margin-bottom: 5px; }
@@ -453,7 +466,6 @@
             font-weight: 700;
         }
 
-        /* E-commerce Cart Items */
         .cart-items-list { max-height: 220px; overflow-y: auto; margin-bottom: 1rem; }
         .cart-item {
             display: flex;
@@ -479,7 +491,6 @@
             font-weight: 700;
         }
 
-        /* Coupon and Shipping Selector */
         .ecom-box {
             background: #091D13;
             border: 1px solid #1E543C;
@@ -516,7 +527,6 @@
             margin-top: 8px;
         }
 
-        /* Payment QR Screen */
         .qr-section {
             background: white;
             border-radius: 16px;
@@ -529,7 +539,6 @@
         .pp-logo { font-size: 1.2rem; font-weight: 800; color: #00427A; }
         .mock-qr { width: 170px; height: 170px; margin: 8px auto; background: #FFF; border: 2px solid #000; padding: 6px; }
 
-        /* Order Tracking Card */
         .order-card {
             background: #091D13;
             border: 1.5px solid #1E543C;
@@ -545,18 +554,105 @@
             font-weight: 700;
         }
         .status-cooking { background: #E85D04; color: white; }
-        .status-delivering { background: #3B82F6; color: white; }
-        .status-done { background: #10B981; color: white; }
+
+        .auth-tab-group {
+            display: flex;
+            border-bottom: 2px solid #1E543C;
+            margin-bottom: 1.5rem;
+        }
+        .auth-tab-btn {
+            flex: 1;
+            padding: 10px;
+            background: none;
+            border: none;
+            color: #8BA89B;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            text-align: center;
+            transition: 0.2s;
+        }
+        .auth-tab-btn.active {
+            color: var(--flame-yellow);
+            border-bottom: 3px solid var(--flame-yellow);
+        }
+        .auth-content { display: none; }
+        .auth-content.active { display: block; }
+        .consent-checkbox-wrap {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            font-size: 0.85rem;
+            color: #C0D8CC;
+            margin-top: 10px;
+        }
+        .consent-checkbox-wrap input {
+            width: 18px;
+            height: 18px;
+            margin-top: 2px;
+            cursor: pointer;
+        }
+
+        .consent-banner {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            right: 20px;
+            max-width: 900px;
+            margin: 0 auto;
+            background: rgba(13, 34, 24, 0.95);
+            backdrop-filter: blur(10px);
+            border: 3px solid var(--cream);
+            border-radius: 18px;
+            padding: 1.2rem 1.8rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            z-index: 300;
+            display: none;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+            animation: slideUp 0.3s ease-out;
+        }
+        @keyframes slideUp {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .consent-text {
+            flex: 1;
+            min-width: 260px;
+            font-size: 0.92rem;
+            color: var(--cream);
+        }
+        .consent-actions { display: flex; gap: 10px; }
+        .btn-consent-accept {
+            background: linear-gradient(180deg, var(--flame-yellow), var(--flame-orange));
+            color: #240C00;
+            border: 2px solid var(--cream);
+            padding: 8px 20px;
+            border-radius: 10px;
+            font-weight: 800;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+        .btn-consent-decline {
+            background: #1F362B;
+            color: var(--cream);
+            border: 1px solid #3E6350;
+            padding: 8px 16px;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
     </style>
 </head>
 <body>
 
-    <!-- Promo Alert -->
     <div class="promo-banner">
         🔥 สั่งซื้อวันนี้ ใส่โค้ด <span class="promo-code-tag">MAX10</span> ลดทันที 10% เมื่อซื้อครบ 150 บาทขึ้นไป!
     </div>
 
-    <!-- Main Navigation -->
     <header>
         <a href="#" class="brand-logo">
             <div>
@@ -565,8 +661,14 @@
             </div>
         </a>
         <div class="header-actions">
+            <div id="authNavArea">
+                <button class="btn-nav-action" onclick="openAuthModal('login')">
+                    👤 เข้าสู่ระบบ / สมัครสมาชิก
+                </button>
+            </div>
+
             <button class="btn-nav-action" onclick="openOrderHistoryModal()">
-                📦 คำสั่งซื้อของฉัน
+                📦 คำสั่งซื้อ
             </button>
             <button class="btn-nav-action" onclick="openCartModal()">
                 🛒 ตะกร้า
@@ -576,7 +678,6 @@
         </div>
     </header>
 
-    <!-- Large Emblem Hero -->
     <section class="hero">
         <div class="emblem-badge">
             <div class="emblem-title">MAXMUXSIX</div>
@@ -589,7 +690,6 @@
         </p>
     </section>
 
-    <!-- Search & Filter Controls -->
     <div class="controls-wrapper">
         <div class="search-container">
             <input type="text" id="filterKeyword" placeholder="🔍 ค้นหาเมนู เช่น ถั่วดำ, ช็อตมะพร้าว, สังขยา..." oninput="applyFilters()">
@@ -602,11 +702,9 @@
         </div>
     </div>
 
-    <!-- Products Showcase -->
     <main class="container">
         <div class="grid" id="productDisplayGrid"></div>
 
-        <!-- Database Storage Bar -->
         <div class="storage-bar">
             <div class="storage-status">
                 📦 สต็อกเมนู: <strong id="productCounter">0 รายการ</strong>
@@ -621,7 +719,90 @@
         </div>
     </main>
 
-    <!-- Modal 1: CRUD Form -->
+    <!-- === เพิ่มส่วนแสดงชื่อและรหัสนักศึกษาตรงนี้ === -->
+    <footer style="text-align: center; padding: 2.5rem 1rem; color: #8BA89B; font-size: 0.95rem; border-top: 1px dashed #1E543C; max-width: 1200px; margin: 1rem auto 3rem;">
+        จัดทำโดย: <strong style="color: var(--flame-yellow); font-size: 1.05rem;">นายธณาเทพ พรมที</strong> | 
+        รหัสนักศึกษา: <strong style="color: var(--flame-yellow); font-size: 1.05rem;">66040233114</strong>
+    </footer>
+
+    <div class="consent-banner" id="cookieConsentBanner">
+        <div class="consent-text">
+            🍪 <strong>นโยบายความเป็นส่วนตัวและคุกกี้ (PDPA):</strong> เว็บไซต์ MAXMUXSIX ใช้คุกกี้และพื้นที่จัดเก็บข้อมูลบนอุปกรณ์เพื่อบันทึกรายการสินค้าในตะกร้า บัญชีสมาชิก และมอบประสบการณ์สั่งซื้อข้าวหลามที่รวดเร็วเร้าใจที่สุดสำหรับคุณ
+        </div>
+        <div class="consent-actions">
+            <button class="btn-consent-accept" onclick="acceptCookieConsent()">ยอมรับทั้งหมด</button>
+            <button class="btn-consent-decline" onclick="dismissCookieConsent()">จำเป็นเท่านั้น</button>
+        </div>
+    </div>
+
+    <div class="modal" id="authModal">
+        <div class="modal-box">
+            <div class="modal-head">
+                <h3 id="authModalTitle">บัญชีสมาชิก MAXMUXSIX</h3>
+                <button class="btn-close" onclick="closeAuthModal()">&times;</button>
+            </div>
+
+            <div class="auth-tab-group">
+                <button class="auth-tab-btn active" id="tabLoginBtn" onclick="switchAuthTab('login')">เข้าสู่ระบบ</button>
+                <button class="auth-tab-btn" id="tabRegisterBtn" onclick="switchAuthTab('register')">สมัครสมาชิกใหม่</button>
+            </div>
+
+            <div class="auth-content active" id="loginContent">
+                <form onsubmit="handleLogin(event)">
+                    <div class="form-row">
+                        <label>อีเมล หรือ เบอร์โทรศัพท์ *</label>
+                        <input type="text" id="loginUserKey" placeholder="เช่น yourname@email.com หรือ 0812345678" required>
+                    </div>
+                    <div class="form-row">
+                        <label>รหัสผ่าน *</label>
+                        <input type="password" id="loginPassword" placeholder="••••••••" required>
+                    </div>
+                    <div class="modal-foot">
+                        <button type="submit" class="btn-save" style="width: 100%;">เข้าสู่ระบบเร้าใจ 🔥</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="auth-content" id="registerContent">
+                <form onsubmit="handleRegister(event)">
+                    <div class="form-row">
+                        <label>ชื่อ-นามสกุล *</label>
+                        <input type="text" id="regName" placeholder="เช่น สมเกียรติ ยิ้มหวาน" required>
+                    </div>
+                    <div class="form-grid form-row">
+                        <div>
+                            <label>อีเมล *</label>
+                            <input type="email" id="regEmail" placeholder="name@domain.com" required>
+                        </div>
+                        <div>
+                            <label>เบอร์โทรศัพท์ *</label>
+                            <input type="tel" id="regPhone" placeholder="08XXXXXXXX" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <label>รหัสผ่าน *</label>
+                        <input type="password" id="regPassword" placeholder="ตั้งรหัสผ่าน 6 ตัวอักษรขึ้นไป" minlength="6" required>
+                    </div>
+                    <div class="form-row">
+                        <label>ที่อยู่เริ่มต้นสำหรับการจัดส่ง (กรอกทีหลังได้)</label>
+                        <textarea id="regAddress" rows="2" placeholder="บ้านเลขที่ ถนน แขวง/ตำบล เขต/อำเภอ จังหวัด..."></textarea>
+                    </div>
+
+                    <div class="consent-checkbox-wrap">
+                        <input type="checkbox" id="regConsentCheckbox" required>
+                        <label for="regConsentCheckbox" style="margin: 0; cursor: pointer;">
+                            ฉันยินยอมรับข้อกำหนดและเงื่อนไขการให้บริการ รวมทั้งยินยอมให้ MAXMUXSIX จัดเก็บและประมวลผลข้อมูลส่วนบุคคลตาม พ.ร.บ. คุ้มครองข้อมูลส่วนบุคคล (PDPA) เพื่อการจัดส่งสินค้าและสิทธิประโยชน์
+                        </label>
+                    </div>
+
+                    <div class="modal-foot">
+                        <button type="submit" class="btn-save" style="width: 100%;">สมัครสมาชิกและยินยอมเงื่อนไข ✅</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <div class="modal" id="crudModal">
         <div class="modal-box">
             <div class="modal-head">
@@ -663,8 +844,8 @@
                 </div>
 
                 <div class="form-row">
-                    <label>ลิงก์รูปภาพจริง (Image URL) หรือเลือกไฟล์ด้านล่าง</label>
-                    <input type="url" id="itemImageUrl" placeholder="https://images.unsplash.com/...">
+                    <label>ลิงก์รูปภาพจริง (Image URL)</label>
+                    <input type="url" id="itemImageUrl" placeholder="https://upload.wikimedia.org/...">
                 </div>
 
                 <div class="form-row">
@@ -685,7 +866,6 @@
         </div>
     </div>
 
-    <!-- Modal 2: Shopping Cart & Checkout -->
     <div class="modal" id="cartModal">
         <div class="modal-box">
             <div class="modal-head">
@@ -695,7 +875,6 @@
             
             <div id="cartItemsContainer" class="cart-items-list"></div>
 
-            <!-- E-Commerce Options -->
             <div class="ecom-box">
                 <label>🏷️ โค้ดส่วนลด (Promo Code)</label>
                 <div class="coupon-input-group">
@@ -740,7 +919,6 @@
         </div>
     </div>
 
-    <!-- Modal 3: Payment Screen -->
     <div class="modal" id="paymentModal">
         <div class="modal-box">
             <div class="modal-head">
@@ -804,7 +982,6 @@
         </div>
     </div>
 
-    <!-- Modal 4: Order History & Tracking -->
     <div class="modal" id="orderHistoryModal">
         <div class="modal-box">
             <div class="modal-head">
@@ -818,9 +995,15 @@
         </div>
     </div>
 
-    <!-- JavaScript Logic -->
     <script>
-        // ข้อมูลสินค้าเริ่มต้น พร้อมรูปภาพจริงคุณภาพสูง
+        // ชุดรูปภาพข้าวหลามจริงความคมชัดสูง จาก Wikimedia Commons
+        const realKhaoLamPhotos = {
+            "max_1": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/Khao_lam_01.jpg/800px-Khao_lam_01.jpg",
+            "max_2": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ab/Khao_lam.JPG/800px-Khao_lam.JPG",
+            "max_3": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/Khao_lam_Nong_Mon.jpg/800px-Khao_lam_Nong_Mon.jpg",
+            "max_4": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/Khao_lam_in_earthenware_container.JPG/800px-Khao_lam_in_earthenware_container.JPG"
+        };
+
         const defaultMaxmuxsixData = [
             {
                 id: "max_1",
@@ -829,7 +1012,7 @@
                 price: 45,
                 stock: 25,
                 rating: "4.9 ★★★★★",
-                image: "https://images.unsplash.com/photo-1596797038530-2c107229654b?auto=format&fit=crop&w=700&q=80",
+                image: "max_1.jpg",
                 tag: "ขายดีอันดับ 1",
                 desc: "ข้าวเหนียวเขี้ยวงูหอมนุ่ม คลุกเคล้าถั่วดำเม็ดโตและหัวกะทิสด เผาถ่านไฟแรงจนส่งกลิ่นหอมกรุ่นถึงเนื้อใน"
             },
@@ -840,7 +1023,7 @@
                 price: 40,
                 stock: 18,
                 rating: "4.8 ★★★★★",
-                image: "https://images.unsplash.com/photo-1541696432-82c6da8ce7bf?auto=format&fit=crop&w=700&q=80",
+                image: "max_2.jpg",
                 tag: "ช็อตเยิ้มสะใจ",
                 desc: "กระบอกสั้นเปิดง่าย ทานสะดวก อัดแน่นด้วยเนื้อมะพร้าวอ่อนเคี่ยวน้ำตาลโตนดแท้ หวานมันนัวลิ้น"
             },
@@ -851,7 +1034,7 @@
                 price: 50,
                 stock: 12,
                 rating: "4.9 ★★★★★",
-                image: "https://images.unsplash.com/photo-1563245372-f21724e3856d?auto=format&fit=crop&w=700&q=80",
+                image: "max_3.jpg",
                 tag: "หอมละมุน",
                 desc: "เนื้อเผือกหอมกวนจนเนียนละเอียด สลับชั้นกับข้าวเหนียวดำหน้ากะทิ รสสัมผัสกลมกล่อม"
             },
@@ -862,16 +1045,37 @@
                 price: 55,
                 stock: 8,
                 rating: "5.0 ★★★★★",
-                image: "https://images.unsplash.com/photo-1625398407796-82650a8c135f?auto=format&fit=crop&w=700&q=80",
+                image: "max_4.jpg",
                 tag: "ไส้ลาวา",
                 desc: "สังขยาไข่เป็ดสูตรเข้มข้น ไหลเยิ้มทะลักเมื่อแกะกระบอก ข้าวเหนียวนุ่มฉ่ำกะทิสด"
             }
         ];
 
-        // State variables
-        let currentProducts = JSON.parse(localStorage.getItem('maxmuxsix_data')) || defaultMaxmuxsixData;
+        // โหลดข้อมูล + Force Update รูปภาพเก่าที่ค้างอยู่ใน LocalStorage ให้เปลี่ยนเป็นรูปข้าวหลามจริงอัตโนมัติ
+        let rawProducts = JSON.parse(localStorage.getItem('maxmuxsix_data'));
+        let currentProducts;
+
+        if (!rawProducts || rawProducts.length === 0) {
+            currentProducts = defaultMaxmuxsixData;
+        } else {
+            currentProducts = rawProducts.map(p => {
+                // บังคับเปลี่ยนรูปเมนูมาตรฐานเป็นรูปข้าวหลามจริง
+                if (realKhaoLamPhotos[p.id]) {
+                    p.image = realKhaoLamPhotos[p.id];
+                }
+                return {
+                    ...p,
+                    stock: (typeof p.stock === 'number' && !isNaN(p.stock)) ? p.stock : 25,
+                    rating: p.rating || '4.9 ★★★★★',
+                    image: p.image || realKhaoLamPhotos["max_1"]
+                };
+            });
+        }
+
         let cart = JSON.parse(localStorage.getItem('maxmuxsix_cart')) || [];
         let orders = JSON.parse(localStorage.getItem('maxmuxsix_orders')) || [];
+        let users = JSON.parse(localStorage.getItem('maxmuxsix_users')) || [];
+        let currentUser = JSON.parse(localStorage.getItem('maxmuxsix_active_user')) || null;
         let activeCategory = 'all';
         let appliedDiscountRate = 0;
         let uploadedImageBase64 = "";
@@ -880,8 +1084,11 @@
             localStorage.setItem('maxmuxsix_data', JSON.stringify(currentProducts));
             localStorage.setItem('maxmuxsix_cart', JSON.stringify(cart));
             localStorage.setItem('maxmuxsix_orders', JSON.stringify(orders));
+            localStorage.setItem('maxmuxsix_users', JSON.stringify(users));
+            localStorage.setItem('maxmuxsix_active_user', JSON.stringify(currentUser));
             document.getElementById('productCounter').textContent = `${currentProducts.length} รายการ`;
             updateCartCounter();
+            renderAuthUI();
         }
 
         function updateCartCounter() {
@@ -889,7 +1096,133 @@
             document.getElementById('cartCount').textContent = count;
         }
 
-        // Render Cards with Real Images
+        function checkCookieConsent() {
+            const consent = localStorage.getItem('maxmuxsix_cookie_consent');
+            if (!consent) {
+                document.getElementById('cookieConsentBanner').style.display = 'flex';
+            }
+        }
+
+        function acceptCookieConsent() {
+            localStorage.setItem('maxmuxsix_cookie_consent', 'accepted_all');
+            document.getElementById('cookieConsentBanner').style.display = 'none';
+        }
+
+        function dismissCookieConsent() {
+            localStorage.setItem('maxmuxsix_cookie_consent', 'accepted_necessary');
+            document.getElementById('cookieConsentBanner').style.display = 'none';
+        }
+
+        function renderAuthUI() {
+            const area = document.getElementById('authNavArea');
+            if (currentUser) {
+                area.innerHTML = `
+                    <div class="user-nav-box">
+                        <span>👤</span>
+                        <span class="user-nav-name">${currentUser.name}</span>
+                        <button class="btn-logout" onclick="handleLogout()">ออกจากระบบ</button>
+                    </div>
+                `;
+            } else {
+                area.innerHTML = `
+                    <button class="btn-nav-action" onclick="openAuthModal('login')">
+                        👤 เข้าสู่ระบบ / สมัครสมาชิก
+                    </button>
+                `;
+            }
+        }
+
+        function openAuthModal(tab = 'login') {
+            switchAuthTab(tab);
+            document.getElementById('authModal').classList.add('active');
+        }
+
+        function closeAuthModal() {
+            document.getElementById('authModal').classList.remove('active');
+        }
+
+        function switchAuthTab(tab) {
+            const loginBtn = document.getElementById('tabLoginBtn');
+            const regBtn = document.getElementById('tabRegisterBtn');
+            const loginContent = document.getElementById('loginContent');
+            const regContent = document.getElementById('registerContent');
+
+            if (tab === 'login') {
+                loginBtn.classList.add('active');
+                regBtn.classList.remove('active');
+                loginContent.classList.add('active');
+                regContent.classList.remove('active');
+            } else {
+                regBtn.classList.add('active');
+                loginBtn.classList.remove('active');
+                regContent.classList.add('active');
+                loginContent.classList.remove('active');
+            }
+        }
+
+        function handleRegister(e) {
+            e.preventDefault();
+            const name = document.getElementById('regName').value.trim();
+            const email = document.getElementById('regEmail').value.trim().toLowerCase();
+            const phone = document.getElementById('regPhone').value.trim();
+            const password = document.getElementById('regPassword').value;
+            const address = document.getElementById('regAddress').value.trim();
+            const consentGiven = document.getElementById('regConsentCheckbox').checked;
+
+            if (!consentGiven) {
+                alert('กรุณายินยอมรับข้อกำหนดและนโยบายคุ้มครองข้อมูลส่วนบุคคล (PDPA)');
+                return;
+            }
+
+            const exists = users.find(u => u.email === email || u.phone === phone);
+            if (exists) {
+                alert('อีเมลหรือเบอร์โทรศัพท์นี้ถูกใช้งานในระบบแล้ว กรุณาเข้าสู่ระบบ');
+                switchAuthTab('login');
+                return;
+            }
+
+            const newUser = {
+                id: 'USR-' + Date.now(),
+                name,
+                email,
+                phone,
+                password,
+                address,
+                registeredDate: new Date().toISOString(),
+                consentPDPA: true
+            };
+
+            users.push(newUser);
+            currentUser = newUser;
+            syncStorage();
+
+            alert(`🎉 ยินดีต้อนรับคุณ ${name} สู่ครอบครัว MAXMUXSIX! สมัครสมาชิกสำเร็จเรียบร้อย`);
+            closeAuthModal();
+        }
+
+        function handleLogin(e) {
+            e.preventDefault();
+            const userKey = document.getElementById('loginUserKey').value.trim().toLowerCase();
+            const password = document.getElementById('loginPassword').value;
+
+            const user = users.find(u => (u.email === userKey || u.phone === userKey) && u.password === password);
+            if (user) {
+                currentUser = user;
+                syncStorage();
+                alert(`🔥 ยินดีต้อนรับกลับ คุณ ${user.name}! เข้าสู่ระบบสำเร็จ`);
+                closeAuthModal();
+            } else {
+                alert('❌ ข้อมูลเข้าสู่ระบบไม่ถูกต้อง กรุณาตรวจสอบอีเมล เบอร์โทร หรือรหัสผ่าน');
+            }
+        }
+
+        function handleLogout() {
+            if (confirm('คุณต้องการออกจากระบบหรือไม่?')) {
+                currentUser = null;
+                syncStorage();
+            }
+        }
+
         function renderItems(data = currentProducts) {
             const container = document.getElementById('productDisplayGrid');
             container.innerHTML = '';
@@ -906,13 +1239,14 @@
             }
 
             data.forEach(p => {
+                const stockCount = (typeof p.stock === 'number' && !isNaN(p.stock)) ? p.stock : 25;
                 const card = document.createElement('div');
                 card.className = 'card';
                 card.innerHTML = `
                     <div class="card-img-wrapper">
-                        <img src="${p.image || defaultMaxmuxsixData[0].image}" alt="${p.name}" onerror="this.src='${defaultMaxmuxsixData[0].image}'">
+                        <img src="${p.image || realKhaoLamPhotos['max_1']}" alt="${p.name}" loading="lazy" onerror="this.src='${realKhaoLamPhotos['max_1']}'">
                         ${p.tag ? `<div class="card-ribbon-tag">${p.tag}</div>` : ''}
-                        <div class="stock-badge">คงเหลือ ${p.stock} กระบอก</div>
+                        <div class="stock-badge">คงเหลือ ${stockCount} กระบอก</div>
                     </div>
                     <div class="card-body">
                         <div class="card-category-rating">
@@ -937,22 +1271,23 @@
             syncStorage();
         }
 
-        // Cart & E-commerce Operations
         function addToCart(productId) {
             const product = currentProducts.find(p => p.id === productId);
             if (!product) return;
 
-            if (product.stock <= 0) {
+            const stock = (typeof product.stock === 'number' && !isNaN(product.stock)) ? product.stock : 25;
+
+            if (stock <= 0) {
                 alert('ขออภัย เมนูนี้หมดชั่วคราว กำลังเผาเพิ่มครับ!');
                 return;
             }
 
             const existingIndex = cart.findIndex(c => c.id === productId);
             if (existingIndex > -1) {
-                if (cart[existingIndex].qty < product.stock) {
+                if (cart[existingIndex].qty < stock) {
                     cart[existingIndex].qty += 1;
                 } else {
-                    alert(`สินค้ามีสต็อกจำกัด ${product.stock} กระบอก`);
+                    alert(`สินค้ามีสต็อกจำกัด ${stock} กระบอก`);
                     return;
                 }
             } else {
@@ -967,7 +1302,7 @@
 
             syncStorage();
             
-            const cartBtn = document.querySelector('.btn-nav-action:nth-child(2)');
+            const cartBtn = document.querySelector('.header-actions button:nth-child(3)');
             if (cartBtn) {
                 cartBtn.style.transform = 'scale(1.15)';
                 setTimeout(() => { cartBtn.style.transform = ''; }, 200);
@@ -1076,6 +1411,13 @@
             if (cart.length === 0) return;
             const bill = calculateTotalOrder();
             document.getElementById('payAmountDisplay').textContent = bill.grandTotal;
+
+            if (currentUser) {
+                document.getElementById('custName').value = currentUser.name || '';
+                document.getElementById('custPhone').value = currentUser.phone || '';
+                document.getElementById('custAddress').value = currentUser.address || '';
+            }
+
             closeCartModal();
             document.getElementById('paymentModal').classList.add('active');
         }
@@ -1099,6 +1441,7 @@
             const orderId = 'MAX-' + Math.floor(100000 + Math.random() * 900000);
             const newOrder = {
                 id: orderId,
+                userId: currentUser ? currentUser.id : 'GUEST',
                 date: new Date().toLocaleString('th-TH'),
                 items: [...cart],
                 name,
@@ -1110,15 +1453,14 @@
 
             orders.unshift(newOrder);
 
-            // Deduct Stock
             cart.forEach(cartItem => {
                 const prod = currentProducts.find(p => p.id === cartItem.id);
                 if (prod) {
-                    prod.stock = Math.max(0, prod.stock - cartItem.qty);
+                    const currentStock = (typeof prod.stock === 'number' && !isNaN(prod.stock)) ? prod.stock : 25;
+                    prod.stock = Math.max(0, currentStock - cartItem.qty);
                 }
             });
 
-            // Reset
             cart = [];
             appliedDiscountRate = 0;
             document.getElementById('couponCodeInput').value = '';
@@ -1129,18 +1471,19 @@
             document.getElementById('checkoutForm').reset();
             closePaymentModal();
 
-            alert(`🎉 สั่งซื้อสำเร็จเรียบร้อย!\n\nรหัสคำสั่งซื้อ: ${orderId}\nคุณ: ${name}\nยอดชำระ: ${bill.grandTotal} บาท\n\nสามารถตรวจสอบความคืบหน้าได้ที่ปุ่ม "คำสั่งซื้อของฉัน" ด้านบนครับ`);
+            alert(`🎉 สั่งซื้อสำเร็จเรียบร้อย!\n\nรหัสคำสั่งซื้อ: ${orderId}\nคุณ: ${name}\nยอดชำระ: ${bill.grandTotal} บาท\n\nสามารถตรวจสอบความคืบหน้าได้ที่ปุ่ม "คำสั่งซื้อ" ด้านบนครับ`);
         }
 
-        // Order History Modal
         function openOrderHistoryModal() {
             const container = document.getElementById('orderHistoryContainer');
             container.innerHTML = '';
 
-            if (orders.length === 0) {
+            const displayOrders = currentUser ? orders.filter(o => o.userId === currentUser.id || o.userId === 'GUEST') : orders;
+
+            if (displayOrders.length === 0) {
                 container.innerHTML = '<p style="text-align: center; color: #8BA89B; padding: 2rem 0;">ยังไม่มีประวัติคำสั่งซื้อ</p>';
             } else {
-                orders.forEach(ord => {
+                displayOrders.forEach(ord => {
                     const div = document.createElement('div');
                     div.className = 'order-card';
                     const itemsSummary = ord.items.map(i => `${i.name} (x${i.qty})`).join(', ');
@@ -1166,7 +1509,6 @@
             document.getElementById('orderHistoryModal').classList.remove('active');
         }
 
-        // Image file preview
         function previewImageUpload(e) {
             const file = e.target.files[0];
             if (!file) return;
@@ -1177,7 +1519,6 @@
             reader.readAsDataURL(file);
         }
 
-        // CRUD Modal Logic
         function openCrudModal(isEdit = false) {
             document.getElementById('crudModal').classList.add('active');
             document.getElementById('modalHeading').textContent = isEdit ? 'แก้ไขเมนู MAXMUXSIX' : 'เพิ่มเมนูข้าวหลามใหม่';
@@ -1203,7 +1544,7 @@
             const desc = document.getElementById('itemDesc').value.trim();
             const imageUrl = document.getElementById('itemImageUrl').value.trim();
 
-            const finalImage = uploadedImageBase64 || imageUrl || defaultMaxmuxsixData[0].image;
+            const finalImage = uploadedImageBase64 || imageUrl || realKhaoLamPhotos["max_1"];
 
             if (id) {
                 const idx = currentProducts.findIndex(p => p.id === id);
@@ -1237,9 +1578,9 @@
             document.getElementById('itemName').value = item.name;
             document.getElementById('itemCategory').value = item.category;
             document.getElementById('itemPrice').value = item.price;
-            document.getElementById('itemStock').value = item.stock || 20;
+            document.getElementById('itemStock').value = (typeof item.stock === 'number' && !isNaN(item.stock)) ? item.stock : 20;
             document.getElementById('itemTag').value = item.tag || '';
-            document.getElementById('itemImageUrl').value = item.image.startsWith('data:') ? '' : item.image;
+            document.getElementById('itemImageUrl').value = (item.image && item.image.startsWith('data:')) ? '' : (item.image || '');
             document.getElementById('itemDesc').value = item.desc;
 
             openCrudModal(true);
@@ -1257,7 +1598,6 @@
             }
         }
 
-        // Filtering
         function applyFilters() {
             const query = document.getElementById('filterKeyword').value.trim().toLowerCase();
             let filtered = currentProducts;
@@ -1283,7 +1623,6 @@
             applyFilters();
         }
 
-        // Backup / Restore
         function backupToJson() {
             const jsonText = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(currentProducts, null, 2));
             const dl = document.createElement('a');
@@ -1303,7 +1642,10 @@
                 try {
                     const parsed = JSON.parse(evt.target.result);
                     if (Array.isArray(parsed)) {
-                        currentProducts = parsed;
+                        currentProducts = parsed.map(p => ({
+                            ...p,
+                            stock: (typeof p.stock === 'number' && !isNaN(p.stock)) ? p.stock : 25
+                        }));
                         syncStorage();
                         applyFilters();
                         alert('นำเข้าข้อมูลสำเร็จ!');
@@ -1320,13 +1662,17 @@
                 currentProducts = [...defaultMaxmuxsixData];
                 cart = [];
                 orders = [];
+                users = [];
+                currentUser = null;
                 syncStorage();
                 applyFilters();
             }
         }
 
-        // Start
+        checkCookieConsent();
+        syncStorage();
         renderItems();
+        renderAuthUI();
     </script>
 </body>
 </html>
