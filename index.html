@@ -1,0 +1,1332 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MAXMUXSIX - ข้าวหลาม หลามหร่อยเร้าใจ</title>
+    <!-- Google Fonts: Prompt -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-wood: #140E0A;
+            --bg-card: #0F291E;
+            --green-badge: #163E2C;
+            --green-border: #1E543C;
+            --flame-orange: #E85D04;
+            --flame-red: #D00000;
+            --flame-yellow: #FAA307;
+            --cream: #FEE8BE;
+            --cream-light: #FFF9ED;
+            --text-light: #FEE8BE;
+            --text-dark: #1F140E;
+            --danger: #EF4444;
+            --success: #10B981;
+            --shadow-badge: 0 14px 35px rgba(0, 0, 0, 0.65);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Prompt', sans-serif; }
+        
+        body {
+            background-color: var(--bg-wood);
+            background-image: 
+                radial-gradient(#261912 15%, transparent 16%), 
+                linear-gradient(180deg, #18110D 0%, #0A0705 100%);
+            background-size: 60px 60px, 100% 100%;
+            color: var(--cream);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        /* Header Navigation */
+        header {
+            background: #0D2218;
+            border-bottom: 4px solid var(--cream);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.6);
+        }
+        .brand-logo { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+        .brand-title {
+            font-size: 1.8rem;
+            font-weight: 800;
+            letter-spacing: 1px;
+            color: var(--flame-yellow);
+            text-shadow: 2px 2px 0px var(--flame-red), 4px 4px 0px #000;
+            line-height: 1;
+        }
+        .brand-subtitle {
+            font-size: 0.85rem;
+            color: var(--cream);
+            background: var(--flame-orange);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: 600;
+            display: inline-block;
+            margin-top: 2px;
+        }
+        
+        .header-actions { display: flex; gap: 10px; align-items: center; }
+
+        .btn-nav-action {
+            background: #091D13;
+            color: var(--cream);
+            border: 2px solid var(--cream);
+            padding: 8px 16px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
+        }
+        .btn-nav-action:hover {
+            background: var(--flame-orange);
+            color: white;
+            transform: translateY(-2px);
+        }
+        .cart-badge {
+            background: var(--flame-red);
+            color: white;
+            border-radius: 50%;
+            padding: 2px 7px;
+            font-size: 0.78rem;
+            font-weight: 800;
+        }
+
+        .btn-add-main {
+            background: linear-gradient(180deg, var(--flame-yellow), var(--flame-orange));
+            color: #240C00;
+            border: 2px solid var(--cream);
+            padding: 8px 18px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 0.9rem;
+            transition: 0.2s;
+        }
+        .btn-add-main:hover { transform: scale(1.04); box-shadow: 0 4px 15px rgba(250, 163, 7, 0.4); }
+
+        /* Promo Alert Banner */
+        .promo-banner {
+            background: linear-gradient(90deg, #D00000, #E85D04);
+            color: #FFF;
+            text-align: center;
+            padding: 7px 15px;
+            font-size: 0.92rem;
+            font-weight: 600;
+            border-bottom: 2px solid var(--flame-yellow);
+        }
+        .promo-code-tag {
+            background: var(--cream);
+            color: #D00000;
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-weight: 800;
+            margin: 0 4px;
+        }
+
+        /* Large Emblem Hero */
+        .hero { text-align: center; padding: 4rem 1.5rem 2.5rem; position: relative; }
+        .emblem-badge {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: radial-gradient(circle, #1E543C 0%, #0D281E 80%);
+            border: 8px solid var(--cream);
+            border-radius: 50%;
+            width: 400px;
+            height: 400px;
+            max-width: 90vw;
+            max-height: 90vw;
+            position: relative;
+            box-shadow: 0 0 50px rgba(232, 93, 4, 0.45), inset 0 0 25px rgba(0,0,0,0.8);
+            margin-bottom: 2.5rem;
+        }
+        .emblem-title {
+            font-size: 2.9rem;
+            font-weight: 800;
+            color: var(--flame-yellow);
+            text-shadow: 3px 3px 0px var(--flame-red), 5px 5px 0px #000;
+            margin-top: 5px;
+            letter-spacing: 2px;
+            line-height: 1.1;
+        }
+        .emblem-text { font-size: 1.6rem; font-weight: 700; color: var(--cream); margin-top: 2px; }
+        .emblem-flame-icon {
+            font-size: 5.5rem;
+            filter: drop-shadow(0 0 15px rgba(250, 163, 7, 0.8));
+            animation: pulseFire 1.6s infinite alternate ease-in-out;
+        }
+        @keyframes pulseFire {
+            0% { transform: scale(1) translateY(0); }
+            100% { transform: scale(1.08) translateY(-4px) rotate(2deg); }
+        }
+        .emblem-ribbon {
+            position: absolute;
+            bottom: -28px;
+            background: var(--cream);
+            color: var(--text-dark);
+            border: 4px solid #825828;
+            padding: 8px 38px;
+            border-radius: 50px;
+            font-weight: 800;
+            font-size: 1.4rem;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.6);
+            white-space: nowrap;
+        }
+
+        /* Filtering & Controls */
+        .controls-wrapper {
+            max-width: 1200px;
+            margin: 2rem auto 1.5rem;
+            padding: 0 1.5rem;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1.2rem;
+        }
+        .search-container { flex: 1; min-width: 280px; max-width: 450px; }
+        .search-container input {
+            width: 100%;
+            padding: 12px 22px;
+            background: #0D2218;
+            border: 2px solid var(--cream);
+            border-radius: 30px;
+            color: var(--cream);
+            font-size: 1rem;
+            outline: none;
+            transition: 0.3s;
+        }
+        .search-container input:focus {
+            border-color: var(--flame-yellow);
+            box-shadow: 0 0 15px rgba(250, 163, 7, 0.4);
+        }
+
+        .filter-group { display: flex; gap: 8px; flex-wrap: wrap; }
+        .btn-filter {
+            background: #0A1C14;
+            color: var(--cream);
+            border: 2px solid #1E543C;
+            padding: 8px 20px;
+            border-radius: 25px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .btn-filter.active, .btn-filter:hover {
+            background: var(--flame-orange);
+            color: white;
+            border-color: var(--flame-yellow);
+        }
+
+        /* Products Grid with Real Images */
+        .container { max-width: 1200px; margin: 0 auto; padding: 1rem 1.5rem 4rem; }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+            gap: 2rem;
+        }
+        .card {
+            background: var(--bg-card);
+            border: 3.5px solid var(--cream);
+            border-radius: 20px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            box-shadow: var(--shadow-badge);
+            transition: transform 0.25s ease, border-color 0.25s ease;
+        }
+        .card:hover {
+            transform: translateY(-6px);
+            border-color: var(--flame-yellow);
+            box-shadow: 0 15px 30px rgba(232, 93, 4, 0.3);
+        }
+        .card-img-wrapper {
+            position: relative;
+            width: 100%;
+            height: 190px;
+            overflow: hidden;
+            background: #07150E;
+            border-bottom: 3.5px solid var(--cream);
+        }
+        .card-img-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.4s ease;
+        }
+        .card:hover .card-img-wrapper img { transform: scale(1.08); }
+        .card-ribbon-tag {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: linear-gradient(90deg, var(--flame-red), var(--flame-orange));
+            color: white;
+            border: 2px solid var(--cream);
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+        .stock-badge {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            background: rgba(13, 34, 24, 0.85);
+            border: 1px solid var(--cream);
+            color: var(--cream);
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        .card-body { padding: 1.2rem; flex: 1; display: flex; flex-direction: column; }
+        .card-category-rating {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.82rem;
+            margin-bottom: 4px;
+        }
+        .card-category { color: var(--flame-yellow); font-weight: 600; }
+        .card-rating { color: #FBBF24; font-weight: 600; }
+        .card-title { font-size: 1.3rem; font-weight: 700; color: var(--cream); margin-bottom: 6px; }
+        .card-desc { color: #C0D8CC; font-size: 0.9rem; flex: 1; margin-bottom: 1rem; }
+        .card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 2px dashed #1E543C;
+            padding-top: 12px;
+        }
+        .card-price { font-size: 1.5rem; font-weight: 800; color: var(--flame-yellow); }
+        
+        .card-btns { display: flex; gap: 6px; align-items: center; }
+        .btn-order {
+            background: var(--flame-orange);
+            color: white;
+            border: 2px solid var(--cream);
+            padding: 7px 14px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 0.88rem;
+            transition: 0.2s;
+        }
+        .btn-order:hover { background: var(--flame-yellow); color: #000; }
+        .btn-act {
+            border: 2px solid var(--cream);
+            background: #091D13;
+            color: var(--cream);
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.2s;
+        }
+        .btn-act.edit:hover { background: var(--flame-yellow); color: #000; }
+        .btn-act.delete:hover { background: var(--danger); border-color: var(--danger); color: white; }
+
+        /* Storage Footer Bar */
+        .storage-bar {
+            background: #0D2218;
+            border: 3px solid var(--cream);
+            border-radius: 20px;
+            padding: 1.2rem 1.8rem;
+            margin-top: 3.5rem;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+        }
+        .storage-status { font-size: 0.95rem; font-weight: 500; }
+        .storage-status strong { color: var(--flame-yellow); font-weight: 700; }
+        .storage-btns { display: flex; gap: 8px; flex-wrap: wrap; }
+        .btn-db {
+            background: #163E2C;
+            border: 2px solid #286C4E;
+            color: var(--cream);
+            padding: 7px 14px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.85rem;
+            transition: 0.2s;
+        }
+        .btn-db:hover { background: var(--green-border); border-color: var(--cream); }
+        .btn-db.reset { border-color: rgba(239, 68, 68, 0.4); color: #FCA5A5; }
+        .btn-db.reset:hover { background: var(--danger); color: white; }
+
+        /* Modals Common Style */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(6px);
+            z-index: 200;
+            justify-content: center;
+            align-items: center;
+            padding: 1rem;
+        }
+        .modal.active { display: flex; }
+        .modal-box {
+            background: #0F291E;
+            border: 4px solid var(--cream);
+            border-radius: 20px;
+            width: 100%;
+            max-width: 540px;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 1.8rem;
+            box-shadow: 0 0 40px rgba(232, 93, 4, 0.4);
+            animation: modalIn 0.2s ease-out;
+        }
+        @keyframes modalIn {
+            from { transform: scale(0.95); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        .modal-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.2rem;
+            border-bottom: 2px dashed #1E543C;
+            padding-bottom: 10px;
+        }
+        .modal-head h3 { font-size: 1.4rem; font-weight: 700; color: var(--flame-yellow); }
+        .btn-close { background: none; border: none; color: var(--cream); font-size: 1.8rem; cursor: pointer; }
+
+        /* Forms */
+        .form-row { margin-bottom: 1rem; }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+        label { display: block; font-size: 0.85rem; font-weight: 600; color: var(--cream); margin-bottom: 5px; }
+        input, select, textarea {
+            width: 100%;
+            padding: 10px 14px;
+            background: #091D13;
+            border: 2px solid #23583F;
+            border-radius: 10px;
+            color: white;
+            font-size: 0.95rem;
+            outline: none;
+        }
+        input:focus, select:focus, textarea:focus {
+            border-color: var(--flame-yellow);
+            box-shadow: 0 0 10px rgba(250, 163, 7, 0.3);
+        }
+        .modal-foot { display: flex; justify-content: flex-end; gap: 10px; margin-top: 1.5rem; }
+        .btn-cancel {
+            background: #23382F;
+            color: var(--cream);
+            border: none;
+            padding: 10px 18px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        .btn-save {
+            background: linear-gradient(180deg, var(--flame-yellow), var(--flame-orange));
+            color: #240C00;
+            border: 2px solid var(--cream);
+            padding: 10px 22px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 700;
+        }
+
+        /* E-commerce Cart Items */
+        .cart-items-list { max-height: 220px; overflow-y: auto; margin-bottom: 1rem; }
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #091D13;
+            padding: 10px 14px;
+            border-radius: 12px;
+            border: 1px solid #1E543C;
+            margin-bottom: 8px;
+        }
+        .cart-item-name { font-weight: 600; font-size: 0.95rem; }
+        .cart-item-price { color: var(--flame-yellow); font-size: 0.88rem; }
+        .qty-controls { display: flex; align-items: center; gap: 8px; }
+        .qty-btn {
+            background: #163E2C;
+            color: white;
+            border: 1px solid var(--cream);
+            width: 26px;
+            height: 26px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 700;
+        }
+
+        /* Coupon and Shipping Selector */
+        .ecom-box {
+            background: #091D13;
+            border: 1px solid #1E543C;
+            border-radius: 12px;
+            padding: 12px;
+            margin-bottom: 1rem;
+        }
+        .coupon-input-group { display: flex; gap: 8px; }
+        .coupon-input-group input { text-transform: uppercase; font-weight: 700; }
+        .btn-apply-coupon {
+            background: var(--flame-orange);
+            color: white;
+            border: none;
+            padding: 0 16px;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+        .cart-bill-breakdown {
+            font-size: 0.95rem;
+            color: #C0D8CC;
+            border-top: 1px dashed #1E543C;
+            padding-top: 10px;
+            margin-top: 10px;
+        }
+        .bill-row { display: flex; justify-content: space-between; margin-bottom: 4px; }
+        .bill-total {
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: var(--flame-yellow);
+            border-top: 2px solid #1E543C;
+            padding-top: 8px;
+            margin-top: 8px;
+        }
+
+        /* Payment QR Screen */
+        .qr-section {
+            background: white;
+            border-radius: 16px;
+            padding: 1.2rem;
+            text-align: center;
+            color: #0D2218;
+            margin-bottom: 1.2rem;
+            border: 4px solid var(--cream);
+        }
+        .pp-logo { font-size: 1.2rem; font-weight: 800; color: #00427A; }
+        .mock-qr { width: 170px; height: 170px; margin: 8px auto; background: #FFF; border: 2px solid #000; padding: 6px; }
+
+        /* Order Tracking Card */
+        .order-card {
+            background: #091D13;
+            border: 1.5px solid #1E543C;
+            border-radius: 12px;
+            padding: 14px;
+            margin-bottom: 12px;
+        }
+        .order-badge {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 20px;
+            font-size: 0.78rem;
+            font-weight: 700;
+        }
+        .status-cooking { background: #E85D04; color: white; }
+        .status-delivering { background: #3B82F6; color: white; }
+        .status-done { background: #10B981; color: white; }
+    </style>
+</head>
+<body>
+
+    <!-- Promo Alert -->
+    <div class="promo-banner">
+        🔥 สั่งซื้อวันนี้ ใส่โค้ด <span class="promo-code-tag">MAX10</span> ลดทันที 10% เมื่อซื้อครบ 150 บาทขึ้นไป!
+    </div>
+
+    <!-- Main Navigation -->
+    <header>
+        <a href="#" class="brand-logo">
+            <div>
+                <div class="brand-title">MAXMUXSIX</div>
+                <div class="brand-subtitle">หลามหร่อยเร้าใจ</div>
+            </div>
+        </a>
+        <div class="header-actions">
+            <button class="btn-nav-action" onclick="openOrderHistoryModal()">
+                📦 คำสั่งซื้อของฉัน
+            </button>
+            <button class="btn-nav-action" onclick="openCartModal()">
+                🛒 ตะกร้า
+                <span class="cart-badge" id="cartCount">0</span>
+            </button>
+            <button class="btn-add-main" onclick="openCrudModal()">+ เพิ่มเมนู</button>
+        </div>
+    </header>
+
+    <!-- Large Emblem Hero -->
+    <section class="hero">
+        <div class="emblem-badge">
+            <div class="emblem-title">MAXMUXSIX</div>
+            <div class="emblem-text">ข้าวหลาม</div>
+            <div class="emblem-flame-icon">🔥🎋</div>
+            <div class="emblem-ribbon">หลามหร่อยเร้าใจ</div>
+        </div>
+        <p style="color: #C0D8CC; max-width: 620px; margin: 1.2rem auto 0; font-size: 1.15rem; font-weight: 400;">
+            ต้นตำรับข้าวหลามเผาเตาถ่านไฟแรง ข้าวเหนียวเขี้ยวงูนุ่มหนึบ กะทิคั้นสดแท้ สั่งง่าย จัดส่งด่วนถึงหน้าบ้าน
+        </p>
+    </section>
+
+    <!-- Search & Filter Controls -->
+    <div class="controls-wrapper">
+        <div class="search-container">
+            <input type="text" id="filterKeyword" placeholder="🔍 ค้นหาเมนู เช่น ถั่วดำ, ช็อตมะพร้าว, สังขยา..." oninput="applyFilters()">
+        </div>
+        <div class="filter-group">
+            <button class="btn-filter active" onclick="selectCategory('all', this)">ทั้งหมด</button>
+            <button class="btn-filter" onclick="selectCategory('สูตรเตาถ่านแท้', this)">สูตรเตาถ่านแท้</button>
+            <button class="btn-filter" onclick="selectCategory('เมนูช็อตไฟลุก', this)">เมนูช็อตไฟลุก</button>
+            <button class="btn-filter" onclick="selectCategory('รสพรีเมียม', this)">รสพรีเมียม</button>
+        </div>
+    </div>
+
+    <!-- Products Showcase -->
+    <main class="container">
+        <div class="grid" id="productDisplayGrid"></div>
+
+        <!-- Database Storage Bar -->
+        <div class="storage-bar">
+            <div class="storage-status">
+                📦 สต็อกเมนู: <strong id="productCounter">0 รายการ</strong>
+                <span style="font-size: 0.85rem; color: #8BA89B; margin-left: 8px;">(ระบบ LocalStorage)</span>
+            </div>
+            <div class="storage-btns">
+                <button class="btn-db" onclick="backupToJson()">📥 สำรองข้อมูล (JSON)</button>
+                <button class="btn-db" onclick="document.getElementById('uploadJsonInput').click()">📤 นำเข้าข้อมูล</button>
+                <input type="file" id="uploadJsonInput" style="display: none;" accept=".json" onchange="restoreFromJson(event)">
+                <button class="btn-db reset" onclick="resetToDefault()">🔄 คืนค่าเริ่มต้น</button>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal 1: CRUD Form -->
+    <div class="modal" id="crudModal">
+        <div class="modal-box">
+            <div class="modal-head">
+                <h3 id="modalHeading">เพิ่มเมนู MAXMUXSIX</h3>
+                <button class="btn-close" onclick="closeCrudModal()">&times;</button>
+            </div>
+            <form id="productForm" onsubmit="saveProduct(event)">
+                <input type="hidden" id="editItemId">
+                
+                <div class="form-row">
+                    <label>ชื่อเมนูข้าวหลาม *</label>
+                    <input type="text" id="itemName" placeholder="เช่น ข้าวหลามถั่วดำกะทิสด" required>
+                </div>
+
+                <div class="form-grid form-row">
+                    <div>
+                        <label>หมวดหมู่ *</label>
+                        <select id="itemCategory" required>
+                            <option value="สูตรเตาถ่านแท้">สูตรเตาถ่านแท้</option>
+                            <option value="เมนูช็อตไฟลุก">เมนูช็อตไฟลุก</option>
+                            <option value="รสพรีเมียม">รสพรีเมียม</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label>ราคา (บาท) *</label>
+                        <input type="number" id="itemPrice" min="1" placeholder="45" required>
+                    </div>
+                </div>
+
+                <div class="form-grid form-row">
+                    <div>
+                        <label>จำนวนในสต็อก (กระบอก) *</label>
+                        <input type="number" id="itemStock" min="0" placeholder="50" value="30" required>
+                    </div>
+                    <div>
+                        <label>ป้ายแท็กไฮไลท์</label>
+                        <input type="text" id="itemTag" placeholder="เช่น ขายดี, ซิกเนเจอร์">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <label>ลิงก์รูปภาพจริง (Image URL) หรือเลือกไฟล์ด้านล่าง</label>
+                    <input type="url" id="itemImageUrl" placeholder="https://images.unsplash.com/...">
+                </div>
+
+                <div class="form-row">
+                    <label>หรืออัปโหลดรูปภาพสินค้าจากเครื่อง</label>
+                    <input type="file" id="itemImageFile" accept="image/*" onchange="previewImageUpload(event)">
+                </div>
+
+                <div class="form-row">
+                    <label>คำบรรยายความอร่อย *</label>
+                    <textarea id="itemDesc" rows="3" placeholder="อธิบายรสชาติ เช่น หัวกะทิเยิ้ม เผาถ่านโบราณหอมทะลุกระบอก" required></textarea>
+                </div>
+
+                <div class="modal-foot">
+                    <button type="button" class="btn-cancel" onclick="closeCrudModal()">ยกเลิก</button>
+                    <button type="submit" class="btn-save" id="btnSubmitForm">บันทึกข้อมูล</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal 2: Shopping Cart & Checkout -->
+    <div class="modal" id="cartModal">
+        <div class="modal-box">
+            <div class="modal-head">
+                <h3>🛒 ตะกร้าสินค้าของคุณ</h3>
+                <button class="btn-close" onclick="closeCartModal()">&times;</button>
+            </div>
+            
+            <div id="cartItemsContainer" class="cart-items-list"></div>
+
+            <!-- E-Commerce Options -->
+            <div class="ecom-box">
+                <label>🏷️ โค้ดส่วนลด (Promo Code)</label>
+                <div class="coupon-input-group">
+                    <input type="text" id="couponCodeInput" placeholder="พิมพ์ MAX10 เพื่อลด 10%">
+                    <button type="button" class="btn-apply-coupon" onclick="applyCoupon()">ใช้โค้ด</button>
+                </div>
+                <small id="couponMessage" style="display:block; margin-top: 4px; font-weight: 600;"></small>
+            </div>
+
+            <div class="ecom-box">
+                <label>🛵 ช่องทางการจัดส่ง</label>
+                <select id="shippingMethodSelect" onchange="calculateTotalOrder()">
+                    <option value="50">จัดส่งด่วน Grab / Lineman (กทม. & ปริมณฑล) (+50 บาท)</option>
+                    <option value="85">จัดส่งควบคุมอุณหภูมิ Inter Express ทั่วประเทศ (+85 บาท)</option>
+                    <option value="0">รับหน้าร้านด้วยตนเอง (ฟรี 0 บาท)</option>
+                </select>
+            </div>
+
+            <div class="cart-bill-breakdown">
+                <div class="bill-row">
+                    <span>ราคารวมสินค้า:</span>
+                    <span id="billSubtotal">0 บาท</span>
+                </div>
+                <div class="bill-row" id="discountRow" style="display: none; color: #10B981;">
+                    <span>ส่วนลดโปรโมชัน:</span>
+                    <span id="billDiscount">-0 บาท</span>
+                </div>
+                <div class="bill-row">
+                    <span>ค่าจัดส่ง:</span>
+                    <span id="billShipping">0 บาท</span>
+                </div>
+                <div class="bill-row bill-total">
+                    <span>ยอดสุทธิที่ต้องชำระ:</span>
+                    <span id="billGrandTotal">0 บาท</span>
+                </div>
+            </div>
+
+            <div class="modal-foot">
+                <button class="btn-cancel" onclick="closeCartModal()">เลือกสินค้าต่อ</button>
+                <button class="btn-save" id="btnProceedCheckout" onclick="proceedToPayment()">ไปชำระเงิน →</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal 3: Payment Screen -->
+    <div class="modal" id="paymentModal">
+        <div class="modal-box">
+            <div class="modal-head">
+                <h3>💳 ชำระเงินผ่าน PromptPay QR</h3>
+                <button class="btn-close" onclick="closePaymentModal()">&times;</button>
+            </div>
+
+            <div class="qr-section">
+                <div class="pp-logo">พร้อมเพย์ (PromptPay)</div>
+                <p style="font-size: 0.85rem; color: #555;">สแกนจ่ายผ่าน Mobile Banking ได้ทุกธนาคาร</p>
+                <div class="mock-qr">
+                    <svg viewBox="0 0 100 100" width="100%" height="100%">
+                        <rect width="100" height="100" fill="#ffffff"/>
+                        <rect x="10" y="10" width="25" height="25" fill="#000"/>
+                        <rect x="15" y="15" width="15" height="15" fill="#fff"/>
+                        <rect x="18" y="18" width="9" height="9" fill="#000"/>
+                        <rect x="65" y="10" width="25" height="25" fill="#000"/>
+                        <rect x="70" y="15" width="15" height="15" fill="#fff"/>
+                        <rect x="73" y="18" width="9" height="9" fill="#000"/>
+                        <rect x="10" y="65" width="25" height="25" fill="#000"/>
+                        <rect x="15" y="70" width="15" height="15" fill="#fff"/>
+                        <rect x="18" y="73" width="9" height="9" fill="#000"/>
+                        <rect x="42" y="15" width="16" height="6" fill="#000"/>
+                        <rect x="42" y="27" width="16" height="6" fill="#000"/>
+                        <rect x="15" y="42" width="25" height="6" fill="#000"/>
+                        <rect x="45" y="42" width="10" height="16" fill="#D00000"/>
+                        <rect x="62" y="42" width="28" height="6" fill="#000"/>
+                        <rect x="42" y="65" width="16" height="20" fill="#000"/>
+                        <rect x="65" y="65" width="10" height="10" fill="#000"/>
+                        <rect x="80" y="80" width="10" height="10" fill="#000"/>
+                    </svg>
+                </div>
+                <div style="font-size: 1.3rem; font-weight: 800; color: #D00000;">
+                    ยอดชำระ: <span id="payAmountDisplay">0</span> บาท
+                </div>
+                <small style="color: #666;">ชื่อบัญชี: MAXMUXSIX ข้าวหลามเตาถ่าน</small>
+            </div>
+
+            <form id="checkoutForm" onsubmit="confirmOrder(event)">
+                <div class="form-row">
+                    <label>ชื่อ-นามสกุล ผู้รับสินค้า *</label>
+                    <input type="text" id="custName" placeholder="เช่น สมชาย ใจเร้าใจ" required>
+                </div>
+                <div class="form-row">
+                    <label>เบอร์โทรศัพท์ติดต่อ *</label>
+                    <input type="tel" id="custPhone" placeholder="08X-XXX-XXXX" required>
+                </div>
+                <div class="form-row">
+                    <label>ที่อยู่สำหรับจัดส่งอย่างละเอียด *</label>
+                    <textarea id="custAddress" rows="2" placeholder="บ้านเลขที่, แขวง/ตำบล, เขต/อำเภอ, จังหวัด, รหัสไปรษณีย์" required></textarea>
+                </div>
+                <div class="form-row">
+                    <label>แนบสลิปการโอนเงิน</label>
+                    <input type="file" id="custSlip" accept="image/*" style="padding: 6px;">
+                </div>
+                <div class="modal-foot">
+                    <button type="button" class="btn-cancel" onclick="backToCart()">← กลับตะกร้า</button>
+                    <button type="submit" class="btn-save">✅ แจ้งชำระเงินและสั่งซื้อ</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal 4: Order History & Tracking -->
+    <div class="modal" id="orderHistoryModal">
+        <div class="modal-box">
+            <div class="modal-head">
+                <h3>📦 ประวัติคำสั่งซื้อ & ติดตามสถานะ</h3>
+                <button class="btn-close" onclick="closeOrderHistoryModal()">&times;</button>
+            </div>
+            <div id="orderHistoryContainer"></div>
+            <div class="modal-foot">
+                <button type="button" class="btn-cancel" onclick="closeOrderHistoryModal()">ปิด</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript Logic -->
+    <script>
+        // ข้อมูลสินค้าเริ่มต้น พร้อมรูปภาพจริงคุณภาพสูง
+        const defaultMaxmuxsixData = [
+            {
+                id: "max_1",
+                name: "ข้าวหลามถั่วดำระเบิดเตา (ต้นตำรับ)",
+                category: "สูตรเตาถ่านแท้",
+                price: 45,
+                stock: 25,
+                rating: "4.9 ★★★★★",
+                image: "https://images.unsplash.com/photo-1596797038530-2c107229654b?auto=format&fit=crop&w=700&q=80",
+                tag: "ขายดีอันดับ 1",
+                desc: "ข้าวเหนียวเขี้ยวงูหอมนุ่ม คลุกเคล้าถั่วดำเม็ดโตและหัวกะทิสด เผาถ่านไฟแรงจนส่งกลิ่นหอมกรุ่นถึงเนื้อใน"
+            },
+            {
+                id: "max_2",
+                name: "ข้าวหลามช็อตมะพร้าวน้ำหอม",
+                category: "เมนูช็อตไฟลุก",
+                price: 40,
+                stock: 18,
+                rating: "4.8 ★★★★★",
+                image: "https://images.unsplash.com/photo-1541696432-82c6da8ce7bf?auto=format&fit=crop&w=700&q=80",
+                tag: "ช็อตเยิ้มสะใจ",
+                desc: "กระบอกสั้นเปิดง่าย ทานสะดวก อัดแน่นด้วยเนื้อมะพร้าวอ่อนเคี่ยวน้ำตาลโตนดแท้ หวานมันนัวลิ้น"
+            },
+            {
+                id: "max_3",
+                name: "ข้าวหลามเผือกหอมกวนกะทิเยิ้ม",
+                category: "สูตรเตาถ่านแท้",
+                price: 50,
+                stock: 12,
+                rating: "4.9 ★★★★★",
+                image: "https://images.unsplash.com/photo-1563245372-f21724e3856d?auto=format&fit=crop&w=700&q=80",
+                tag: "หอมละมุน",
+                desc: "เนื้อเผือกหอมกวนจนเนียนละเอียด สลับชั้นกับข้าวเหนียวดำหน้ากะทิ รสสัมผัสกลมกล่อม"
+            },
+            {
+                id: "max_4",
+                name: "ข้าวหลามสังขยาลาวาไข่เป็ด",
+                category: "รสพรีเมียม",
+                price: 55,
+                stock: 8,
+                rating: "5.0 ★★★★★",
+                image: "https://images.unsplash.com/photo-1625398407796-82650a8c135f?auto=format&fit=crop&w=700&q=80",
+                tag: "ไส้ลาวา",
+                desc: "สังขยาไข่เป็ดสูตรเข้มข้น ไหลเยิ้มทะลักเมื่อแกะกระบอก ข้าวเหนียวนุ่มฉ่ำกะทิสด"
+            }
+        ];
+
+        // State variables
+        let currentProducts = JSON.parse(localStorage.getItem('maxmuxsix_data')) || defaultMaxmuxsixData;
+        let cart = JSON.parse(localStorage.getItem('maxmuxsix_cart')) || [];
+        let orders = JSON.parse(localStorage.getItem('maxmuxsix_orders')) || [];
+        let activeCategory = 'all';
+        let appliedDiscountRate = 0;
+        let uploadedImageBase64 = "";
+
+        function syncStorage() {
+            localStorage.setItem('maxmuxsix_data', JSON.stringify(currentProducts));
+            localStorage.setItem('maxmuxsix_cart', JSON.stringify(cart));
+            localStorage.setItem('maxmuxsix_orders', JSON.stringify(orders));
+            document.getElementById('productCounter').textContent = `${currentProducts.length} รายการ`;
+            updateCartCounter();
+        }
+
+        function updateCartCounter() {
+            const count = cart.reduce((total, item) => total + item.qty, 0);
+            document.getElementById('cartCount').textContent = count;
+        }
+
+        // Render Cards with Real Images
+        function renderItems(data = currentProducts) {
+            const container = document.getElementById('productDisplayGrid');
+            container.innerHTML = '';
+
+            if (data.length === 0) {
+                container.innerHTML = `
+                    <div style="grid-column: 1/-1; text-align: center; padding: 4rem 1rem;">
+                        <div style="font-size: 3.5rem;">🔥</div>
+                        <h3 style="color: var(--flame-yellow); margin-top: 10px;">ไม่พบรายการข้าวหลามที่ค้นหา!</h3>
+                        <p style="color: #8BA89B;">ลองค้นหาด้วยคำอื่น หรือกดปุ่มเพิ่มเมนูใหม่ได้ทันที</p>
+                    </div>
+                `;
+                return;
+            }
+
+            data.forEach(p => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.innerHTML = `
+                    <div class="card-img-wrapper">
+                        <img src="${p.image || defaultMaxmuxsixData[0].image}" alt="${p.name}" onerror="this.src='${defaultMaxmuxsixData[0].image}'">
+                        ${p.tag ? `<div class="card-ribbon-tag">${p.tag}</div>` : ''}
+                        <div class="stock-badge">คงเหลือ ${p.stock} กระบอก</div>
+                    </div>
+                    <div class="card-body">
+                        <div class="card-category-rating">
+                            <span class="card-category">${p.category}</span>
+                            <span class="card-rating">${p.rating || '4.9 ★★★★★'}</span>
+                        </div>
+                        <h2 class="card-title">${p.name}</h2>
+                        <p class="card-desc">${p.desc}</p>
+                        <div class="card-footer">
+                            <div class="card-price">${p.price} <span style="font-size:0.85rem; color:var(--cream);">บาท</span></div>
+                            <div class="card-btns">
+                                <button class="btn-order" onclick="addToCart('${p.id}')">🛒 สั่งซื้อ</button>
+                                <button class="btn-act edit" title="แก้ไข" onclick="editProduct('${p.id}')">✏️</button>
+                                <button class="btn-act delete" title="ลบ" onclick="deleteProduct('${p.id}')">🗑️</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+
+            syncStorage();
+        }
+
+        // Cart & E-commerce Operations
+        function addToCart(productId) {
+            const product = currentProducts.find(p => p.id === productId);
+            if (!product) return;
+
+            if (product.stock <= 0) {
+                alert('ขออภัย เมนูนี้หมดชั่วคราว กำลังเผาเพิ่มครับ!');
+                return;
+            }
+
+            const existingIndex = cart.findIndex(c => c.id === productId);
+            if (existingIndex > -1) {
+                if (cart[existingIndex].qty < product.stock) {
+                    cart[existingIndex].qty += 1;
+                } else {
+                    alert(`สินค้ามีสต็อกจำกัด ${product.stock} กระบอก`);
+                    return;
+                }
+            } else {
+                cart.push({
+                    id: product.id,
+                    name: product.name,
+                    price: product.price,
+                    image: product.image,
+                    qty: 1
+                });
+            }
+
+            syncStorage();
+            
+            const cartBtn = document.querySelector('.btn-nav-action:nth-child(2)');
+            if (cartBtn) {
+                cartBtn.style.transform = 'scale(1.15)';
+                setTimeout(() => { cartBtn.style.transform = ''; }, 200);
+            }
+        }
+
+        function openCartModal() {
+            renderCartItems();
+            calculateTotalOrder();
+            document.getElementById('cartModal').classList.add('active');
+        }
+
+        function closeCartModal() {
+            document.getElementById('cartModal').classList.remove('active');
+        }
+
+        function renderCartItems() {
+            const listContainer = document.getElementById('cartItemsContainer');
+            listContainer.innerHTML = '';
+
+            if (cart.length === 0) {
+                listContainer.innerHTML = '<p style="text-align: center; color: #8BA89B; padding: 2rem 0;">ยังไม่มีสินค้าในตะกร้า</p>';
+                document.getElementById('btnProceedCheckout').style.display = 'none';
+                return;
+            }
+
+            document.getElementById('btnProceedCheckout').style.display = 'block';
+
+            cart.forEach(item => {
+                const subtotal = item.price * item.qty;
+                const itemRow = document.createElement('div');
+                itemRow.className = 'cart-item';
+                itemRow.innerHTML = `
+                    <div>
+                        <div class="cart-item-name">${item.name}</div>
+                        <div class="cart-item-price">${item.price} บาท × ${item.qty} = <strong>${subtotal}</strong> บาท</div>
+                    </div>
+                    <div class="qty-controls">
+                        <button class="qty-btn" onclick="changeQty('${item.id}', -1)">-</button>
+                        <span>${item.qty}</span>
+                        <button class="qty-btn" onclick="changeQty('${item.id}', 1)">+</button>
+                    </div>
+                `;
+                listContainer.appendChild(itemRow);
+            });
+        }
+
+        function changeQty(productId, change) {
+            const idx = cart.findIndex(c => c.id === productId);
+            if (idx > -1) {
+                cart[idx].qty += change;
+                if (cart[idx].qty <= 0) {
+                    cart.splice(idx, 1);
+                }
+                syncStorage();
+                renderCartItems();
+                calculateTotalOrder();
+            }
+        }
+
+        function applyCoupon() {
+            const code = document.getElementById('couponCodeInput').value.trim().toUpperCase();
+            const msg = document.getElementById('couponMessage');
+            const subtotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+
+            if (code === 'MAX10') {
+                if (subtotal >= 150) {
+                    appliedDiscountRate = 0.10;
+                    msg.style.color = '#10B981';
+                    msg.textContent = '✅ ใช้โค้ดสำเร็จ! ได้รับส่วนลด 10%';
+                } else {
+                    appliedDiscountRate = 0;
+                    msg.style.color = '#EF4444';
+                    msg.textContent = '⚠️ ซื้อขั้นต่ำ 150 บาทเพื่อใช้โค้ดนี้';
+                }
+            } else {
+                appliedDiscountRate = 0;
+                msg.style.color = '#EF4444';
+                msg.textContent = '❌ โค้ดส่วนลดไม่ถูกต้อง';
+            }
+            calculateTotalOrder();
+        }
+
+        function calculateTotalOrder() {
+            const subtotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+            const shippingCost = Number(document.getElementById('shippingMethodSelect').value) || 0;
+            const discountAmount = Math.round(subtotal * appliedDiscountRate);
+            const grandTotal = Math.max(0, subtotal - discountAmount + shippingCost);
+
+            document.getElementById('billSubtotal').textContent = `${subtotal} บาท`;
+            document.getElementById('billShipping').textContent = `${shippingCost} บาท`;
+            
+            const discountRow = document.getElementById('discountRow');
+            if (discountAmount > 0) {
+                discountRow.style.display = 'flex';
+                document.getElementById('billDiscount').textContent = `-${discountAmount} บาท`;
+            } else {
+                discountRow.style.display = 'none';
+            }
+
+            document.getElementById('billGrandTotal').textContent = `${grandTotal} บาท`;
+            return { subtotal, discountAmount, shippingCost, grandTotal };
+        }
+
+        function proceedToPayment() {
+            if (cart.length === 0) return;
+            const bill = calculateTotalOrder();
+            document.getElementById('payAmountDisplay').textContent = bill.grandTotal;
+            closeCartModal();
+            document.getElementById('paymentModal').classList.add('active');
+        }
+
+        function closePaymentModal() {
+            document.getElementById('paymentModal').classList.remove('active');
+        }
+
+        function backToCart() {
+            closePaymentModal();
+            openCartModal();
+        }
+
+        function confirmOrder(e) {
+            e.preventDefault();
+            const name = document.getElementById('custName').value.trim();
+            const phone = document.getElementById('custPhone').value.trim();
+            const address = document.getElementById('custAddress').value.trim();
+            const bill = calculateTotalOrder();
+
+            const orderId = 'MAX-' + Math.floor(100000 + Math.random() * 900000);
+            const newOrder = {
+                id: orderId,
+                date: new Date().toLocaleString('th-TH'),
+                items: [...cart],
+                name,
+                phone,
+                address,
+                total: bill.grandTotal,
+                status: 'กำลังเผาไฟแรง 🔥'
+            };
+
+            orders.unshift(newOrder);
+
+            // Deduct Stock
+            cart.forEach(cartItem => {
+                const prod = currentProducts.find(p => p.id === cartItem.id);
+                if (prod) {
+                    prod.stock = Math.max(0, prod.stock - cartItem.qty);
+                }
+            });
+
+            // Reset
+            cart = [];
+            appliedDiscountRate = 0;
+            document.getElementById('couponCodeInput').value = '';
+            document.getElementById('couponMessage').textContent = '';
+            syncStorage();
+            renderItems();
+
+            document.getElementById('checkoutForm').reset();
+            closePaymentModal();
+
+            alert(`🎉 สั่งซื้อสำเร็จเรียบร้อย!\n\nรหัสคำสั่งซื้อ: ${orderId}\nคุณ: ${name}\nยอดชำระ: ${bill.grandTotal} บาท\n\nสามารถตรวจสอบความคืบหน้าได้ที่ปุ่ม "คำสั่งซื้อของฉัน" ด้านบนครับ`);
+        }
+
+        // Order History Modal
+        function openOrderHistoryModal() {
+            const container = document.getElementById('orderHistoryContainer');
+            container.innerHTML = '';
+
+            if (orders.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: #8BA89B; padding: 2rem 0;">ยังไม่มีประวัติคำสั่งซื้อ</p>';
+            } else {
+                orders.forEach(ord => {
+                    const div = document.createElement('div');
+                    div.className = 'order-card';
+                    const itemsSummary = ord.items.map(i => `${i.name} (x${i.qty})`).join(', ');
+                    div.innerHTML = `
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+                            <strong>รหัส: ${ord.id}</strong>
+                            <span class="order-badge status-cooking">${ord.status}</span>
+                        </div>
+                        <div style="font-size: 0.85rem; color: #8BA89B; margin-bottom: 6px;">วันที่สั่ง: ${ord.date}</div>
+                        <div style="font-size: 0.9rem; margin-bottom: 6px;">รายการ: ${itemsSummary}</div>
+                        <div style="font-size: 0.95rem; font-weight: 700; color: var(--flame-yellow);">
+                            ยอดชำระรวม: ${ord.total} บาท
+                        </div>
+                    `;
+                    container.appendChild(div);
+                });
+            }
+
+            document.getElementById('orderHistoryModal').classList.add('active');
+        }
+
+        function closeOrderHistoryModal() {
+            document.getElementById('orderHistoryModal').classList.remove('active');
+        }
+
+        // Image file preview
+        function previewImageUpload(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                uploadedImageBase64 = evt.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // CRUD Modal Logic
+        function openCrudModal(isEdit = false) {
+            document.getElementById('crudModal').classList.add('active');
+            document.getElementById('modalHeading').textContent = isEdit ? 'แก้ไขเมนู MAXMUXSIX' : 'เพิ่มเมนูข้าวหลามใหม่';
+            document.getElementById('btnSubmitForm').textContent = isEdit ? 'บันทึกการแก้ไข' : 'เพิ่มเมนูเร้าใจ';
+            uploadedImageBase64 = "";
+        }
+
+        function closeCrudModal() {
+            document.getElementById('crudModal').classList.remove('active');
+            document.getElementById('productForm').reset();
+            document.getElementById('editItemId').value = '';
+            uploadedImageBase64 = "";
+        }
+
+        function saveProduct(e) {
+            e.preventDefault();
+            const id = document.getElementById('editItemId').value;
+            const name = document.getElementById('itemName').value.trim();
+            const category = document.getElementById('itemCategory').value;
+            const price = Number(document.getElementById('itemPrice').value);
+            const stock = Number(document.getElementById('itemStock').value) || 20;
+            const tag = document.getElementById('itemTag').value.trim();
+            const desc = document.getElementById('itemDesc').value.trim();
+            const imageUrl = document.getElementById('itemImageUrl').value.trim();
+
+            const finalImage = uploadedImageBase64 || imageUrl || defaultMaxmuxsixData[0].image;
+
+            if (id) {
+                const idx = currentProducts.findIndex(p => p.id === id);
+                if (idx !== -1) {
+                    currentProducts[idx] = {
+                        ...currentProducts[idx],
+                        name, category, price, stock, tag, desc,
+                        image: finalImage || currentProducts[idx].image
+                    };
+                }
+            } else {
+                const newItem = {
+                    id: 'max_' + Date.now(),
+                    name, category, price, stock, tag, desc,
+                    rating: '5.0 ★★★★★',
+                    image: finalImage
+                };
+                currentProducts.unshift(newItem);
+            }
+
+            syncStorage();
+            applyFilters();
+            closeCrudModal();
+        }
+
+        function editProduct(id) {
+            const item = currentProducts.find(p => p.id === id);
+            if (!item) return;
+
+            document.getElementById('editItemId').value = item.id;
+            document.getElementById('itemName').value = item.name;
+            document.getElementById('itemCategory').value = item.category;
+            document.getElementById('itemPrice').value = item.price;
+            document.getElementById('itemStock').value = item.stock || 20;
+            document.getElementById('itemTag').value = item.tag || '';
+            document.getElementById('itemImageUrl').value = item.image.startsWith('data:') ? '' : item.image;
+            document.getElementById('itemDesc').value = item.desc;
+
+            openCrudModal(true);
+        }
+
+        function deleteProduct(id) {
+            const item = currentProducts.find(p => p.id === id);
+            if (!item) return;
+
+            if (confirm(`ต้องการลบเมนู "${item.name}" ออกจากระบบใช่หรือไม่?`)) {
+                currentProducts = currentProducts.filter(p => p.id !== id);
+                cart = cart.filter(c => c.id !== id);
+                syncStorage();
+                applyFilters();
+            }
+        }
+
+        // Filtering
+        function applyFilters() {
+            const query = document.getElementById('filterKeyword').value.trim().toLowerCase();
+            let filtered = currentProducts;
+
+            if (activeCategory !== 'all') {
+                filtered = filtered.filter(p => p.category === activeCategory);
+            }
+
+            if (query) {
+                filtered = filtered.filter(p => 
+                    p.name.toLowerCase().includes(query) || 
+                    p.desc.toLowerCase().includes(query)
+                );
+            }
+
+            renderItems(filtered);
+        }
+
+        function selectCategory(cat, element) {
+            activeCategory = cat;
+            document.querySelectorAll('.btn-filter').forEach(btn => btn.classList.remove('active'));
+            element.classList.add('active');
+            applyFilters();
+        }
+
+        // Backup / Restore
+        function backupToJson() {
+            const jsonText = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(currentProducts, null, 2));
+            const dl = document.createElement('a');
+            dl.setAttribute("href", jsonText);
+            dl.setAttribute("download", `maxmuxsix_backup_${Date.now()}.json`);
+            document.body.appendChild(dl);
+            dl.click();
+            dl.remove();
+        }
+
+        function restoreFromJson(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                try {
+                    const parsed = JSON.parse(evt.target.result);
+                    if (Array.isArray(parsed)) {
+                        currentProducts = parsed;
+                        syncStorage();
+                        applyFilters();
+                        alert('นำเข้าข้อมูลสำเร็จ!');
+                    }
+                } catch (err) {
+                    alert('ไฟล์ JSON ไม่ถูกต้อง');
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function resetToDefault() {
+            if (confirm('คุณต้องการรีเซ็ตข้อมูลกลับเป็นค่าเริ่มต้นของ MAXMUXSIX หรือไม่?')) {
+                currentProducts = [...defaultMaxmuxsixData];
+                cart = [];
+                orders = [];
+                syncStorage();
+                applyFilters();
+            }
+        }
+
+        // Start
+        renderItems();
+    </script>
+</body>
+</html>
