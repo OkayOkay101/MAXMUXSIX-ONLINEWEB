@@ -1291,17 +1291,16 @@
                 </div>
             </div>
 
-            <!-- กล่องทางเลือกสำหรับส่งอีเมลจริง EmailJS / Real Mailer -->
-            <div id="realEmailConfigCard" style="display: none; background: #07150E; border: 1px dashed #38BDF8; border-radius: 10px; padding: 12px 16px; margin-bottom: 12px; font-size: 0.85rem;">
-                <div style="color: #38BDF8; font-weight: 700; margin-bottom: 6px;">🌐 ระบบส่งอีเมลจริง (Email Service Integration)</div>
-                <p style="color: #C0D8CC; margin-bottom: 8px;">
-                    ระบบได้จำลองการส่งอีเมลเสมือนจริงและบันทึกลงประวัติกล่องจดหมายเรียบร้อยแล้ว หากต้องการส่งทดสอบเข้า Inbox จริง สามารถกดปุ่มส่งทดสอบได้ทันที
-                </p>
-                <div style="display: flex; gap: 8px;">
-                    <input type="email" id="targetRealEmailInput" placeholder="กรอกอีเมลปลายทาง..." style="flex: 1; padding: 6px 12px; background: #0A1C14; border: 1px solid #1E543C; border-radius: 8px; color: var(--cream); font-size: 0.85rem;">
-                    <button class="btn-order" style="padding: 6px 14px; font-size: 0.85rem;" onclick="sendRealEmailAction()">🚀 ส่งทันที</button>
+            <!-- แถบแสดงสถานะและปุ่มส่งเข้าอีเมลจริง -->
+            <div id="realEmailQuickBar" style="background: #091D13; border: 1px solid #1E543C; border-radius: 10px; padding: 10px 14px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+                <div style="font-size: 0.85rem;">
+                    <span style="color: #8BA89B;">ระบบส่งอีเมลจริง:</span>
+                    <span id="quickKeyStatusBadge" style="font-weight: 700; margin-left: 6px; color: #FAA307;">กำลังตรวจสอบ...</span>
                 </div>
-                <div id="realEmailSendStatus" style="margin-top: 6px; font-size: 0.82rem;"></div>
+                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                    <button class="btn-nav-action" style="padding: 5px 12px; font-size: 0.82rem; border-color: #38BDF8; color: #38BDF8;" onclick="openRealEmailSettingsModal()">⚙️ ใส่ / แก้ไข Access Key</button>
+                    <button class="btn-order" id="btnQuickResend" style="padding: 5px 14px; font-size: 0.82rem;" onclick="resendCurrentEmailReal()">🚀 ส่งเข้าอีเมลนี้ทันที</button>
+                </div>
             </div>
 
             <!-- Email Live Preview Frame -->
@@ -1368,14 +1367,17 @@
             </div>
 
             <!-- Provider 1: Web3Forms Options -->
-            <div id="providerWeb3FormsPanel" style="background: #091D13; border: 1px solid #1E543C; border-radius: 10px; padding: 12px 14px; margin-bottom: 1rem;">
-                <label style="font-size: 0.85rem; color: #FAA307; font-weight: 600; display: block; margin-bottom: 4px;">
-                    Web3Forms Access Key:
-                </label>
-                <input type="text" id="settingWeb3FormsKey" placeholder="เช่น xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" style="width: 100%; padding: 8px 12px; background: #0A1C14; border: 1px solid #1E543C; border-radius: 6px; color: var(--cream); font-size: 0.85rem; margin-bottom: 6px;">
-                <div style="font-size: 0.8rem; color: #8BA89B; display: flex; justify-content: space-between; align-items: center;">
-                    <span>💡 ขอ Access Key ฟรีทันทีที่</span>
-                    <a href="https://web3forms.com" target="_blank" style="color: #38BDF8; font-weight: 700; text-decoration: underline;">web3forms.com (กรอกอีเมลรับ Key ใน 10 วิ)</a>
+            <div id="providerWeb3FormsPanel" style="background: #091D13; border: 1px solid #1E543C; border-radius: 10px; padding: 14px; margin-bottom: 1rem;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                    <label style="font-size: 0.88rem; color: #FAA307; font-weight: 700;">
+                        🔑 Web3Forms Access Key:
+                    </label>
+                    <span id="web3formsKeyBadge" style="font-size: 0.8rem; font-weight: 600;"></span>
+                </div>
+                <input type="text" id="settingWeb3FormsKey" placeholder="วาง Access Key ที่ได้จาก web3forms.com ที่นี่..." oninput="autoSaveWeb3FormsKey(this.value)" style="width: 100%; padding: 10px 12px; background: #0A1C14; border: 2px solid #1E543C; border-radius: 8px; color: var(--cream); font-size: 0.9rem; margin-bottom: 8px; font-family: monospace;">
+                <div style="font-size: 0.82rem; color: #C0D8CC; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+                    <span>💡 <strong>วิธีรับ Key ฟรี:</strong> เข้า <a href="https://web3forms.com" target="_blank" style="color: #38BDF8; font-weight: 700; text-decoration: underline;">web3forms.com</a> กรอกอีเมลของคุณ แล้วคัดลอก Access Key ในอีเมลมาวางที่นี่</span>
+                    <button type="button" class="btn-consent-accept" style="padding: 4px 14px; font-size: 0.8rem;" onclick="saveEmailSettings()">💾 บันทึก Key</button>
                 </div>
             </div>
 
@@ -3071,10 +3073,63 @@
                 statusMeta.innerHTML = `<span style="color:#FAA307;">⏳ กำลังเชื่อมต่อส่งอีเมลจริง...</span>`;
             }
 
+            // ดึงค่าล่าสุดจาก input เผื่อผู้ใช้เพิ่งวางแล้วกดส่งทันที
+            const keyInput = document.getElementById('settingWeb3FormsKey');
+            if (keyInput && keyInput.value.trim()) {
+                emailSettings.web3formsKey = keyInput.value.trim();
+                localStorage.setItem('maxmuxsix_email_settings', JSON.stringify(emailSettings));
+            }
+
             let result = { success: false, method: 'none', message: '' };
 
-            // 1. ตรวจสอบการส่งผ่าน Local Python Server
-            if (emailSettings.provider === 'local_server') {
+            // 1. ส่งผ่าน Web3Forms API (Default & Recommended)
+            if (emailSettings.provider === 'web3forms') {
+                const key = emailSettings.web3formsKey || (keyInput ? keyInput.value.trim() : '');
+                if (!key) {
+                    result = {
+                        success: false,
+                        method: 'Web3Forms API',
+                        message: 'ยังไม่ได้ใส่ Web3Forms Access Key (กรุณากด "⚙️ ใส่ / แก้ไข Access Key" เพื่อวาง Key)'
+                    };
+                } else {
+                    try {
+                        const formData = new FormData();
+                        formData.append('access_key', key);
+                        formData.append('from_name', 'MAXMUXSIX ข้าวหลามเตาถ่าน');
+                        formData.append('name', emailRecord.toName || 'ลูกค้า MAXMUXSIX');
+                        formData.append('email', emailRecord.to);
+                        formData.append('subject', emailRecord.subject);
+                        formData.append('message', `🎋 ยินดีต้อนรับสู่ครอบครัว MAXMUXSIX ข้าวหลามเตาถ่าน!\n\nเรียนคุณ ${emailRecord.toName}\nอีเมลผู้รับ: ${emailRecord.to}\n\n🎁 โค้ดส่วนลดต้อนรับสมาชิกใหม่ 10%: ${emailRecord.promoCode}\n🤝 รหัสชวนเพื่อนของคุณ: ${emailRecord.referralCode}\n\nสามารถนำโค้ดไปใส่ในช่องส่วนลดหน้าสั่งซื้อได้ทันทีครับ!`);
+
+                        const resp = await fetch('https://api.web3forms.com/submit', {
+                            method: 'POST',
+                            body: formData
+                        });
+                        const data = await resp.json();
+                        if (data.success) {
+                            result = { 
+                                success: true, 
+                                method: 'Web3Forms API', 
+                                message: 'จัดส่งอีเมลจริงไปยัง ' + emailRecord.to + ' สำเร็จเรียบร้อย! (กรุณาตรวจสอบกล่องข้อความหรือโฟลเดอร์ Spam)' 
+                            };
+                        } else {
+                            result = { 
+                                success: false, 
+                                method: 'Web3Forms API', 
+                                message: data.message || 'Web3Forms แจ้งว่า Access Key ไม่ถูกต้องหรือยังไม่เปิดใช้งาน' 
+                            };
+                        }
+                    } catch (err) {
+                        result = { 
+                            success: false, 
+                            method: 'Web3Forms API', 
+                            message: `เชื่อมต่อ Web3Forms ไม่สำเร็จ: ${err.message}` 
+                        };
+                    }
+                }
+            }
+            // 2. ส่งผ่าน Local Python Server
+            else if (emailSettings.provider === 'local_server') {
                 try {
                     const serverUrl = emailSettings.localServerUrl || 'http://localhost:5000';
                     const resp = await fetch(`${serverUrl}/api/send-email`, {
@@ -3085,13 +3140,13 @@
                             toName: emailRecord.toName,
                             subject: emailRecord.subject,
                             htmlContent: emailRecord.htmlContent,
-                            textContent: `สวัสดีคุณ ${emailRecord.toName} ยินดีต้อนรับสู่ MAXMUXSIX ข้าวหลามเตาถ่าน โค้ดส่วนลด 10% ของคุณคือ ${emailRecord.promoCode}`
+                            textContent: `สวัสดีคุณ ${emailRecord.toName} ยินดีต้อนรับสู่ MAXMUXSIX โค้ดลด 10% คือ ${emailRecord.promoCode}`
                         }),
                         signal: AbortSignal.timeout(6000)
                     });
                     const data = await resp.json();
                     if (data.success) {
-                        result = { success: true, method: 'Local Python SMTP Server', message: data.message };
+                        result = { success: true, method: 'Local Python Server', message: data.message };
                     } else {
                         result = { success: false, method: 'Local Python Server', message: data.message };
                     }
@@ -3102,41 +3157,8 @@
                         message: 'ไม่สามารถเชื่อมต่อ Python Server ได้ (กรุณารัน python email_server.py หรือสลับเป็น Web3Forms)' 
                     };
                 }
-            } 
-            // 2. ตรวจสอบการส่งผ่าน Web3Forms API
-            else if (emailSettings.provider === 'web3forms') {
-                if (!emailSettings.web3formsKey) {
-                    result = {
-                        success: false,
-                        method: 'Web3Forms API',
-                        message: 'ยังไม่ได้ใส่ Web3Forms Access Key (สามารถกดรับฟรีได้ที่ web3forms.com)'
-                    };
-                } else {
-                    try {
-                        const resp = await fetch('https://api.web3forms.com/submit', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-                            body: JSON.stringify({
-                                access_key: emailSettings.web3formsKey,
-                                name: 'MAXMUXSIX ข้าวหลามเตาถ่าน',
-                                email: emailRecord.to,
-                                subject: emailRecord.subject,
-                                message: `🎉 ยินดีต้อนรับคุณ ${emailRecord.toName} สู่ครอบครัว MAXMUXSIX!\n\n🎁 โค้ดส่วนลด 10% สำหรับคำสั่งซื้อแรก: ${emailRecord.promoCode}\n🤝 รหัสชวนเพื่อนของคุณ: ${emailRecord.referralCode}\n\nขอบคุณที่สมัครสมาชิกกับเราครับ`,
-                                from_name: 'MAXMUXSIX Official'
-                            })
-                        });
-                        const data = await resp.json();
-                        if (data.success) {
-                            result = { success: true, method: 'Web3Forms API', message: 'ส่งเข้ากล่องจดหมายจริงสำเร็จเรียบร้อย!' };
-                        } else {
-                            result = { success: false, method: 'Web3Forms API', message: data.message || 'ส่งไม่สำเร็จ' };
-                        }
-                    } catch (err) {
-                        result = { success: false, method: 'Web3Forms API', message: 'เกิดข้อผิดพลาดในการเชื่อมต่อ Web3Forms' };
-                    }
-                }
             }
-            // 3. ตรวจสอบการส่งผ่าน EmailJS
+            // 3. ส่งผ่าน EmailJS
             else if (emailSettings.provider === 'emailjs') {
                 if (!emailSettings.emailjsPublicKey || !emailSettings.emailjsServiceId) {
                     result = {
@@ -3165,7 +3187,7 @@
             if (result.success) {
                 emailRecord.dispatchStatus = `✅ ส่งเข้า Inbox จริงสำเร็จ (${result.method})`;
             } else {
-                emailRecord.dispatchStatus = `📬 แสดงในระบบ (${result.message || 'จำลอง In-App'})`;
+                emailRecord.dispatchStatus = `📬 แสดงในระบบ (${result.message})`;
             }
             syncStorage();
 
@@ -3177,7 +3199,49 @@
                 }
             }
 
+            updateQuickBarStatus();
             return result;
+        }
+
+        function autoSaveWeb3FormsKey(val) {
+            const key = val.trim();
+            emailSettings.web3formsKey = key;
+            localStorage.setItem('maxmuxsix_email_settings', JSON.stringify(emailSettings));
+
+            const badge = document.getElementById('web3formsKeyBadge');
+            if (badge) {
+                if (key.length >= 8) {
+                    badge.style.color = '#10B981';
+                    badge.innerHTML = `✅ บันทึก Access Key แล้ว (${key.substring(0, 8)}...) พร้อมใช้งานทันที`;
+                } else if (key.length > 0) {
+                    badge.style.color = '#FAA307';
+                    badge.innerHTML = `⚠️ Access Key สั้นเกินไป กรุณาตรวจสอบ`;
+                } else {
+                    badge.style.color = '#EF4444';
+                    badge.innerHTML = `❌ ยังไม่ได้ใส่ Access Key`;
+                }
+            }
+            updateQuickBarStatus();
+        }
+
+        function updateQuickBarStatus() {
+            const badge = document.getElementById('quickKeyStatusBadge');
+            if (!badge) return;
+            if (emailSettings.provider === 'web3forms') {
+                if (emailSettings.web3formsKey && emailSettings.web3formsKey.length >= 8) {
+                    badge.style.color = '#10B981';
+                    badge.textContent = `🟢 มี Access Key แล้ว (${emailSettings.web3formsKey.substring(0, 8)}...) พร้อมส่งเข้า Inbox จริง`;
+                } else {
+                    badge.style.color = '#EF4444';
+                    badge.textContent = `🔴 ยังไม่ได้ใส่ Access Key (กดปุ่มด้านขวาเพื่อใส่ Key ฟรี)`;
+                }
+            } else if (emailSettings.provider === 'local_server') {
+                badge.style.color = '#38BDF8';
+                badge.textContent = `🖥️ โหมด Python Server (http://localhost:5000)`;
+            } else {
+                badge.style.color = '#A855F7';
+                badge.textContent = `⚡ โหมด EmailJS`;
+            }
         }
 
         function openRealEmailSettingsModal() {
@@ -3190,7 +3254,10 @@
             else if (radioVal === 'emailjs' && rEmailJs) rEmailJs.checked = true;
             else if (rWeb) rWeb.checked = true;
 
-            document.getElementById('settingWeb3FormsKey').value = emailSettings.web3formsKey || '';
+            const keyInput = document.getElementById('settingWeb3FormsKey');
+            keyInput.value = emailSettings.web3formsKey || '';
+            autoSaveWeb3FormsKey(keyInput.value);
+
             document.getElementById('settingLocalServerUrl').value = emailSettings.localServerUrl || 'http://localhost:5000';
             document.getElementById('settingEmailjsService').value = emailSettings.emailjsServiceId || '';
             document.getElementById('settingEmailjsTemplate').value = emailSettings.emailjsTemplateId || '';
@@ -3208,6 +3275,7 @@
 
         function closeRealEmailSettingsModal() {
             document.getElementById('realEmailSettingsModal').classList.remove('active');
+            updateQuickBarStatus();
         }
 
         function switchProviderView(provider) {
@@ -3223,9 +3291,11 @@
                 if (r.checked) chosen = r.value;
             }
 
+            const keyVal = document.getElementById('settingWeb3FormsKey').value.trim();
+
             emailSettings = {
                 provider: chosen,
-                web3formsKey: document.getElementById('settingWeb3FormsKey').value.trim(),
+                web3formsKey: keyVal,
                 localServerUrl: document.getElementById('settingLocalServerUrl').value.trim() || 'http://localhost:5000',
                 emailjsServiceId: document.getElementById('settingEmailjsService').value.trim(),
                 emailjsTemplateId: document.getElementById('settingEmailjsTemplate').value.trim(),
@@ -3233,6 +3303,7 @@
             };
 
             localStorage.setItem('maxmuxsix_email_settings', JSON.stringify(emailSettings));
+            autoSaveWeb3FormsKey(keyVal);
             alert('💾 บันทึกการตั้งค่าระบบส่งอีเมลจริงเรียบร้อยแล้ว!');
             closeRealEmailSettingsModal();
         }
@@ -3267,28 +3338,44 @@
         }
 
         async function testSendRealEmailFromSettings() {
+            const keyInput = document.getElementById('settingWeb3FormsKey');
+            if (keyInput && keyInput.value.trim()) {
+                emailSettings.web3formsKey = keyInput.value.trim();
+                localStorage.setItem('maxmuxsix_email_settings', JSON.stringify(emailSettings));
+            }
+
             const emailInput = document.getElementById('testRecipientEmailInput');
             const statusDiv = document.getElementById('testSendStatusText');
             const btn = document.getElementById('btnTestSendRealEmail');
             const toEmail = emailInput ? emailInput.value.trim() : '';
 
             if (!toEmail || !toEmail.includes('@')) {
-                alert('กรุณาระบุอีเมลผู้รับที่ถูกต้อง');
+                alert('กรุณาระบุอีเมลผู้รับที่ถูกต้อง เช่น yourname@gmail.com');
+                return;
+            }
+
+            if (emailSettings.provider === 'web3forms' && !emailSettings.web3formsKey) {
+                alert('⚠️ กรุณากรอก Web3Forms Access Key ในช่องด้านบนก่อนกดส่งครับ\n\nสามารถกดรับฟรีได้ใน 10 วินาทีที่ web3forms.com');
+                document.getElementById('settingWeb3FormsKey').focus();
                 return;
             }
 
             btn.disabled = true;
-            btn.textContent = 'กำลังส่ง...';
+            btn.textContent = '⏳ กำลังส่ง...';
             statusDiv.style.color = '#FAA307';
-            statusDiv.textContent = `⏳ กำลังส่งอีเมลจริงไปยัง ${toEmail}...`;
+            statusDiv.textContent = `⏳ กำลังเชื่อมต่อไปยังเซิร์ฟเวอร์ส่งอีเมลไปยัง ${toEmail}...`;
 
             const dummyRecord = {
+                id: 'TEST-' + Date.now(),
                 to: toEmail,
-                toName: 'ผู้ทดสอบระบบ',
+                toName: currentUser ? currentUser.name : 'ผู้ทดสอบระบบ',
                 subject: '🎋 [ทดสอบส่งจริง] ยินดีต้อนรับสู่ MAXMUXSIX ข้าวหลามเตาถ่าน',
                 promoCode: 'WELCOME10',
-                referralCode: 'MAXTEST',
-                htmlContent: generateWelcomeEmailHtml({ name: 'ผู้ทดสอบระบบ', referralCode: 'MAXTEST' })
+                referralCode: currentUser ? currentUser.referralCode : 'MAX9999',
+                htmlContent: generateWelcomeEmailHtml({ 
+                    name: currentUser ? currentUser.name : 'ผู้ทดสอบระบบ', 
+                    referralCode: currentUser ? currentUser.referralCode : 'MAX9999' 
+                })
             };
 
             const res = await dispatchRealEmail(dummyRecord);
@@ -3297,12 +3384,44 @@
 
             if (res.success) {
                 statusDiv.style.color = '#10B981';
-                statusDiv.innerHTML = `✅ ${res.message || 'ส่งเข้ากล่องจดหมายจริงสำเร็จแล้ว! กรุณาเช็ค Inbox หรือ Spam'}`;
-                alert(`🎉 จัดส่งอีเมลจริงไปยัง ${toEmail} สำเร็จ!\n\nกรุณาเปิดตรวจสอบในกล่องจดหมาย (Inbox) หรือโฟลเดอร์ขยะ (Spam) ของคุณได้เลยครับ`);
+                statusDiv.innerHTML = `✅ ${res.message}`;
+                alert(`🎉 ${res.message}`);
             } else {
                 statusDiv.style.color = '#EF4444';
-                statusDiv.innerHTML = `⚠️ ${res.message || 'ส่งไม่สำเร็จ'}`;
-                alert(`⚠️ แจ้งเตือน: ${res.message}\n\nคำแนะนำ:\n1. หากใช้ Web3Forms ให้กดขอ Access Key ฟรีที่ web3forms.com มาใส่ในช่อง\n2. หากใช้ Python Server ให้รันคำสั่ง python email_server.py ในเทอร์มินัล`);
+                statusDiv.innerHTML = `⚠️ ${res.message}`;
+                alert(`⚠️ แจ้งเตือน: ${res.message}`);
+            }
+        }
+
+        async function resendCurrentEmailReal() {
+            let targetEmail = null;
+            if (currentViewingEmailId) {
+                targetEmail = sentEmails.find(m => m.id === currentViewingEmailId);
+            }
+            if (!targetEmail) {
+                targetEmail = sentEmails[0];
+            }
+            if (!targetEmail) {
+                alert('ยังไม่มีอีเมลในระบบ');
+                return;
+            }
+
+            const btn = document.getElementById('btnQuickResend');
+            if (btn) {
+                btn.disabled = true;
+                btn.textContent = '⏳ กำลังส่ง...';
+            }
+
+            const res = await dispatchRealEmail(targetEmail);
+            if (btn) {
+                btn.disabled = false;
+                btn.textContent = '🚀 ส่งเข้าอีเมลนี้ทันที';
+            }
+
+            if (res.success) {
+                alert(`🎉 ${res.message}`);
+            } else {
+                alert(`⚠️ แจ้งเตือน: ${res.message}`);
             }
         }
 
