@@ -1211,6 +1211,10 @@
                     <input type="text" id="custName" placeholder="เช่น สมชาย ใจเร้าใจ" required>
                 </div>
                 <div class="form-row">
+                    <label>อีเมลสำหรับรับใบเสร็จและแจ้งเตือนสถานะ *</label>
+                    <input type="email" id="custEmail" placeholder="เช่น yourname@gmail.com" required>
+                </div>
+                <div class="form-row">
                     <label>เบอร์โทรศัพท์ติดต่อ *</label>
                     <input type="tel" id="custPhone" placeholder="08X-XXX-XXXX" required>
                 </div>
@@ -1460,6 +1464,60 @@
             <div class="modal-foot">
                 <button type="button" class="btn-cancel" onclick="closeRealEmailSettingsModal()">ยกเลิก</button>
                 <button type="button" class="btn-consent-accept" style="padding: 8px 24px;" onclick="saveEmailSettings()">💾 บันทึกการตั้งค่า</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal 11: หน้าเว็บสรุปข้อมูลการสั่งซื้อ & ใบเสร็จ (Order Receipt Modal) -->
+    <div class="modal" id="orderReceiptModal">
+        <div class="modal-box" style="max-width: 680px;">
+            <div class="modal-head">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <span style="font-size: 1.4rem;">🧾</span>
+                    <div>
+                        <h3 style="margin: 0; font-size: 1.15rem;">สรุปข้อมูลการสั่งซื้อ & ใบเสร็จ</h3>
+                        <small style="color: #4ADE80; font-weight: 600;">🎉 ยืนยันคำสั่งซื้อและจัดส่งเข้าอีเมลเรียบร้อยแล้ว</small>
+                    </div>
+                </div>
+                <button class="btn-close" onclick="closeOrderReceiptModal()">&times;</button>
+            </div>
+
+            <!-- Email Meta & Dispatch Info -->
+            <div class="email-meta-card" style="margin-bottom: 10px;">
+                <div class="email-meta-row">
+                    <span class="email-meta-label">หมายเลขคำสั่งซื้อ:</span>
+                    <strong id="receiptMetaOrderId" style="color: var(--flame-yellow); font-family: monospace; font-size: 1rem;">MAX-000000</strong>
+                </div>
+                <div class="email-meta-row">
+                    <span class="email-meta-label">ส่งไปยังอีเมล:</span>
+                    <span id="receiptMetaTo" style="color: #38BDF8; font-weight: 600;">-</span>
+                </div>
+                <div class="email-meta-row">
+                    <span class="email-meta-label">สถานะการส่งอีเมลจริง:</span>
+                    <span id="receiptMetaStatus">⏳ กำลังจัดส่ง...</span>
+                </div>
+            </div>
+
+            <div class="email-view-toolbar">
+                <div class="email-view-toggle">
+                    <span style="font-size:0.85rem; color:#8BA89B; margin-right:4px; align-self:center;">มุมมอง:</span>
+                    <button class="email-btn-view active" id="receiptViewBtnDesktop" onclick="setReceiptViewMode('desktop')">💻 จอคอม (600px)</button>
+                    <button class="email-btn-view" id="receiptViewBtnMobile" onclick="setReceiptViewMode('mobile')">📱 มือถือ (380px)</button>
+                </div>
+                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                    <button class="btn-nav-action" style="padding: 6px 12px; font-size: 0.82rem;" onclick="printOrderReceipt()">🖨️ พิมพ์ใบเสร็จ / PDF</button>
+                    <button class="btn-order" style="padding: 6px 14px; font-size: 0.82rem;" id="btnResendOrderEmail" onclick="resendCurrentOrderEmail()">🚀 ส่งซ้ำเข้าอีเมล</button>
+                </div>
+            </div>
+
+            <!-- Receipt Live Preview Frame -->
+            <div class="email-preview-wrapper" style="height: 520px;">
+                <iframe id="orderReceiptPreviewFrame" title="Order Receipt Preview" style="width: 100%;"></iframe>
+            </div>
+
+            <div class="modal-foot" style="margin-top: 14px; justify-content: space-between;">
+                <button type="button" class="btn-nav-action" style="border-color: #FAA307; color: #FAA307;" onclick="closeOrderReceiptModal(); openOrderHistoryModal();">📦 ตรวจสอบสถานะคำสั่งซื้อ</button>
+                <button type="button" class="btn-cancel" onclick="closeOrderReceiptModal()">ปิดหน้าต่าง / เลือกซื้อต่อ</button>
             </div>
         </div>
     </div>
@@ -1772,6 +1830,285 @@
 </body>
 </html>
 
+    </template>
+
+    <!-- Template อีเมลสรุปการสั่งซื้อ & ใบเสร็จ ดึงมาจาก order_summary_email.html -->
+    <template id="orderReceiptTemplate">
+<!DOCTYPE html>
+<html lang="th" xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
+<head>
+<meta charset="UTF-8">
+<base href="./">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<title>ใบเสร็จและสรุปข้อมูลคำสั่งซื้อ - MAXMUXSIX ข้าวหลามเตาถ่าน</title>
+<!--[if mso]>
+<noscript>
+<xml>
+<o:OfficeDocumentSettings>
+<o:PixelsPerInch>96</o:PixelsPerInch>
+</o:OfficeDocumentSettings>
+</xml>
+</noscript>
+<![endif]-->
+<style>
+    body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
+    table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
+    img { -ms-interpolation-mode: bicubic; border: 0; height: auto; line-height: 100%; outline: none; text-decoration: none; display: block; }
+    body { margin: 0; padding: 0; width: 100% !important; height: 100% !important; background-color: #0A0704; font-family: 'Segoe UI', Tahoma, Arial, sans-serif; }
+
+    @media screen and (max-width: 600px) {
+        .email-container { width: 100% !important; }
+        .fluid-padding { padding-left: 16px !important; padding-right: 16px !important; }
+        .stack-column { display: block !important; width: 100% !important; box-sizing: border-box; }
+        .badge-circle { width: 200px !important; height: 200px !important; }
+        .badge-circle-inner { padding-top: 25px !important; }
+        .brand-title { font-size: 28px !important; }
+        .order-item-img { width: 60px !important; height: 60px !important; }
+        .grand-total-text { font-size: 24px !important; }
+    }
+</style>
+</head>
+<body style="margin:0; padding:0; background-color:#0A0704;">
+
+    <div style="display:none; max-height:0; overflow:hidden; mso-hide:all;">
+        ยืนยันคำสั่งซื้อ #{{ORDER_ID}} สำเร็จเรียบร้อย! ยอดชำระ {{GRAND_TOTAL}} บาท กำลังจัดเตรียมเผาเตาถ่าน 🔥🎋
+    </div>
+    <div style="display:none; max-height:0; overflow:hidden; mso-hide:all;">
+        &#847; &zwnj; &nbsp; &#8199; &#8203; &#847; &zwnj; &nbsp; &#8199; &#8203;
+    </div>
+
+    <center style="width:100%; background-color:#0A0704;">
+    <!--[if mso]>
+    <table role="presentation" cellpadding="0" cellspacing="0" width="600" align="center"><tr><td>
+    <![endif]-->
+
+    <div class="email-container" style="max-width:600px; margin:0 auto;">
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:600px; margin:0 auto; background-color:#0D0906; border:1px solid #1E543C; border-radius:12px; overflow:hidden;">
+
+            <!-- TOP BAR -->
+            <tr>
+                <td style="background-color:#0F2A1C; border-top:4px solid #FAA307; padding:16px 24px;">
+                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+                        <tr>
+                            <td align="left" valign="middle">
+                                <span style="font-family:'Segoe UI',Tahoma,Arial,sans-serif; font-size:22px; font-weight:900; color:#FAA307; letter-spacing:0.5px;">MAXMUXSIX</span>
+                                <span style="font-size:12px; color:#FEE8BE; display:block; font-weight:600;">ข้าวหลามเตาถ่านไฟแรง</span>
+                            </td>
+                            <td align="right" valign="middle">
+                                <span style="display:inline-block; background-color:#E85D04; color:#FFF9ED; font-family:'Segoe UI',Tahoma,Arial,sans-serif; font-size:11px; font-weight:700; padding:5px 14px; border-radius:20px;">🧾 ใบเสร็จรับเงิน</span>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+
+            <!-- HERO -->
+            <tr>
+                <td align="center" style="background-color:#0D0906; background-image: radial-gradient(rgba(232,93,4,0.35) 1.4px, transparent 1.4px); background-size: 22px 22px; padding:36px 20px 20px;">
+
+                    <!-- Circular badge -->
+                    <table role="presentation" cellpadding="0" cellspacing="0" align="center" class="badge-circle" style="width:230px; height:230px; border-radius:50%; background:linear-gradient(180deg,#12331F,#0A1C14); border:3px solid #FEE8BE; box-shadow:0 0 40px 6px rgba(250,163,7,0.45);">
+                        <tr>
+                            <td align="center" valign="middle" class="badge-circle-inner" style="width:230px; height:230px; border-radius:50%; padding-top:30px;">
+                                <div style="font-size:32px; letter-spacing:6px;">🔥🎋</div>
+                                <div class="brand-title" style="font-family:'Segoe UI',Tahoma,Arial,sans-serif; font-size:30px; font-weight:900; color:#FAA307; letter-spacing:0.5px; margin-top:4px;">
+                                    MAXMUXSIX
+                                </div>
+                                <div style="font-family:'Segoe UI',Tahoma,Arial,sans-serif; font-size:13px; font-weight:700; color:#FEE8BE; margin-top:4px;">
+                                    ยืนยันคำสั่งซื้อสำเร็จ
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+
+                    <!-- Tag pill -->
+                    <table role="presentation" cellpadding="0" cellspacing="0" style="margin-top:22px;">
+                        <tr>
+                            <td align="center" style="background-color:#FEE8BE; border-radius:30px; padding:10px 24px;">
+                                <span style="font-family:'Segoe UI',Tahoma,Arial,sans-serif; font-size:15px; font-weight:800; color:#3A1400;">🎉 ขอบคุณสำหรับคำสั่งซื้อของคุณ!</span>
+                            </td>
+                        </tr>
+                    </table>
+
+                    <p style="margin:16px 0 0; max-width:480px; font-family:'Segoe UI',Tahoma,Arial,sans-serif; font-size:14px; line-height:22px; color:#C0D8CC;">
+                        เราได้รับรายการสั่งซื้อของคุณเรียบร้อยแล้ว ทีมงานกำลังคัดสรรกระบอกไม้ไผ่ ข้าวเหนียวเขี้ยวงู และกะทิคั้นสดแท้เพื่อเริ่มขั้นตอนการเผาเตาถ่านไฟแรงครับ
+                    </p>
+                </td>
+            </tr>
+
+            <!-- ORDER METADATA BOX -->
+            <tr>
+                <td class="fluid-padding" style="padding:10px 28px 16px;">
+                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#07150E; border:1px solid #1E543C; border-radius:12px; padding:16px;">
+                        <tr>
+                            <td width="50%" valign="top" style="padding:6px 10px;">
+                                <span style="font-size:11px; color:#8BA89B; text-transform:uppercase; letter-spacing:1px; display:block;">หมายเลขคำสั่งซื้อ (Order ID)</span>
+                                <strong style="font-family:monospace; font-size:17px; color:#FAA307; letter-spacing:1px;">{{ORDER_ID}}</strong>
+                            </td>
+                            <td width="50%" valign="top" align="right" style="padding:6px 10px;">
+                                <span style="font-size:11px; color:#8BA89B; text-transform:uppercase; letter-spacing:1px; display:block;">วันที่และเวลาสั่งซื้อ</span>
+                                <span style="font-size:13px; color:#FEE8BE; font-weight:600;">{{ORDER_DATE}}</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" style="border-top:1px dashed #1E543C; padding:10px 10px 4px; margin-top:8px;">
+                                <span style="font-size:12px; color:#8BA89B;">สถานะคำสั่งซื้อ: </span>
+                                <span style="display:inline-block; background-color:#E85D04; color:#FFF9ED; font-size:11px; font-weight:700; padding:3px 10px; border-radius:12px;">{{ORDER_STATUS}}</span>
+                                <span style="display:inline-block; margin-left:8px; background-color:#1E543C; color:#4ADE80; font-size:11px; font-weight:700; padding:3px 10px; border-radius:12px;">✅ แจ้งชำระเงินเรียบร้อย</span>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+
+            <!-- CUSTOMER & DELIVERY INFO -->
+            <tr>
+                <td class="fluid-padding" style="padding:4px 28px 16px;">
+                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#0A1C14; border:1px solid #1E543C; border-radius:12px; padding:16px;">
+                        <tr>
+                            <td style="padding:0 8px 8px;">
+                                <div style="font-size:14px; font-weight:800; color:#FAA307; margin-bottom:10px;">
+                                    📍 ข้อมูลผู้รับและการจัดส่ง
+                                </div>
+                                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="font-size:13px; color:#C0D8CC; line-height:22px;">
+                                    <tr>
+                                        <td width="100" style="color:#8BA89B; font-weight:600;">ชื่อผู้รับ:</td>
+                                        <td style="color:#FEE8BE; font-weight:700;">{{CUST_NAME}}</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="color:#8BA89B; font-weight:600;">เบอร์ติดต่อ:</td>
+                                        <td style="color:#FEE8BE;">{{CUST_PHONE}}</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="color:#8BA89B; font-weight:600;">อีเมล:</td>
+                                        <td style="color:#38BDF8;">{{CUST_EMAIL}}</td>
+                                    </tr>
+                                    <tr>
+                                        <td valign="top" style="color:#8BA89B; font-weight:600; padding-top:4px;">ที่อยู่จัดส่ง:</td>
+                                        <td style="color:#FEE8BE; padding-top:4px;">{{CUST_ADDRESS}}</td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+
+            <!-- ORDERED ITEMS TABLE -->
+            <tr>
+                <td class="fluid-padding" style="padding:4px 28px 16px;">
+                    <div style="font-size:15px; font-weight:800; color:#FEE8BE; margin-bottom:10px;">
+                        🎋 รายการสินค้าที่สั่งซื้อ
+                    </div>
+                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#07150E; border:1px solid #1E543C; border-radius:12px; overflow:hidden;">
+                        <thead>
+                            <tr style="background-color:#0F2A1C; border-bottom:2px solid #1E543C;">
+                                <th align="left" style="padding:10px 14px; font-size:12px; color:#FAA307; font-weight:700;">สินค้า</th>
+                                <th align="center" style="padding:10px 8px; font-size:12px; color:#FAA307; font-weight:700;">จำนวน</th>
+                                <th align="right" style="padding:10px 14px; font-size:12px; color:#FAA307; font-weight:700;">ราคารวม</th>
+                            </tr>
+                        </thead>
+                        <tbody id="orderItemsTableBody">
+                            {{ORDER_ITEMS_ROWS}}
+                        </tbody>
+                    </table>
+                </td>
+            </tr>
+
+            <!-- FINANCIAL SUMMARY -->
+            <tr>
+                <td class="fluid-padding" style="padding:4px 28px 20px;">
+                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:linear-gradient(180deg,#0A1C14,#07150E); border:2px solid #FAA307; border-radius:12px; padding:18px;">
+                        <tr>
+                            <td style="padding:4px 8px; font-size:13px; color:#8BA89B;">ยอดรวมค่าสินค้า (Subtotal):</td>
+                            <td align="right" style="padding:4px 8px; font-size:13px; color:#FEE8BE; font-weight:600;">{{SUBTOTAL}} บาท</td>
+                        </tr>
+                        <tr>
+                            <td style="padding:4px 8px; font-size:13px; color:#8BA89B;">ค่าจัดส่งเตาถ่านด่วน:</td>
+                            <td align="right" style="padding:4px 8px; font-size:13px; color:#FEE8BE; font-weight:600;">{{SHIPPING_COST}} บาท</td>
+                        </tr>
+                        <tr>
+                            <td style="padding:4px 8px; font-size:13px; color:#4ADE80;">ส่วนลดคูปอง:</td>
+                            <td align="right" style="padding:4px 8px; font-size:13px; color:#4ADE80; font-weight:700;">-{{DISCOUNT_AMOUNT}} บาท</td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" style="border-top:1px solid #1E543C; padding-top:10px; margin-top:8px;">
+                                <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+                                    <tr>
+                                        <td valign="middle">
+                                            <span style="font-size:15px; font-weight:800; color:#FAA307;">ยอดชำระสุทธิ (Grand Total):</span>
+                                        </td>
+                                        <td align="right" valign="middle">
+                                            <span class="grand-total-text" style="font-family:'Segoe UI',Tahoma,Arial,sans-serif; font-size:26px; font-weight:900; color:#FAA307;">
+                                                {{GRAND_TOTAL}} บาท
+                                            </span>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+
+            <!-- CHARCOAL ROASTING PROMISE -->
+            <tr>
+                <td class="fluid-padding" style="padding:0 28px 20px;">
+                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#05140C; border:1px dashed #4ADE80; border-radius:10px; padding:14px;">
+                        <tr>
+                            <td align="center">
+                                <div style="font-size:13px; font-weight:700; color:#4ADE80; margin-bottom:4px;">
+                                    🎋 กรรมวิธีเตาถ่านโบราณ พิถีพิถันทุกกระบอก
+                                </div>
+                                <div style="font-size:12px; color:#C0D8CC; line-height:18px;">
+                                    ข้าวเหนียวเขี้ยวงูนุ่มหนึบ • กะทิคั้นสดหวานมันพอดี • เผาด้วยเตาถ่านไฟแรงธรรมชาติ ให้กลิ่นหอมกรุ่นเฉพาะตัว
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+
+            <!-- CTA BUTTON -->
+            <tr>
+                <td align="center" style="padding:0 28px 28px;">
+                    <table role="presentation" cellpadding="0" cellspacing="0">
+                        <tr>
+                            <td align="center" style="border-radius:50px; background-color:#E85D04; box-shadow:0 8px 22px rgba(232,93,4,0.4);">
+                                <a href="index.html" target="_blank" style="display:inline-block; padding:14px 38px; font-family:'Segoe UI',Tahoma,Arial,sans-serif; font-size:15px; font-weight:800; color:#FFF9ED; text-decoration:none; border-radius:50px;">
+                                    📦 ติดตามสถานะคำสั่งซื้อบนเว็บไซต์
+                                </a>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+
+            <!-- FOOTER -->
+            <tr>
+                <td align="center" style="background-color:#07150E; border-top:3px solid #FAA307; padding:24px 20px;">
+                    <div style="font-size:13px; font-weight:800; color:#FAA307; margin-bottom:4px;">
+                        MAXMUXSIX ข้าวหลามเตาถ่าน
+                    </div>
+                    <div style="font-size:11px; color:#8BA89B; line-height:18px;">
+                        หากมีข้อสงสัยเกี่ยวกับคำสั่งซื้อ ติดต่อฝ่ายบริการลูกค้า โทร 08X-XXX-XXXX หรือทักแชทหน้าเว็บ<br>
+                        ใบเสร็จอิเล็กทรอนิกส์นี้จัดส่งโดยระบบอัตโนมัติของ MAXMUXSIX
+                    </div>
+                </td>
+            </tr>
+
+            <tr><td style="height:16px; line-height:16px; font-size:1px; background-color:#0A0704;">&nbsp;</td></tr>
+
+        </table>
+    </div>
+
+    <!--[if mso]>
+    </td></tr></table>
+    <![endif]-->
+    </center>
+</body>
+</html>
     </template>
 
     <script>
@@ -2583,6 +2920,7 @@
 
             if (currentUser) {
                 document.getElementById('custName').value = currentUser.name || '';
+                document.getElementById('custEmail').value = currentUser.email || '';
                 document.getElementById('custPhone').value = currentUser.phone || '';
                 document.getElementById('custAddress').value = currentUser.address || '';
             }
@@ -2603,6 +2941,7 @@
         function confirmOrder(e) {
             e.preventDefault();
             const name = document.getElementById('custName').value.trim();
+            const email = document.getElementById('custEmail').value.trim();
             const phone = document.getElementById('custPhone').value.trim();
             const address = document.getElementById('custAddress').value.trim();
             const bill = calculateTotalOrder();
@@ -2611,11 +2950,18 @@
             const newOrder = {
                 id: orderId,
                 userId: currentUser ? currentUser.id : 'GUEST',
-                date: new Date().toLocaleString('th-TH'),
+                date: new Date().toLocaleString('th-TH', { 
+                    year: 'numeric', month: 'short', day: 'numeric', 
+                    hour: '2-digit', minute: '2-digit' 
+                }),
                 items: [...cart],
                 name,
+                email,
                 phone,
                 address,
+                subtotal: bill.subtotal,
+                shippingCost: bill.shippingCost,
+                discountAmount: bill.discountAmount,
                 total: bill.grandTotal,
                 status: 'กำลังเผาไฟแรง 🔥'
             };
@@ -2642,7 +2988,13 @@
             document.getElementById('checkoutForm').reset();
             closePaymentModal();
 
-            alert(`🎉 สั่งซื้อสำเร็จเรียบร้อย!\n\nรหัสคำสั่งซื้อ: ${orderId}\nคุณ: ${name}\nยอดชำระ: ${bill.grandTotal} บาท\n\nสามารถตรวจสอบความคืบหน้าได้ที่ปุ่ม "คำสั่งซื้อ" ด้านบนครับ`);
+            // ส่งอีเมลสรุปข้อมูลการสั่งซื้อและใบเสร็จไปยังลูกค้าทันที
+            sendOrderConfirmationEmail(newOrder);
+
+            // เปิดหน้าต่างสรุปคำสั่งซื้อ & ใบเสร็จดิจิทัล
+            setTimeout(() => {
+                openOrderReceiptModal(orderId);
+            }, 300);
         }
 
         function openOrderHistoryModal() {
@@ -2665,8 +3017,11 @@
                         </div>
                         <div style="font-size: 0.85rem; color: #8BA89B; margin-bottom: 6px;">วันที่สั่ง: ${ord.date}</div>
                         <div style="font-size: 0.9rem; margin-bottom: 6px;">รายการ: ${itemsSummary}</div>
-                        <div style="font-size: 0.95rem; font-weight: 700; color: var(--flame-yellow);">
-                            ยอดชำระรวม: ${ord.total} บาท
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 8px;">
+                            <div style="font-size: 0.95rem; font-weight: 700; color: var(--flame-yellow);">
+                                ยอดชำระรวม: ${ord.total} บาท
+                            </div>
+                            <button class="btn-nav-action" style="padding: 4px 10px; font-size: 0.8rem; border-color: #38BDF8; color: #38BDF8;" onclick="closeOrderHistoryModal(); openOrderReceiptModal('${ord.id}')">🧾 ดูใบเสร็จ & อีเมลสรุป</button>
                         </div>
                     `;
                     container.appendChild(div);
@@ -2932,20 +3287,24 @@
         }
 
         let toastTimeout = null;
-        function showEmailToast(email, emailId) {
+        function showEmailToast(email, emailId, title, subText) {
             const toastArea = document.getElementById('emailToastArea');
             if (!toastArea) return;
             
             if (toastTimeout) clearTimeout(toastTimeout);
 
+            const isOrder = emailId && emailId.startsWith('ORD-EML');
+            const displayTitle = title || (isOrder ? 'ส่งใบเสร็จคำสั่งซื้อแล้ว!' : 'ส่งอีเมลต้อนรับแล้ว!');
+            const displaySub = subText || `ส่งไปยัง <span>${email}</span> เรียบร้อย`;
+
             toastArea.innerHTML = `
                 <div class="email-toast">
-                    <div class="email-toast-icon">📬</div>
+                    <div class="email-toast-icon">${isOrder ? '🧾' : '📬'}</div>
                     <div class="email-toast-body">
-                        <strong>ส่งอีเมลต้อนรับแล้ว!</strong><br>
-                        ส่งไปยัง <span>${email}</span> เรียบร้อย พร้อมโค้ดลด 10%
+                        <strong>${displayTitle}</strong><br>
+                        ${displaySub}
                     </div>
-                    <button class="email-toast-btn" onclick="openWelcomeEmailModal('${emailId}')">เปิดดูอีเมล</button>
+                    <button class="email-toast-btn" onclick="${isOrder ? `openOrderReceiptModalFromEmailId('${emailId}')` : `openWelcomeEmailModal('${emailId}')`}">${isOrder ? 'เปิดดูใบเสร็จ' : 'เปิดดูอีเมล'}</button>
                     <button class="email-toast-close" onclick="closeEmailToast()">&times;</button>
                 </div>
             `;
@@ -2958,6 +3317,225 @@
         function closeEmailToast() {
             const toastArea = document.getElementById('emailToastArea');
             if (toastArea) toastArea.innerHTML = '';
+        }
+
+        // ==========================================
+        // ระบบสรุปข้อมูลการสั่งซื้อ & ใบเสร็จดิจิทัล (Order Receipt System)
+        // ==========================================
+        let currentViewingReceiptOrderId = null;
+
+        function generateOrderSummaryHtml(order) {
+            const tmpl = document.getElementById('orderReceiptTemplate');
+            if (!tmpl) return '';
+            let html = tmpl.innerHTML;
+
+            // สร้างแถวตารางสินค้าที่สั่ง
+            let itemsRows = '';
+            if (Array.isArray(order.items)) {
+                order.items.forEach(item => {
+                    const lineTotal = (item.price || 0) * (item.qty || 1);
+                    const imgFile = item.image || item.img || 'max_1.jpg';
+                    itemsRows += `
+                        <tr style="border-bottom:1px solid #143526;">
+                            <td style="padding:10px 14px; vertical-align:middle;">
+                                <table role="presentation" cellpadding="0" cellspacing="0">
+                                    <tr>
+                                        <td width="55" valign="middle">
+                                            <img class="order-item-img" src="${imgFile}" alt="${item.name}" width="50" height="50" style="width:50px; height:50px; object-fit:cover; border-radius:8px; border:1px solid #1E543C; display:block;">
+                                        </td>
+                                        <td style="padding-left:10px; vertical-align:middle;">
+                                            <div style="font-size:13px; font-weight:700; color:#FEE8BE;">${item.name}</div>
+                                            <div style="font-size:11px; color:#8BA89B;">ราคาชิ้นละ ${item.price} บาท</div>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                            <td align="center" style="padding:10px 8px; font-size:13px; color:#FAA307; font-weight:700; vertical-align:middle;">
+                                x${item.qty}
+                            </td>
+                            <td align="right" style="padding:10px 14px; font-size:13px; color:#FEE8BE; font-weight:700; vertical-align:middle;">
+                                ${lineTotal} บาท
+                            </td>
+                        </tr>
+                    `;
+                });
+            }
+
+            html = html.replace(/{{ORDER_ID}}/g, order.id || '');
+            html = html.replace(/{{ORDER_DATE}}/g, order.date || new Date().toLocaleString('th-TH'));
+            html = html.replace(/{{ORDER_STATUS}}/g, order.status || 'กำลังเผาไฟแรง 🔥');
+            html = html.replace(/{{CUST_NAME}}/g, order.name || 'ลูกค้าผู้มีอุปการคุณ');
+            html = html.replace(/{{CUST_PHONE}}/g, order.phone || '-');
+            html = html.replace(/{{CUST_EMAIL}}/g, order.email || (currentUser ? currentUser.email : '-'));
+            html = html.replace(/{{CUST_ADDRESS}}/g, order.address || '-');
+            html = html.replace(/{{ORDER_ITEMS_ROWS}}/g, itemsRows);
+            html = html.replace(/{{SUBTOTAL}}/g, order.subtotal !== undefined ? order.subtotal : order.total);
+            html = html.replace(/{{SHIPPING_COST}}/g, order.shippingCost !== undefined ? order.shippingCost : 0);
+            html = html.replace(/{{DISCOUNT_AMOUNT}}/g, order.discountAmount !== undefined ? order.discountAmount : 0);
+            html = html.replace(/{{GRAND_TOTAL}}/g, order.total || 0);
+
+            return html;
+        }
+
+        function sendOrderConfirmationEmail(order) {
+            const receiptHtml = generateOrderSummaryHtml(order);
+            const targetEmail = order.email || (currentUser ? currentUser.email : '');
+            
+            const emailRecord = {
+                id: 'ORD-EML-' + Date.now(),
+                orderId: order.id,
+                userId: order.userId || (currentUser ? currentUser.id : 'GUEST'),
+                to: targetEmail,
+                toName: order.name,
+                subject: `🔥 ยืนยันคำสั่งซื้อ #${order.id} ยอดชำระ ${order.total} บ. - MAXMUXSIX ข้าวหลามเตาถ่าน`,
+                date: order.date,
+                total: order.total,
+                htmlContent: receiptHtml,
+                promoCode: '',
+                isRead: false
+            };
+
+            sentEmails.unshift(emailRecord);
+            syncStorage();
+
+            // ส่งอีเมลจริงผ่าน Provider ที่เลือก
+            if (targetEmail) {
+                dispatchRealEmail(emailRecord).then(res => {
+                    const metaStatus = document.getElementById('receiptMetaStatus');
+                    if (metaStatus) {
+                        if (res.success) {
+                            metaStatus.innerHTML = `<span style="color:#10B981; font-weight:700;">✅ จัดส่งเข้าอีเมลจริงแล้ว (${res.method})</span>`;
+                        } else {
+                            metaStatus.innerHTML = `<span style="color:#FCD34D;">📬 บันทึกในกล่องอีเมลบนเว็บ (${res.message || 'รอดำเนินการ'})</span>`;
+                        }
+                    }
+                });
+            }
+
+            // แสดง Toast แจ้งเตือนส่งอีเมลใบเสร็จ
+            if (targetEmail) {
+                showEmailToast(targetEmail, emailRecord.id, 'ส่งใบเสร็จคำสั่งซื้อแล้ว!', `รหัส #${order.id} ส่งไปยัง <span>${targetEmail}</span>`);
+            }
+
+            return emailRecord;
+        }
+
+        function openOrderReceiptModal(orderId) {
+            closeEmailToast();
+            let order = null;
+            if (orderId) {
+                order = orders.find(o => o.id === orderId);
+            }
+            if (!order && orders.length > 0) {
+                order = orders[0];
+            }
+            if (!order) {
+                alert('ยังไม่มีข้อมูลคำสั่งซื้อในระบบ');
+                return;
+            }
+
+            currentViewingReceiptOrderId = order.id;
+            const targetEmail = order.email || (currentUser ? currentUser.email : 'ไม่ระบุอีเมล');
+
+            document.getElementById('receiptMetaOrderId').textContent = order.id;
+            document.getElementById('receiptMetaTo').textContent = `${order.name} <${targetEmail}>`;
+            
+            const statusEl = document.getElementById('receiptMetaStatus');
+            if (statusEl) {
+                statusEl.innerHTML = `<span style="color:#34D399; font-weight:600;">✅ ออกใบเสร็จและบันทึกในระบบเรียบร้อย</span>`;
+            }
+
+            const html = generateOrderSummaryHtml(order);
+            const frame = document.getElementById('orderReceiptPreviewFrame');
+            if (frame) {
+                frame.srcdoc = html;
+            }
+
+            setReceiptViewMode('desktop');
+            document.getElementById('orderReceiptModal').classList.add('active');
+        }
+
+        function closeOrderReceiptModal() {
+            document.getElementById('orderReceiptModal').classList.remove('active');
+        }
+
+        function setReceiptViewMode(mode) {
+            const frame = document.getElementById('orderReceiptPreviewFrame');
+            const btnDesktop = document.getElementById('receiptViewBtnDesktop');
+            const btnMobile = document.getElementById('receiptViewBtnMobile');
+            if (!frame) return;
+
+            if (mode === 'mobile') {
+                frame.style.width = '380px';
+                if (btnMobile) btnMobile.classList.add('active');
+                if (btnDesktop) btnDesktop.classList.remove('active');
+            } else {
+                frame.style.width = '100%';
+                if (btnDesktop) btnDesktop.classList.add('active');
+                if (btnMobile) btnMobile.classList.remove('active');
+            }
+        }
+
+        function printOrderReceipt() {
+            const frame = document.getElementById('orderReceiptPreviewFrame');
+            if (frame && frame.contentWindow) {
+                frame.contentWindow.focus();
+                frame.contentWindow.print();
+            } else {
+                window.print();
+            }
+        }
+
+        async function resendCurrentOrderEmail() {
+            if (!currentViewingReceiptOrderId) return;
+            const order = orders.find(o => o.id === currentViewingReceiptOrderId);
+            if (!order) return;
+
+            const targetEmail = order.email || (currentUser ? currentUser.email : '');
+            if (!targetEmail || !targetEmail.includes('@')) {
+                alert('คำสั่งซื้อนี้ไม่ได้ระบุอีเมลผู้รับ กรุณาตรวจสอบข้อมูล');
+                return;
+            }
+
+            const btn = document.getElementById('btnResendOrderEmail');
+            if (btn) {
+                btn.disabled = true;
+                btn.textContent = '⏳ กำลังส่ง...';
+            }
+
+            const emailRecord = {
+                id: 'ORD-RESEND-' + Date.now(),
+                orderId: order.id,
+                to: targetEmail,
+                toName: order.name,
+                subject: `🔥 [ส่งซ้ำ] ใบเสร็จคำสั่งซื้อ #${order.id} - MAXMUXSIX ข้าวหลามเตาถ่าน`,
+                date: order.date,
+                total: order.total,
+                htmlContent: generateOrderSummaryHtml(order)
+            };
+
+            const res = await dispatchRealEmail(emailRecord);
+            if (btn) {
+                btn.disabled = false;
+                btn.textContent = '🚀 ส่งซ้ำเข้าอีเมล';
+            }
+
+            const metaStatus = document.getElementById('receiptMetaStatus');
+            if (res.success) {
+                if (metaStatus) metaStatus.innerHTML = `<span style="color:#10B981; font-weight:700;">✅ จัดส่งเข้าอีเมลจริงสำเร็จ!</span>`;
+                alert(`🎉 ${res.message}`);
+            } else {
+                alert(`⚠️ แจ้งเตือน: ${res.message}`);
+            }
+        }
+
+        function openOrderReceiptModalFromEmailId(emailId) {
+            const eml = sentEmails.find(m => m.id === emailId);
+            if (eml && eml.orderId) {
+                openOrderReceiptModal(eml.orderId);
+            } else if (orders.length > 0) {
+                openOrderReceiptModal(orders[0].id);
+            }
         }
 
         function openWelcomeEmailModal(emailId) {
@@ -3078,14 +3656,22 @@
                 userEmails.forEach(item => {
                     const div = document.createElement('div');
                     div.className = 'inbox-item';
+                    const isOrder = Boolean(item.orderId);
                     div.onclick = () => {
                         closeEmailInboxModal();
-                        openWelcomeEmailModal(item.id);
+                        if (isOrder) {
+                            openOrderReceiptModal(item.orderId);
+                        } else {
+                            openWelcomeEmailModal(item.id);
+                        }
                     };
+                    const subInfo = isOrder 
+                        ? `ถึง: ${item.toName} (${item.to}) • คำสั่งซื้อ: <strong>#${item.orderId}</strong>`
+                        : `ถึง: ${item.toName} (${item.to}) • โค้ดส่วนลด: <strong>${item.promoCode}</strong>`;
                     div.innerHTML = `
                         <div>
-                            <div class="inbox-item-title">${item.isRead ? '📩' : '📬'} ${item.subject}</div>
-                            <div class="inbox-item-sub">ถึง: ${item.toName} (${item.to}) • โค้ดส่วนลด: <strong>${item.promoCode}</strong></div>
+                            <div class="inbox-item-title">${item.isRead ? (isOrder ? '🧾' : '📩') : (isOrder ? '🧾' : '📬')} ${item.subject}</div>
+                            <div class="inbox-item-sub">${subInfo}</div>
                         </div>
                         <div class="inbox-item-date">${item.date}</div>
                     `;
@@ -3126,13 +3712,20 @@
                     };
                 } else {
                     try {
+                        let msgText = '';
+                        if (emailRecord.orderId) {
+                            msgText = `🎋 ยืนยันคำสั่งซื้อ #${emailRecord.orderId} - MAXMUXSIX ข้าวหลามเตาถ่าน!\n\nเรียนคุณ ${emailRecord.toName}\nอีเมลผู้รับ: ${emailRecord.to}\nยอดชำระสุทธิ: ${emailRecord.total || 0} บาท\n\nรายการคำสั่งซื้อของคุณได้รับการยืนยันและทางร้านกำลังจัดเตรียมเผาเตาถ่านไฟแรงครับ!\nสามารถเปิดดูใบเสร็จฉบับเต็มได้ในระบบของท่าน`;
+                        } else {
+                            msgText = `🎋 ยินดีต้อนรับสู่ครอบครัว MAXMUXSIX ข้าวหลามเตาถ่าน!\n\nเรียนคุณ ${emailRecord.toName}\nอีเมลผู้รับ: ${emailRecord.to}\n\n🎁 โค้ดส่วนลดต้อนรับสมาชิกใหม่ 10%: ${emailRecord.promoCode}\n🤝 รหัสชวนเพื่อนของคุณ: ${emailRecord.referralCode}\n\nสามารถนำโค้ดไปใส่ในช่องส่วนลดหน้าสั่งซื้อได้ทันทีครับ!`;
+                        }
+
                         const formData = new FormData();
                         formData.append('access_key', key);
                         formData.append('from_name', 'MAXMUXSIX ข้าวหลามเตาถ่าน');
                         formData.append('name', emailRecord.toName || 'ลูกค้า MAXMUXSIX');
                         formData.append('email', emailRecord.to);
                         formData.append('subject', emailRecord.subject);
-                        formData.append('message', `🎋 ยินดีต้อนรับสู่ครอบครัว MAXMUXSIX ข้าวหลามเตาถ่าน!\n\nเรียนคุณ ${emailRecord.toName}\nอีเมลผู้รับ: ${emailRecord.to}\n\n🎁 โค้ดส่วนลดต้อนรับสมาชิกใหม่ 10%: ${emailRecord.promoCode}\n🤝 รหัสชวนเพื่อนของคุณ: ${emailRecord.referralCode}\n\nสามารถนำโค้ดไปใส่ในช่องส่วนลดหน้าสั่งซื้อได้ทันทีครับ!`);
+                        formData.append('message', msgText);
 
                         const resp = await fetch('https://api.web3forms.com/submit', {
                             method: 'POST',
@@ -3165,6 +3758,10 @@
             else if (emailSettings.provider === 'local_server') {
                 try {
                     const serverUrl = emailSettings.localServerUrl || 'http://localhost:5000';
+                    const txtContent = emailRecord.orderId 
+                        ? `สวัสดีคุณ ${emailRecord.toName} คำสั่งซื้อ #${emailRecord.orderId} ยอดชำระ ${emailRecord.total || 0} บาท กำลังจัดเตรียมเผาเตาถ่านไฟแรง ขอบคุณสำหรับการสั่งซื้อกับ MAXMUXSIX`
+                        : `สวัสดีคุณ ${emailRecord.toName} ยินดีต้อนรับสู่ MAXMUXSIX โค้ดลด 10% คือ ${emailRecord.promoCode}`;
+
                     const resp = await fetch(`${serverUrl}/api/send-email`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
@@ -3173,7 +3770,7 @@
                             toName: emailRecord.toName,
                             subject: emailRecord.subject,
                             htmlContent: emailRecord.htmlContent,
-                            textContent: `สวัสดีคุณ ${emailRecord.toName} ยินดีต้อนรับสู่ MAXMUXSIX โค้ดลด 10% คือ ${emailRecord.promoCode}`
+                            textContent: txtContent
                         }),
                         signal: AbortSignal.timeout(6000)
                     });

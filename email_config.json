@@ -1,9 +1,9 @@
 {
-  "enabled": false,
+  "enabled": true,
   "smtp_host": "smtp.gmail.com",
   "smtp_port": 587,
-  "smtp_user": "",
-  "smtp_pass": "",
-  "from_email": "",
+  "smtp_user": "tanatep23@gmail.com",
+  "smtp_pass": "stjauhuwzzbnxmpv",
+  "from_email": "tanatep23@gmail.com",
   "from_name": "MAXMUXSIX ข้าวหลามเตาถ่าน"
 }
