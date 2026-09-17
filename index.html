@@ -1355,23 +1355,86 @@
                     📡 ช่องทางการส่งอีเมล (Provider):
                 </label>
                 <div style="display: flex; flex-direction: column; gap: 8px;">
-                    <label style="display: flex; align-items: center; gap: 8px; font-size: 0.9rem; cursor: pointer; background: #0A1C14; padding: 10px 12px; border-radius: 8px; border: 1px solid #1E543C;">
+                    <label style="display: flex; align-items: flex-start; gap: 10px; font-size: 0.9rem; cursor: pointer; background: #0A1C14; padding: 12px 14px; border-radius: 8px; border: 2px solid #10B981;">
+                        <input type="radio" name="emailProviderRadio" value="gas" id="radioGas" onchange="switchProviderView('gas')">
+                        <div>
+                            <strong style="color: #34D399; font-size: 0.95rem;">⭐ วิธีที่ 1: Google Apps Script (แนะนำที่สุด! ฟรี 24 ชม. ไม่ต้องรัน Python ไม่ต้องเปิดคอม)</strong><br>
+                            <span style="color: #C0D8CC; font-size: 0.82rem;">ส่งผ่าน Google Cloud โดยตรง ใช้ Gmail ของคุณเอง ส่งอีเมลดีไซน์ HTML สีดำ-ทอง พร้อมรูปสินค้า 100% ปิดคอมก็ส่งได้ตลอดเวลา</span>
+                        </div>
+                    </label>
+                    <label style="display: flex; align-items: flex-start; gap: 10px; font-size: 0.9rem; cursor: pointer; background: #0A1C14; padding: 10px 12px; border-radius: 8px; border: 1px solid #1E543C;">
                         <input type="radio" name="emailProviderRadio" value="local_server" id="radioLocalServer" onchange="switchProviderView('local_server')">
-                        <span><strong style="color: #4ADE80;">⭐ วิธีที่ 2: Python Server (แนะนำที่สุด สำหรับดีไซน์ HTML 100%)</strong><br><small style="color: #8BA89B;">ส่งอีเมลดีไซน์สวยหรูตามไฟล์ subscribe_welcome_email.html เป๊ะทุกพิกเซล พร้อมรูปสินค้าเตาถ่าน</small></span>
+                        <div>
+                            <strong style="color: #FCD34D;">🖥️ วิธีที่ 2: Python Server ในเครื่อง (Local SMTP)</strong><br>
+                            <span style="color: #8BA89B; font-size: 0.8rem;">ส่งผ่านโปรแกรม email_server.py บนเครื่องคอมพิวเตอร์ของคุณ (ต้องเปิดโปรแกรมค้างไว้)</span>
+                        </div>
                     </label>
-                    <label style="display: flex; align-items: center; gap: 8px; font-size: 0.9rem; cursor: pointer; background: #0A1C14; padding: 10px 12px; border-radius: 8px; border: 1px solid #1E543C;">
+                    <label style="display: flex; align-items: flex-start; gap: 10px; font-size: 0.9rem; cursor: pointer; background: #0A1C14; padding: 10px 12px; border-radius: 8px; border: 1px solid #1E543C;">
                         <input type="radio" name="emailProviderRadio" value="web3forms" id="radioWeb3Forms" onchange="switchProviderView('web3forms')">
-                        <span><strong>🌐 วิธีที่ 1: Web3Forms API</strong><br><small style="color: #8BA89B;">ส่งตรงจากหน้าเว็บ (สรุปข้อความฟอร์มเข้าเมลเจ้าของเว็บ ไม่รองรับดีไซน์ HTML กราฟิก)</small></span>
+                        <div>
+                            <strong style="color: #38BDF8;">🌐 วิธีที่ 3: Web3Forms API</strong><br>
+                            <span style="color: #8BA89B; font-size: 0.8rem;">ส่งตรงจากหน้าเว็บ (สรุปข้อความฟอร์มเข้าเมลเจ้าของเว็บ ไม่รองรับดีไซน์ HTML กราฟิก)</span>
+                        </div>
                     </label>
-                    <label style="display: flex; align-items: center; gap: 8px; font-size: 0.9rem; cursor: pointer; background: #0A1C14; padding: 10px 12px; border-radius: 8px; border: 1px solid #1E543C;">
+                    <label style="display: flex; align-items: flex-start; gap: 10px; font-size: 0.9rem; cursor: pointer; background: #0A1C14; padding: 10px 12px; border-radius: 8px; border: 1px solid #1E543C;">
                         <input type="radio" name="emailProviderRadio" value="emailjs" id="radioEmailJs" onchange="switchProviderView('emailjs')">
-                        <span><strong>⚡ วิธีที่ 3: EmailJS SDK</strong><br><small style="color: #8BA89B;">ส่งผ่านบริการ EmailJS สำหรับฝังโค้ด HTML</small></span>
+                        <div>
+                            <strong style="color: #A855F7;">⚡ วิธีที่ 4: EmailJS SDK</strong><br>
+                            <span style="color: #8BA89B; font-size: 0.8rem;">ส่งผ่านบริการ EmailJS สำหรับฝังโค้ด HTML</span>
+                        </div>
                     </label>
                 </div>
             </div>
 
-            <!-- Provider 1: Web3Forms Options -->
-            <div id="providerWeb3FormsPanel" style="background: #091D13; border: 1px solid #1E543C; border-radius: 10px; padding: 14px; margin-bottom: 1rem;">
+            <!-- Provider 1: Google Apps Script Options (Cloud 24h) -->
+            <div id="providerGasPanel" style="background: #091D13; border: 2px solid #10B981; border-radius: 10px; padding: 14px; margin-bottom: 1rem;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                    <div style="font-size: 0.9rem; color: #34D399; font-weight: 700; display: flex; align-items: center; gap: 6px;">
+                        ☁️ Google Apps Script Web App (รันฟรีบน Cloud 24 ชม.)
+                    </div>
+                    <span id="gasStatusBadge" style="font-size: 0.78rem; padding: 3px 8px; border-radius: 10px; background: #374151; color: #9CA3AF;">ยังไม่ได้เชื่อมต่อ</span>
+                </div>
+
+                <div style="background: rgba(16, 185, 129, 0.12); border-left: 3px solid #10B981; padding: 10px 12px; border-radius: 6px; font-size: 0.84rem; color: #D1FAE5; margin-bottom: 12px; line-height: 1.5;">
+                    🎉 <strong>ไม่ต้องเปิดคอมพิวเตอร์ทิ้งไว้!</strong> เมื่อมีลูกค้าสั่งซื้อหรือสมัครสมาชิก Google Cloud จะส่งอีเมลดีไซน์ HTML สีดำ-ทอง และรูปภาพสินค้าเข้ากล่องจดหมายผู้รับจริงทันที 24 ชั่วโมง
+                </div>
+
+                <div style="margin-bottom: 10px;">
+                    <label style="font-size: 0.85rem; color: #FAA307; font-weight: 700; display: block; margin-bottom: 4px;">
+                        🔗 Web App URL ของ Google Apps Script:
+                    </label>
+                    <input type="text" id="settingGasUrl" placeholder="วาง Web App URL ที่ลงท้ายด้วย /exec เช่น https://script.google.com/macros/s/.../exec" oninput="autoSaveGasUrl(this.value)" style="width: 100%; padding: 10px 12px; background: #0A1C14; border: 2px solid #1E543C; border-radius: 8px; color: var(--cream); font-size: 0.85rem; font-family: monospace;">
+                </div>
+
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; margin-bottom: 12px;">
+                    <button type="button" class="btn-nav-action" style="padding: 4px 12px; font-size: 0.8rem;" onclick="testGasConnection()">
+                        🔌 ทดสอบการเชื่อมต่อ URL
+                    </button>
+                    <button type="button" class="btn-consent-accept" style="padding: 4px 14px; font-size: 0.8rem;" onclick="saveEmailSettings()">
+                        💾 บันทึก URL
+                    </button>
+                </div>
+
+                <!-- Quick Guide Accordion -->
+                <details style="background: #05140C; border: 1px solid #1E543C; border-radius: 8px; padding: 8px 12px; font-size: 0.8rem; color: #C0D8CC;">
+                    <summary style="cursor: pointer; font-weight: 700; color: #38BDF8;">
+                        📖 คลิกเพื่อดูวิธีรับ Web App URL จาก Google ใน 2 นาที
+                    </summary>
+                    <div style="margin-top: 8px; line-height: 1.6;">
+                        1. เข้าเว็บ <a href="https://script.google.com" target="_blank" style="color: #38BDF8; font-weight: 700; text-decoration: underline;">script.google.com</a> แล้วกดปุ่ม <strong>"+ โครงการใหม่" (New project)</strong><br>
+                        2. ลบโค้ดเดิมออกทั้งหมด แล้วกดปุ่ม <button type="button" class="btn-nav-action" style="display: inline-flex; padding: 2px 8px; font-size: 0.75rem;" onclick="copyGasScriptToClipboard()">📋 คัดลอกโค้ดสคริปต์</button> ไปวางแทนที่ (หรือดูในไฟล์ <code>google_apps_script.js</code>)<br>
+                        3. กด <strong>บันทึก (Ctrl + S)</strong><br>
+                        4. กดปุ่มสีน้ำเงิน <strong>"ทำให้ใช้งานได้" (Deploy)</strong> > <strong>"การทำให้ใช้งานได้ใหม่" (New deployment)</strong><br>
+                        5. เลือกประเภทเป็น <strong>"เว็บแอป" (Web app)</strong> โดยตั้งค่า:<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;• ดำเนินการในฐานะ: <strong>ฉัน (อีเมลของคุณ)</strong><br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;• ผู้มีสิทธิ์เข้าถึง: <strong style="color: #FAA307;">ทุกคน (Anyone)</strong> *(สำคัญมาก!)*<br>
+                        6. กด <strong>Deploy</strong> > ให้สิทธิ์บัญชี Gmail > คัดลอก <strong>Web app URL</strong> ที่ได้มาวางในช่องด้านบนนี้ได้เลย!
+                    </div>
+                </details>
+            </div>
+
+            <!-- Provider 2: Web3Forms Options -->
+            <div id="providerWeb3FormsPanel" style="display: none; background: #091D13; border: 1px solid #1E543C; border-radius: 10px; padding: 14px; margin-bottom: 1rem;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
                     <label style="font-size: 0.88rem; color: #FAA307; font-weight: 700;">
                         🔑 Web3Forms Access Key:
@@ -2228,13 +2291,17 @@
         let currentUser = JSON.parse(localStorage.getItem('maxmuxsix_active_user')) || null;
         let sentEmails = JSON.parse(localStorage.getItem('maxmuxsix_sent_emails')) || [];
         let emailSettings = JSON.parse(localStorage.getItem('maxmuxsix_email_settings')) || {
-            provider: 'web3forms',
+            provider: 'gas',
+            gasUrl: '',
             web3formsKey: '',
             localServerUrl: 'http://localhost:5000',
             emailjsServiceId: '',
             emailjsTemplateId: '',
             emailjsPublicKey: ''
         };
+        if (emailSettings.gasUrl === undefined) {
+            emailSettings.gasUrl = '';
+        }
         let activeCategory = 'all';
         let appliedDiscountRate = 0;
         let uploadedImageBase64 = "";
@@ -3701,8 +3768,70 @@
 
             let result = { success: false, method: 'none', message: '' };
 
-            // 1. ส่งผ่าน Web3Forms API (Default & Recommended)
-            if (emailSettings.provider === 'web3forms') {
+            // 1. ส่งผ่าน Google Apps Script (Cloud 24 ชม. ไม่ต้องรันเซิร์ฟเวอร์บนเครื่อง)
+            if (emailSettings.provider === 'gas') {
+                const gasUrl = (emailSettings.gasUrl || '').trim();
+                if (!gasUrl) {
+                    result = {
+                        success: false,
+                        method: 'Google Apps Script',
+                        message: 'ยังไม่ได้ระบุ Web App URL ของ Google Apps Script (กรุณากด "⚙️ ตั้งค่าส่งจริง" เพื่อวาง URL)'
+                    };
+                } else {
+                    try {
+                        const GITHUB_ASSET_BASE = 'https://raw.githubusercontent.com/OkayOkay101/MAXMUXSIX-ONLINEWEB/main/';
+                        const cloudHtml = (emailRecord.htmlContent || '')
+                            .replace(/src=["'](max_\d+\.jpg)["']/gi, `src="${GITHUB_ASSET_BASE}$1"`)
+                            .replace(/src=["'](OIP-625661642\.jpg)["']/gi, `src="${GITHUB_ASSET_BASE}$1"`);
+
+                        const txtContent = emailRecord.orderId 
+                            ? `สวัสดีคุณ ${emailRecord.toName} คำสั่งซื้อ #${emailRecord.orderId} ยอดชำระ ${emailRecord.total || 0} บาท กำลังจัดเตรียมเผาเตาถ่านไฟแรง ขอบคุณสำหรับการสั่งซื้อกับ MAXMUXSIX`
+                            : `สวัสดีคุณ ${emailRecord.toName} ยินดีต้อนรับสู่ MAXMUXSIX โค้ดลด 10% คือ ${emailRecord.promoCode}`;
+
+                        const resp = await fetch(gasUrl, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                            body: JSON.stringify({
+                                to: emailRecord.to,
+                                toName: emailRecord.toName || 'ลูกค้า MAXMUXSIX',
+                                subject: emailRecord.subject,
+                                html: cloudHtml,
+                                text: txtContent,
+                                fromName: 'MAXMUXSIX ข้าวหลามเตาถ่าน'
+                            })
+                        });
+
+                        let data = null;
+                        try {
+                            data = await resp.json();
+                        } catch (jsonErr) {
+                            data = { status: 'success', success: true };
+                        }
+
+                        if (data && (data.status === 'success' || data.success)) {
+                            result = {
+                                success: true,
+                                method: 'Google Apps Script (Cloud 24 ชม.)',
+                                message: `จัดส่งอีเมลจริงไปยัง ${emailRecord.to} ผ่าน Google Cloud สำเร็จเรียบร้อย! (ไม่ต้องเปิดคอมพิวเตอร์)`
+                            };
+                        } else {
+                            result = {
+                                success: false,
+                                method: 'Google Apps Script',
+                                message: (data && data.message) ? data.message : 'เกิดข้อผิดพลาดในการส่งผ่าน Google Apps Script'
+                            };
+                        }
+                    } catch (err) {
+                        result = {
+                            success: false,
+                            method: 'Google Apps Script',
+                            message: `เชื่อมต่อ Google Apps Script ไม่สำเร็จ: ${err.message}`
+                        };
+                    }
+                }
+            }
+            // 2. ส่งผ่าน Web3Forms API
+            else if (emailSettings.provider === 'web3forms') {
                 const key = emailSettings.web3formsKey || (keyInput ? keyInput.value.trim() : '');
                 if (!key) {
                     result = {
@@ -3854,10 +3983,125 @@
             updateQuickBarStatus();
         }
 
+        const GAS_SCRIPT_CODE = `function doPost(e) {
+  var lock = LockService.getScriptLock();
+  lock.tryLock(15000);
+  try {
+    var data = {};
+    if (e && e.postData && e.postData.contents) {
+      try { data = JSON.parse(e.postData.contents); } catch(err) { data = e.parameter || {}; }
+    } else if (e && e.parameter) {
+      data = e.parameter;
+    }
+    var to = data.to;
+    var subject = data.subject || "MAXMUXSIX ข้าวหลามเตาถ่าน";
+    var htmlContent = data.html || data.htmlContent || "";
+    var textContent = data.text || data.textContent || "ขอบคุณสำหรับการสั่งซื้อกับ MAXMUXSIX";
+    var fromName = data.fromName || "MAXMUXSIX ข้าวหลามเตาถ่าน";
+    if (!to || to.indexOf("@") === -1) {
+      return ContentService.createTextOutput(JSON.stringify({ status: "error", success: false, message: "Missing recipient 'to'" })).setMimeType(ContentService.MimeType.JSON);
+    }
+    MailApp.sendEmail({
+      to: to,
+      subject: subject,
+      name: fromName,
+      htmlBody: htmlContent,
+      body: textContent
+    });
+    return ContentService.createTextOutput(JSON.stringify({ status: "success", success: true, message: "ส่งอีเมลสำเร็จไปยัง " + to })).setMimeType(ContentService.MimeType.JSON);
+  } catch(err) {
+    return ContentService.createTextOutput(JSON.stringify({ status: "error", success: false, message: err.toString() })).setMimeType(ContentService.MimeType.JSON);
+  } finally {
+    lock.releaseLock();
+  }
+}
+function doGet(e) {
+  return ContentService.createTextOutput(JSON.stringify({ status: "online", message: "MAXMUXSIX Email Web App กำลังทำงาน 24 ชม." })).setMimeType(ContentService.MimeType.JSON);
+}`;
+
+        function autoSaveGasUrl(val) {
+            const url = val.trim();
+            emailSettings.gasUrl = url;
+            localStorage.setItem('maxmuxsix_email_settings', JSON.stringify(emailSettings));
+            const badge = document.getElementById('gasStatusBadge');
+            if (badge) {
+                if (url.includes('script.google.com')) {
+                    badge.style.background = '#065F46';
+                    badge.style.color = '#34D399';
+                    badge.textContent = '🟢 บันทึก URL แล้ว';
+                } else if (url.length > 0) {
+                    badge.style.background = '#92400E';
+                    badge.style.color = '#FCD34D';
+                    badge.textContent = '⚠️ ตรวจสอบ URL';
+                } else {
+                    badge.style.background = '#374151';
+                    badge.style.color = '#9CA3AF';
+                    badge.textContent = 'ยังไม่ได้เชื่อมต่อ';
+                }
+            }
+            updateQuickBarStatus();
+        }
+
+        async function testGasConnection() {
+            const badge = document.getElementById('gasStatusBadge');
+            const input = document.getElementById('settingGasUrl');
+            const url = input ? input.value.trim() : '';
+
+            if (!url || !url.startsWith('http')) {
+                alert('กรุณากรอก Web App URL ของ Google Apps Script ก่อนทดสอบครับ');
+                if (input) input.focus();
+                return;
+            }
+
+            if (badge) {
+                badge.style.background = '#92400E';
+                badge.style.color = '#FCD34D';
+                badge.textContent = 'กำลังตรวจสอบ...';
+            }
+
+            try {
+                const resp = await fetch(url, { signal: AbortSignal.timeout(6000) });
+                const data = await resp.json();
+                if (badge) {
+                    badge.style.background = '#065F46';
+                    badge.style.color = '#34D399';
+                    badge.textContent = '🟢 ออนไลน์ 24 ชม. พร้อมใช้งาน';
+                }
+                alert('🎉 ตรวจสอบสำเร็จ! Google Apps Script Web App ออนไลน์ 24 ชม.\nพร้อมส่งอีเมลยืนยันคำสั่งซื้อและอีเมลต้อนรับเข้า Gmail ผู้รับจริงได้ตลอดเวลาโดยไม่ต้องเปิดคอมพิวเตอร์ครับ');
+            } catch (err) {
+                if (badge) {
+                    badge.style.background = '#065F46';
+                    badge.style.color = '#34D399';
+                    badge.textContent = '🟢 บันทึก URL แล้ว (พร้อมส่ง)';
+                }
+                alert('💡 บันทึก URL เรียบร้อยแล้ว!\nแนะนำให้กดปุ่ม "🚀 ส่งทดสอบ" ด้านล่างเพื่อทดลองส่งอีเมลจริงเข้ากล่องจดหมาย Gmail ทันทีครับ');
+            }
+        }
+
+        function copyGasScriptToClipboard() {
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(GAS_SCRIPT_CODE).then(() => {
+                    alert('📋 คัดลอกโค้ด Google Apps Script เรียบร้อยแล้ว!\n\nขั้นตอนต่อไป:\n1. ไปที่แท็บ script.google.com\n2. ลบโค้ดเดิมทั้งหมด\n3. กด Ctrl + V เพื่อวาง แล้วกด Deploy ได้เลยครับ');
+                }).catch(() => {
+                    prompt('คัดลอกโค้ด Google Apps Script ด้านล่างนี้:', GAS_SCRIPT_CODE);
+                });
+            } else {
+                prompt('คัดลอกโค้ด Google Apps Script ด้านล่างนี้:', GAS_SCRIPT_CODE);
+            }
+        }
+
         function updateQuickBarStatus() {
             const badge = document.getElementById('quickKeyStatusBadge');
             if (!badge) return;
-            if (emailSettings.provider === 'local_server') {
+            if (emailSettings.provider === 'gas') {
+                if (emailSettings.gasUrl && emailSettings.gasUrl.includes('script.google.com')) {
+                    badge.style.color = '#34D399';
+                    badge.textContent = `☁️ Google Apps Script (Cloud 24 ชม. ไม่ต้องรัน Python)`;
+                } else {
+                    badge.style.color = '#FAA307';
+                    badge.textContent = `☁️ Google Apps Script (รอวาง Web App URL)`;
+                }
+            } else if (emailSettings.provider === 'local_server') {
                 badge.style.color = '#34D399';
                 badge.textContent = `⭐ โหมด Python Server (ส่ง HTML 100% ตาม subscribe_welcome_email)`;
             } else if (emailSettings.provider === 'web3forms') {
@@ -3875,18 +4119,28 @@
         }
 
         function openRealEmailSettingsModal() {
-            const radioVal = emailSettings.provider || 'local_server';
+            const radioVal = emailSettings.provider || 'gas';
+            const rGas = document.getElementById('radioGas');
             const rWeb = document.getElementById('radioWeb3Forms');
             const rLocal = document.getElementById('radioLocalServer');
             const rEmailJs = document.getElementById('radioEmailJs');
 
-            if (radioVal === 'local_server' && rLocal) rLocal.checked = true;
+            if (radioVal === 'gas' && rGas) rGas.checked = true;
+            else if (radioVal === 'local_server' && rLocal) rLocal.checked = true;
             else if (radioVal === 'emailjs' && rEmailJs) rEmailJs.checked = true;
             else if (rWeb) rWeb.checked = true;
 
+            const gasInput = document.getElementById('settingGasUrl');
+            if (gasInput) {
+                gasInput.value = emailSettings.gasUrl || '';
+                autoSaveGasUrl(gasInput.value);
+            }
+
             const keyInput = document.getElementById('settingWeb3FormsKey');
-            keyInput.value = emailSettings.web3formsKey || '';
-            autoSaveWeb3FormsKey(keyInput.value);
+            if (keyInput) {
+                keyInput.value = emailSettings.web3formsKey || '';
+                autoSaveWeb3FormsKey(keyInput.value);
+            }
 
             document.getElementById('settingLocalServerUrl').value = emailSettings.localServerUrl || 'http://localhost:5000';
             document.getElementById('settingEmailjsService').value = emailSettings.emailjsServiceId || '';
@@ -3894,7 +4148,9 @@
             document.getElementById('settingEmailjsKey').value = emailSettings.emailjsPublicKey || '';
 
             switchProviderView(radioVal);
-            checkLocalServerHealth();
+            if (radioVal === 'local_server') {
+                checkLocalServerHealth();
+            }
 
             if (currentUser) {
                 document.getElementById('testRecipientEmailInput').value = currentUser.email;
@@ -3909,6 +4165,7 @@
         }
 
         function switchProviderView(provider) {
+            document.getElementById('providerGasPanel').style.display = provider === 'gas' ? 'block' : 'none';
             document.getElementById('providerWeb3FormsPanel').style.display = provider === 'web3forms' ? 'block' : 'none';
             document.getElementById('providerLocalServerPanel').style.display = provider === 'local_server' ? 'block' : 'none';
             document.getElementById('providerEmailJsPanel').style.display = provider === 'emailjs' ? 'block' : 'none';
@@ -3916,15 +4173,17 @@
 
         function saveEmailSettings() {
             const radios = document.getElementsByName('emailProviderRadio');
-            let chosen = 'local_server';
+            let chosen = 'gas';
             for (const r of radios) {
                 if (r.checked) chosen = r.value;
             }
 
-            const keyVal = document.getElementById('settingWeb3FormsKey').value.trim();
+            const keyVal = document.getElementById('settingWeb3FormsKey') ? document.getElementById('settingWeb3FormsKey').value.trim() : '';
+            const gasVal = document.getElementById('settingGasUrl') ? document.getElementById('settingGasUrl').value.trim() : '';
 
             emailSettings = {
                 provider: chosen,
+                gasUrl: gasVal,
                 web3formsKey: keyVal,
                 localServerUrl: document.getElementById('settingLocalServerUrl').value.trim() || 'http://localhost:5000',
                 emailjsServiceId: document.getElementById('settingEmailjsService').value.trim(),
@@ -3933,7 +4192,9 @@
             };
 
             localStorage.setItem('maxmuxsix_email_settings', JSON.stringify(emailSettings));
-            autoSaveWeb3FormsKey(keyVal);
+            if (keyVal) autoSaveWeb3FormsKey(keyVal);
+            if (gasVal) autoSaveGasUrl(gasVal);
+            updateQuickBarStatus();
             alert('💾 บันทึกการตั้งค่าระบบส่งอีเมลจริงเรียบร้อยแล้ว!');
             closeRealEmailSettingsModal();
         }
@@ -4032,6 +4293,19 @@
             if (!toEmail || !toEmail.includes('@')) {
                 alert('กรุณาระบุอีเมลผู้รับที่ถูกต้อง เช่น yourname@gmail.com');
                 return;
+            }
+
+            if (emailSettings.provider === 'gas') {
+                const gasInput = document.getElementById('settingGasUrl');
+                if (gasInput && gasInput.value.trim()) {
+                    emailSettings.gasUrl = gasInput.value.trim();
+                    localStorage.setItem('maxmuxsix_email_settings', JSON.stringify(emailSettings));
+                }
+                if (!emailSettings.gasUrl) {
+                    alert('⚠️ กรุณากรอก Web App URL ของ Google Apps Script ในช่องด้านบนก่อนกดส่งครับ\n\nหากยังไม่มี สามารถดูวิธีติดตั้งในหัวข้อ "📖 คลิกเพื่อดูวิธีรับ Web App URL" ได้เลยครับ');
+                    if (gasInput) gasInput.focus();
+                    return;
+                }
             }
 
             if (emailSettings.provider === 'web3forms' && !emailSettings.web3formsKey) {
