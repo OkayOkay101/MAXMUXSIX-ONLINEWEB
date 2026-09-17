@@ -1351,17 +1351,17 @@
                     📡 ช่องทางการส่งอีเมล (Provider):
                 </label>
                 <div style="display: flex; flex-direction: column; gap: 8px;">
-                    <label style="display: flex; align-items: center; gap: 8px; font-size: 0.9rem; cursor: pointer; background: #0A1C14; padding: 8px 12px; border-radius: 8px; border: 1px solid #1E543C;">
-                        <input type="radio" name="emailProviderRadio" value="web3forms" id="radioWeb3Forms" onchange="switchProviderView('web3forms')">
-                        <span><strong>🌐 Web3Forms API (แนะนำที่สุด)</strong> — ส่งตรงจากเบราว์เซอร์เข้า Inbox จริง ไม่ต้องรันเซิร์ฟเวอร์</span>
-                    </label>
-                    <label style="display: flex; align-items: center; gap: 8px; font-size: 0.9rem; cursor: pointer; background: #0A1C14; padding: 8px 12px; border-radius: 8px; border: 1px solid #1E543C;">
+                    <label style="display: flex; align-items: center; gap: 8px; font-size: 0.9rem; cursor: pointer; background: #0A1C14; padding: 10px 12px; border-radius: 8px; border: 1px solid #1E543C;">
                         <input type="radio" name="emailProviderRadio" value="local_server" id="radioLocalServer" onchange="switchProviderView('local_server')">
-                        <span><strong>🖥️ Local Python Server (email_server.py)</strong> — ส่งผ่าน SMTP / Gmail App Password หลังบ้าน</span>
+                        <span><strong style="color: #4ADE80;">⭐ วิธีที่ 2: Python Server (แนะนำที่สุด สำหรับดีไซน์ HTML 100%)</strong><br><small style="color: #8BA89B;">ส่งอีเมลดีไซน์สวยหรูตามไฟล์ subscribe_welcome_email.html เป๊ะทุกพิกเซล พร้อมรูปสินค้าเตาถ่าน</small></span>
                     </label>
-                    <label style="display: flex; align-items: center; gap: 8px; font-size: 0.9rem; cursor: pointer; background: #0A1C14; padding: 8px 12px; border-radius: 8px; border: 1px solid #1E543C;">
+                    <label style="display: flex; align-items: center; gap: 8px; font-size: 0.9rem; cursor: pointer; background: #0A1C14; padding: 10px 12px; border-radius: 8px; border: 1px solid #1E543C;">
+                        <input type="radio" name="emailProviderRadio" value="web3forms" id="radioWeb3Forms" onchange="switchProviderView('web3forms')">
+                        <span><strong>🌐 วิธีที่ 1: Web3Forms API</strong><br><small style="color: #8BA89B;">ส่งตรงจากหน้าเว็บ (สรุปข้อความฟอร์มเข้าเมลเจ้าของเว็บ ไม่รองรับดีไซน์ HTML กราฟิก)</small></span>
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 8px; font-size: 0.9rem; cursor: pointer; background: #0A1C14; padding: 10px 12px; border-radius: 8px; border: 1px solid #1E543C;">
                         <input type="radio" name="emailProviderRadio" value="emailjs" id="radioEmailJs" onchange="switchProviderView('emailjs')">
-                        <span><strong>⚡ EmailJS SDK</strong> — ส่งผ่านบัญชี EmailJS</span>
+                        <span><strong>⚡ วิธีที่ 3: EmailJS SDK</strong><br><small style="color: #8BA89B;">ส่งผ่านบริการ EmailJS สำหรับฝังโค้ด HTML</small></span>
                     </label>
                 </div>
             </div>
@@ -1375,24 +1375,57 @@
                     <span id="web3formsKeyBadge" style="font-size: 0.8rem; font-weight: 600;"></span>
                 </div>
                 <input type="text" id="settingWeb3FormsKey" placeholder="วาง Access Key ที่ได้จาก web3forms.com ที่นี่..." oninput="autoSaveWeb3FormsKey(this.value)" style="width: 100%; padding: 10px 12px; background: #0A1C14; border: 2px solid #1E543C; border-radius: 8px; color: var(--cream); font-size: 0.9rem; margin-bottom: 8px; font-family: monospace;">
-                <div style="font-size: 0.82rem; color: #C0D8CC; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+                <div style="font-size: 0.82rem; color: #C0D8CC; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; margin-bottom: 8px;">
                     <span>💡 <strong>วิธีรับ Key ฟรี:</strong> เข้า <a href="https://web3forms.com" target="_blank" style="color: #38BDF8; font-weight: 700; text-decoration: underline;">web3forms.com</a> กรอกอีเมลของคุณ แล้วคัดลอก Access Key ในอีเมลมาวางที่นี่</span>
                     <button type="button" class="btn-consent-accept" style="padding: 4px 14px; font-size: 0.8rem;" onclick="saveEmailSettings()">💾 บันทึก Key</button>
+                </div>
+                <div style="background: rgba(234, 179, 8, 0.12); border-left: 3px solid #EAB308; padding: 8px 10px; border-radius: 4px; font-size: 0.78rem; color: #FEF08A; line-height: 1.4;">
+                    ℹ️ <strong>ทำไมวิธีนี้ถึงส่งเป็นข้อความธรรมดา?</strong> บริการ Web3Forms ฟรีเป็น Form Collector ที่นำข้อมูลไปจัดลงในตารางข้อความมาตรฐาน จึงไม่สามารถแสดงกราฟิกสีดำทอง กล่องคูปอง และภาพสินค้าของไฟล์ <code>subscribe_welcome_email.html</code> ได้ (แนะนำให้เลือก <strong>วิธีที่ 2 ด้านล่าง</strong> เพื่อส่งแบบสวยงาม 100%)
                 </div>
             </div>
 
             <!-- Provider 2: Local Python Server Options -->
-            <div id="providerLocalServerPanel" style="display: none; background: #091D13; border: 1px solid #1E543C; border-radius: 10px; padding: 12px 14px; margin-bottom: 1rem;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                    <span style="font-size: 0.85rem; color: #FAA307; font-weight: 600;">สถานะ Python Server (email_server.py):</span>
+            <div id="providerLocalServerPanel" style="display: none; background: #091D13; border: 1px solid #10B981; border-radius: 10px; padding: 14px; margin-bottom: 1rem;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                    <div style="font-size: 0.88rem; color: #34D399; font-weight: 700;">
+                        🖥️ ระบบ Python Server (ส่ง HTML แท้เหมือน subscribe_welcome_email)
+                    </div>
                     <span id="localServerStatusBadge" style="font-size: 0.78rem; padding: 2px 8px; border-radius: 10px; background: #374151; color: #9CA3AF;">กำลังตรวจสอบ...</span>
                 </div>
-                <div style="font-size: 0.82rem; color: #C0D8CC; line-height: 1.4; margin-bottom: 8px;">
-                    รันเซิร์ฟเวอร์ด้วยคำสั่งในเทอร์มินัล: <code style="background: #000; padding: 2px 6px; border-radius: 4px; color: #4ADE80;">python email_server.py</code>
+                
+                <div style="background: rgba(16, 185, 129, 0.1); border-left: 3px solid #10B981; padding: 8px 12px; border-radius: 4px; font-size: 0.82rem; color: #D1FAE5; margin-bottom: 12px; line-height: 1.5;">
+                    ✨ <strong>วิธีนี้จะส่งอีเมลดีไซน์สวยหรู 100%</strong> ตามไฟล์ <code>subscribe_welcome_email.html</code> มีสีเตาถ่าน สีดำ-ทอง กล่องโค้ดส่วนลด และฝังรูปภาพสินค้าครบทุกเมนูเข้า Inbox ผู้รับจริง!
                 </div>
-                <div style="display: flex; gap: 8px;">
-                    <input type="text" id="settingLocalServerUrl" value="http://localhost:5000" style="flex: 1; padding: 6px 10px; background: #0A1C14; border: 1px solid #1E543C; border-radius: 6px; color: var(--cream); font-size: 0.82rem;">
-                    <button class="btn-nav-action" style="padding: 4px 10px; font-size: 0.8rem;" onclick="checkLocalServerHealth()">🔄 เช็คการเชื่อมต่อ</button>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+                    <div>
+                        <label style="font-size: 0.8rem; color: #FAA307; font-weight: 600; display: block; margin-bottom: 4px;">
+                            📧 อีเมล Gmail ของคุณ (ผู้ส่ง):
+                        </label>
+                        <input type="email" id="settingGmailUser" placeholder="เช่น yourname@gmail.com" style="width: 100%; padding: 8px 10px; background: #0A1C14; border: 1px solid #1E543C; border-radius: 6px; color: var(--cream); font-size: 0.85rem;">
+                    </div>
+                    <div>
+                        <label style="font-size: 0.8rem; color: #FAA307; font-weight: 600; display: block; margin-bottom: 4px;">
+                            🔑 Google App Password 16 หลัก:
+                        </label>
+                        <input type="password" id="settingGmailPass" placeholder="เช่น abcd efgh ijkl mnop" style="width: 100%; padding: 8px 10px; background: #0A1C14; border: 1px solid #1E543C; border-radius: 6px; color: var(--cream); font-size: 0.85rem; font-family: monospace;">
+                    </div>
+                </div>
+
+                <div style="font-size: 0.78rem; color: #8BA89B; line-height: 1.4; margin-bottom: 10px; background: #05140C; padding: 8px 10px; border-radius: 6px;">
+                    💡 <strong>วิธีเอา App Password 16 หลักจาก Google:</strong><br>
+                    1. เข้าไปที่ <a href="https://myaccount.google.com/apppasswords" target="_blank" style="color: #38BDF8; font-weight: 700; text-decoration: underline;">myaccount.google.com/apppasswords</a><br>
+                    2. ตั้งชื่อ เช่น <code>MAXMUXSIX</code> แล้วกดปุ่ม "สร้าง" (Create)<br>
+                    3. คัดลอกรหัสผ่าน 16 ตัวอักษรสีเหลืองมาวางที่นี่ แล้วกดปุ่ม <strong>"💾 บันทึกตั้งค่า Gmail"</strong>
+                </div>
+
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+                    <div style="display: flex; align-items: center; gap: 6px;">
+                        <span style="font-size: 0.78rem; color: #8BA89B;">URL เซิร์ฟเวอร์:</span>
+                        <input type="text" id="settingLocalServerUrl" value="http://localhost:5000" style="width: 150px; padding: 4px 8px; background: #0A1C14; border: 1px solid #1E543C; border-radius: 4px; color: var(--cream); font-size: 0.78rem;">
+                        <button class="btn-nav-action" style="padding: 3px 8px; font-size: 0.75rem;" onclick="checkLocalServerHealth()">🔄 รีเฟรช</button>
+                    </div>
+                    <button class="btn-consent-accept" style="padding: 6px 16px; font-size: 0.82rem;" onclick="saveGmailToPythonServer()">💾 บันทึกตั้งค่า Gmail</button>
                 </div>
             </div>
 
@@ -3227,17 +3260,17 @@
         function updateQuickBarStatus() {
             const badge = document.getElementById('quickKeyStatusBadge');
             if (!badge) return;
-            if (emailSettings.provider === 'web3forms') {
+            if (emailSettings.provider === 'local_server') {
+                badge.style.color = '#34D399';
+                badge.textContent = `⭐ โหมด Python Server (ส่ง HTML 100% ตาม subscribe_welcome_email)`;
+            } else if (emailSettings.provider === 'web3forms') {
                 if (emailSettings.web3formsKey && emailSettings.web3formsKey.length >= 8) {
-                    badge.style.color = '#10B981';
-                    badge.textContent = `🟢 มี Access Key แล้ว (${emailSettings.web3formsKey.substring(0, 8)}...) พร้อมส่งเข้า Inbox จริง`;
+                    badge.style.color = '#38BDF8';
+                    badge.textContent = `🌐 Web3Forms API (${emailSettings.web3formsKey.substring(0, 8)}...) [ส่งข้อความฟอร์ม]`;
                 } else {
                     badge.style.color = '#EF4444';
                     badge.textContent = `🔴 ยังไม่ได้ใส่ Access Key (กดปุ่มด้านขวาเพื่อใส่ Key ฟรี)`;
                 }
-            } else if (emailSettings.provider === 'local_server') {
-                badge.style.color = '#38BDF8';
-                badge.textContent = `🖥️ โหมด Python Server (http://localhost:5000)`;
             } else {
                 badge.style.color = '#A855F7';
                 badge.textContent = `⚡ โหมด EmailJS`;
@@ -3245,7 +3278,7 @@
         }
 
         function openRealEmailSettingsModal() {
-            const radioVal = emailSettings.provider || 'web3forms';
+            const radioVal = emailSettings.provider || 'local_server';
             const rWeb = document.getElementById('radioWeb3Forms');
             const rLocal = document.getElementById('radioLocalServer');
             const rEmailJs = document.getElementById('radioEmailJs');
@@ -3286,7 +3319,7 @@
 
         function saveEmailSettings() {
             const radios = document.getElementsByName('emailProviderRadio');
-            let chosen = 'web3forms';
+            let chosen = 'local_server';
             for (const r of radios) {
                 if (r.checked) chosen = r.value;
             }
@@ -3317,23 +3350,73 @@
 
             const serverUrl = document.getElementById('settingLocalServerUrl').value.trim() || 'http://localhost:5000';
             try {
-                const resp = await fetch(`${serverUrl}/api/status`, { signal: AbortSignal.timeout(2000) });
+                const resp = await fetch(`${serverUrl}/api/status`, { signal: AbortSignal.timeout(2500) });
                 const data = await resp.json();
                 if (data.status === 'online') {
                     if (data.smtp_configured) {
                         badge.style.background = '#065F46';
                         badge.style.color = '#34D399';
-                        badge.textContent = '🟢 Server Online (พร้อมส่ง SMTP)';
+                        badge.textContent = `🟢 พร้อมส่ง HTML 100% (${data.smtp_user || 'Gmail'})`;
                     } else {
                         badge.style.background = '#92400E';
                         badge.style.color = '#FCD34D';
-                        badge.textContent = '🟡 Server Online (รอตั้งค่า Gmail ใน email_config.json)';
+                        badge.textContent = '🟡 Server Online (รอใส่ Gmail & App Password ด้านล่าง)';
+                    }
+                    const gUser = document.getElementById('settingGmailUser');
+                    if (gUser && !gUser.value && data.smtp_user) {
+                        gUser.value = data.smtp_user;
                     }
                 }
             } catch (e) {
                 badge.style.background = '#7F1D1D';
                 badge.style.color = '#FCA5A5';
-                badge.textContent = '🔴 ออฟไลน์ (ยังไม่ได้รัน python email_server.py)';
+                badge.textContent = '🔴 ออฟไลน์ (รัน python email_server.py)';
+            }
+        }
+
+        async function saveGmailToPythonServer() {
+            const serverUrl = document.getElementById('settingLocalServerUrl').value.trim() || 'http://localhost:5000';
+            const gmailUser = document.getElementById('settingGmailUser').value.trim();
+            const gmailPass = document.getElementById('settingGmailPass').value.trim().replace(/\s+/g, '');
+            
+            if (!gmailUser || !gmailUser.includes('@')) {
+                alert('กรุณากรอกอีเมล Gmail ของคุณ (เช่น yourname@gmail.com)');
+                document.getElementById('settingGmailUser').focus();
+                return;
+            }
+            if (!gmailPass) {
+                alert('กรุณากรอก Google App Password 16 หลัก (สร้างได้ที่ myaccount.google.com/apppasswords)');
+                document.getElementById('settingGmailPass').focus();
+                return;
+            }
+
+            try {
+                const resp = await fetch(`${serverUrl}/api/save-config`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        smtp_user: gmailUser,
+                        smtp_pass: gmailPass,
+                        from_email: gmailUser,
+                        from_name: 'MAXMUXSIX ข้าวหลามเตาถ่าน',
+                        enabled: true
+                    })
+                });
+                const data = await resp.json();
+                if (data.success) {
+                    const rLocal = document.getElementById('radioLocalServer');
+                    if (rLocal) rLocal.checked = true;
+                    emailSettings.provider = 'local_server';
+                    localStorage.setItem('maxmuxsix_email_settings', JSON.stringify(emailSettings));
+
+                    alert('🎉 บันทึกตั้งค่า Gmail เข้าเซิร์ฟเวอร์เรียบร้อย!\nระบบพร้อมส่งอีเมลดีไซน์ HTML 100% ตามไฟล์ subscribe_welcome_email.html ทันทีครับ');
+                    checkLocalServerHealth();
+                    updateQuickBarStatus();
+                } else {
+                    alert('⚠️ ไม่สามารถบันทึกได้: ' + (data.message || 'Unknown error'));
+                }
+            } catch (err) {
+                alert(`❌ เชื่อมต่อ Python Server ไม่สำเร็จ: ${err.message}\nกรุณาตรวจสอบว่ารัน 'python email_server.py' อยู่หรือไม่`);
             }
         }
 
@@ -3358,6 +3441,14 @@
                 alert('⚠️ กรุณากรอก Web3Forms Access Key ในช่องด้านบนก่อนกดส่งครับ\n\nสามารถกดรับฟรีได้ใน 10 วินาทีที่ web3forms.com');
                 document.getElementById('settingWeb3FormsKey').focus();
                 return;
+            }
+
+            if (emailSettings.provider === 'local_server') {
+                const gPass = document.getElementById('settingGmailPass');
+                const gUser = document.getElementById('settingGmailUser');
+                if (gPass && gPass.value.trim() && gUser && gUser.value.trim()) {
+                    await saveGmailToPythonServer();
+                }
             }
 
             btn.disabled = true;
