@@ -850,12 +850,135 @@
         .inbox-item-title { font-weight: 700; color: var(--flame-yellow); font-size: 0.95rem; }
         .inbox-item-sub { color: #8BA89B; font-size: 0.82rem; margin-top: 2px; }
         .inbox-item-date { color: #C0D8CC; font-size: 0.8rem; font-weight: 500; white-space: nowrap; }
+
+        /* Newsletter / Quick Subscribe System */
+        .subscribe-section {
+            margin: 2.5rem auto 1.5rem;
+            max-width: 1200px;
+            padding: 0 1rem;
+        }
+        .subscribe-card {
+            background: radial-gradient(circle at 50% 0%, #163E2C 0%, #0D2218 55%, #0A1C14 100%);
+            border: 2px solid #2B6E4E;
+            border-radius: 20px;
+            padding: 2.5rem 1.8rem;
+            text-align: center;
+            position: relative;
+            box-shadow: 0 16px 40px rgba(0,0,0,0.6);
+            overflow: hidden;
+        }
+        .subscribe-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; height: 5px;
+            background: linear-gradient(90deg, #FAA307, #E85D04, #D00000, #FAA307);
+        }
+        .subscribe-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(232, 93, 4, 0.2);
+            color: var(--flame-yellow);
+            border: 1px solid var(--flame-orange);
+            padding: 5px 16px;
+            border-radius: 50px;
+            font-size: 0.88rem;
+            font-weight: 700;
+            margin-bottom: 0.8rem;
+            letter-spacing: 0.5px;
+        }
+        .subscribe-title {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--cream);
+            margin-bottom: 0.5rem;
+            text-shadow: 0 2px 8px rgba(0,0,0,0.6);
+        }
+        .subscribe-desc {
+            color: #C0D8CC;
+            font-size: 0.95rem;
+            max-width: 650px;
+            margin: 0 auto 1.5rem;
+            line-height: 1.6;
+        }
+        .subscribe-form {
+            max-width: 680px;
+            margin: 0 auto;
+        }
+        .subscribe-input-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .subscribe-input-group input {
+            padding: 12px 16px;
+            background: #06150E;
+            border: 2px solid #1E543C;
+            border-radius: 10px;
+            color: var(--cream);
+            font-size: 0.95rem;
+            outline: none;
+            transition: all 0.2s;
+        }
+        .subscribe-input-group input:focus {
+            border-color: var(--flame-yellow);
+            box-shadow: 0 0 10px rgba(250, 163, 7, 0.3);
+        }
+        .subscribe-input-name {
+            flex: 1;
+            min-width: 140px;
+        }
+        .subscribe-input-email {
+            flex: 2;
+            min-width: 200px;
+        }
+        .btn-subscribe {
+            background: linear-gradient(135deg, #E85D04, #FAA307);
+            color: #1A0B02;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-weight: 800;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 6px 16px rgba(232, 93, 4, 0.4);
+            white-space: nowrap;
+        }
+        .btn-subscribe:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(250, 163, 7, 0.5);
+            background: linear-gradient(135deg, #FAA307, #E85D04);
+        }
+        .subscribe-terms {
+            font-size: 0.78rem;
+            color: #7D9B8D;
+            margin-top: 10px;
+            line-height: 1.4;
+        }
+        .subscribe-success-box {
+            background: #06381D;
+            border: 1px solid #10B981;
+            border-radius: 12px;
+            padding: 14px 20px;
+            margin-top: 15px;
+            color: #D1FAE5;
+            font-size: 0.92rem;
+            display: inline-block;
+            text-align: left;
+            animation: fadeIn 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+        }
     </style>
 </head>
 <body>
 
     <div class="promo-banner">
-        🔥 สั่งซื้อวันนี้ ใส่โค้ด <span class="promo-code-tag">MAX10</span> หรือสมาชิกใหม่ใช้ <span class="promo-code-tag">WELCOME10</span> รับส่วนลดทันที 10%!
+        🔥 สั่งซื้อวันนี้ ใส่โค้ด <span class="promo-code-tag">MAX10</span> หรือลูกค้าใหม่ใช้ <span class="promo-code-tag">WELCOME10</span> รับส่วนลดทันที 10%!
+        <button onclick="openSubscribeModal()" style="background: var(--flame-orange); color: #FFF; border: none; padding: 2px 10px; border-radius: 20px; font-size: 0.8rem; font-weight: 700; cursor: pointer; margin-left: 8px; transition: 0.2s;">
+            🎁 คลิกรับโค้ดเข้าอีเมล
+        </button>
     </div>
 
     <header>
@@ -866,6 +989,10 @@
             </div>
         </a>
         <div class="header-actions">
+            <button class="btn-nav-action" style="background: linear-gradient(135deg, #E85D04, #D00000); color: #FFF; border-color: #FAA307; font-weight: 700;" onclick="openSubscribeModal()">
+                🎁 รับส่วนลด 10%
+            </button>
+
             <div id="authNavArea">
                 <button class="btn-nav-action" onclick="openAuthModal('login')">
                     👤 เข้าสู่ระบบ / สมัครสมาชิก
@@ -929,6 +1056,31 @@
             </div>
         </div>
     </main>
+
+    <!-- Section: สมัครรับข่าวสาร & โค้ดส่วนลด (Newsletter Subscribe โดยไม่ต้อง Login) -->
+    <section class="subscribe-section" id="newsletterSection">
+        <div class="subscribe-card">
+            <div class="subscribe-badge">🎁 สิทธิพิเศษสำหรับลูกค้าทุกท่าน</div>
+            <h2 class="subscribe-title">🎋 สมัครรับข่าวสาร & รับโค้ดส่วนลด 10%</h2>
+            <p class="subscribe-desc">
+                เพียงกรอกอีเมลของคุณ ระบบจะจัดส่งโค้ดส่วนลด <strong style="color:var(--flame-yellow);">WELCOME10</strong> และข้อเสนอพิเศษ ข้าวหลามเผาเตาถ่านไฟแรง ส่งตรงถึง Gmail ของคุณทันที <span style="color:#A7F3D0;">(ไม่ต้องสมัครสมาชิก ไม่ต้องล็อกอิน)</span>
+            </p>
+            
+            <form class="subscribe-form" onsubmit="handleQuickSubscribe(event, 'section')">
+                <div class="subscribe-input-group">
+                    <input type="text" id="subscribeNameInput" class="subscribe-input-name" placeholder="ชื่อของคุณ (ระบุหรือไม่ก็ได้)">
+                    <input type="email" id="subscribeEmailInput" class="subscribe-input-email" required placeholder="อีเมลของคุณ เช่น yourname@gmail.com">
+                    <button type="submit" class="btn-subscribe" id="btnSubmitSubscribe">
+                        🚀 รับโค้ดลด 10% ทันที
+                    </button>
+                </div>
+                <div class="subscribe-terms">
+                    🔒 ปลอดภัยตามมาตรฐาน PDPA • จัดส่งอีเมลดีไซน์เตาถ่านพรีเมียมสีดำ-ทองทันที • ยกเลิกได้ตลอดเวลา
+                </div>
+            </form>
+            <div id="subscribeSuccessBox" style="display:none; margin: 15px auto 0;" class="subscribe-success-box"></div>
+        </div>
+    </section>
 
     <footer style="text-align: center; padding: 2.5rem 1rem; color: #8BA89B; font-size: 0.95rem; border-top: 1px dashed #1E543C; max-width: 1200px; margin: 1rem auto 3rem;">
         จัดทำโดย: <strong style="color: var(--flame-yellow); font-size: 1.05rem;">นายธณาเทพ พรมที</strong> | 
@@ -1581,6 +1733,52 @@
             <div class="modal-foot" style="margin-top: 14px; justify-content: space-between;">
                 <button type="button" class="btn-nav-action" style="border-color: #FAA307; color: #FAA307;" onclick="closeOrderReceiptModal(); openOrderHistoryModal();">📦 ตรวจสอบสถานะคำสั่งซื้อ</button>
                 <button type="button" class="btn-cancel" onclick="closeOrderReceiptModal()">ปิดหน้าต่าง / เลือกซื้อต่อ</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal 12: หน้าต่างสมัครรับข่าวสาร & โค้ดส่วนลด (Subscribe Modal โดยไม่ต้อง Login) -->
+    <div class="modal" id="subscribeModal">
+        <div class="modal-box" style="max-width: 500px; text-align: center;">
+            <div class="modal-head">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <span style="font-size: 1.3rem;">🎁</span>
+                    <h3 style="margin: 0; font-size: 1.15rem; color: var(--flame-yellow);">รับโค้ดส่วนลด 10% (Subscribe)</h3>
+                </div>
+                <button class="btn-close" onclick="closeSubscribeModal()">&times;</button>
+            </div>
+            
+            <div style="padding: 1rem 0;">
+                <div style="width: 64px; height: 64px; border-radius: 50%; background: rgba(232, 93, 4, 0.15); border: 2px solid var(--flame-orange); display: flex; align-items: center; justify-content: center; font-size: 1.8rem; margin: 0 auto 0.8rem;">
+                    🎋
+                </div>
+                <h4 style="color: var(--cream); font-size: 1.2rem; font-weight: 700; margin-bottom: 6px;">
+                    ส่งตรงโค้ดส่วนลดถึง Gmail ของคุณ
+                </h4>
+                <p style="color: #C0D8CC; font-size: 0.88rem; line-height: 1.5; margin-bottom: 1.2rem;">
+                    กรอกอีเมลเพื่อรับโค้ดส่วนลด <span style="background:#E85D04; color:#FFF; padding:2px 8px; border-radius:4px; font-weight:700;">WELCOME10</span> ใช้ลดได้ทันทีในออเดอร์แรก <em style="color:#A7F3D0;">(ไม่ต้องสมัครสมาชิก ไม่ต้องล็อกอิน)</em>
+                </p>
+
+                <form onsubmit="handleQuickSubscribe(event, 'modal')">
+                    <div style="margin-bottom: 10px; text-align: left;">
+                        <label style="font-size: 0.82rem; color: #FAA307; font-weight: 600; display: block; margin-bottom: 4px;">
+                            👤 ชื่อของคุณ (ระบุหรือไม่ก็ได้):
+                        </label>
+                        <input type="text" id="modalSubscribeName" placeholder="เช่น คุณสมาร์ท, ป้าณี" style="width: 100%; padding: 10px 12px; background: #0A1C14; border: 1px solid #1E543C; border-radius: 8px; color: var(--cream); font-size: 0.9rem;">
+                    </div>
+                    <div style="margin-bottom: 15px; text-align: left;">
+                        <label style="font-size: 0.82rem; color: #FAA307; font-weight: 600; display: block; margin-bottom: 4px;">
+                            📧 อีเมลสำหรับรับโค้ดส่วนลด <span style="color:#EF4444;">*</span>:
+                        </label>
+                        <input type="email" id="modalSubscribeEmail" required placeholder="เช่น yourname@gmail.com" style="width: 100%; padding: 10px 12px; background: #0A1C14; border: 2px solid #1E543C; border-radius: 8px; color: var(--cream); font-size: 0.9rem;">
+                    </div>
+                    <button type="submit" class="btn-order" id="modalBtnSubmitSubscribe" style="width: 100%; padding: 12px; font-size: 1rem;">
+                        🚀 รับโค้ดลด 10% และส่งเข้าอีเมลทันที
+                    </button>
+                    <div style="font-size: 0.75rem; color: #8BA89B; margin-top: 10px; line-height: 1.4;">
+                        🔒 จัดส่งอีเมลต้อนรับดีไซน์เตาถ่านพรีเมียมสีดำ-ทอง พร้อมโค้ดลดทันที
+                    </div>
+                </form>
             </div>
         </div>
     </div>
@@ -2378,6 +2576,20 @@
 
         function closeAuthModal() {
             document.getElementById('authModal').classList.remove('active');
+        }
+
+        function openSubscribeModal() {
+            const input = document.getElementById('modalSubscribeEmail');
+            if (input && currentUser) {
+                input.value = currentUser.email;
+                const nameInput = document.getElementById('modalSubscribeName');
+                if (nameInput) nameInput.value = currentUser.name;
+            }
+            document.getElementById('subscribeModal').classList.add('active');
+        }
+
+        function closeSubscribeModal() {
+            document.getElementById('subscribeModal').classList.remove('active');
         }
 
         function switchAuthTab(tab) {
@@ -3351,6 +3563,106 @@
             }, 500);
 
             return emailRecord;
+        }
+
+        async function handleQuickSubscribe(e, source) {
+            if (e) e.preventDefault();
+
+            let email = '';
+            let name = '';
+            let submitBtn = null;
+
+            if (source === 'modal') {
+                email = (document.getElementById('modalSubscribeEmail').value || '').trim();
+                name = (document.getElementById('modalSubscribeName').value || '').trim();
+                submitBtn = document.getElementById('modalBtnSubmitSubscribe');
+            } else {
+                email = (document.getElementById('subscribeEmailInput').value || '').trim();
+                name = (document.getElementById('subscribeNameInput').value || '').trim();
+                submitBtn = document.getElementById('btnSubmitSubscribe');
+            }
+
+            if (!email || !email.includes('@')) {
+                alert('กรุณากรอกอีเมลที่ถูกต้อง เช่น yourname@gmail.com');
+                return;
+            }
+
+            const originalBtnText = submitBtn ? submitBtn.innerHTML : '';
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '⏳ กำลังส่งโค้ดลด...';
+            }
+
+            const displayName = name || email.split('@')[0];
+            const referralCode = 'WELCOME' + Math.floor(1000 + Math.random() * 9000);
+
+            // บันทึกลง subscribers ใน localStorage
+            let subscribers = JSON.parse(localStorage.getItem('maxmuxsix_subscribers')) || [];
+            const existingIdx = subscribers.findIndex(s => s.email.toLowerCase() === email.toLowerCase());
+            const subRecord = {
+                id: 'SUB-' + Date.now(),
+                email: email.toLowerCase(),
+                name: displayName,
+                referralCode: referralCode,
+                subscribedAt: new Date().toISOString(),
+                source: source || 'web_page'
+            };
+
+            if (existingIdx >= 0) {
+                subscribers[existingIdx] = subRecord;
+            } else {
+                subscribers.push(subRecord);
+            }
+            localStorage.setItem('maxmuxsix_subscribers', JSON.stringify(subscribers));
+
+            // จัดส่งอีเมลต้อนรับพร้อมโค้ด WELCOME10 เข้าอีเมลจริงทันที
+            const emailRecord = sendWelcomeEmail({
+                id: subRecord.id,
+                email: subRecord.email,
+                name: displayName,
+                referralCode: referralCode
+            });
+
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalBtnText;
+            }
+
+            if (source === 'modal') {
+                closeSubscribeModal();
+            }
+
+            // แสดง Feedback บนหน้าจอ
+            showSubscribeSuccessFeedback(subRecord, emailRecord);
+        }
+
+        function showSubscribeSuccessFeedback(subRecord, emailRecord) {
+            const successBox = document.getElementById('subscribeSuccessBox');
+            if (successBox) {
+                successBox.style.display = 'inline-block';
+                successBox.innerHTML = `
+                    <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px;">
+                        <span style="font-size:1.3rem;">🎉</span>
+                        <strong style="color:var(--flame-yellow); font-size:1rem;">สมัครรับข่าวสารและโค้ดลดสำเร็จ!</strong>
+                    </div>
+                    <div>
+                        ระบบได้จัดส่งอีเมลต้อนรับพร้อมโค้ดส่วนลด <strong>WELCOME10</strong> ไปยัง <span style="color:#38BDF8; font-weight:700;">${subRecord.email}</span> เรียบร้อยแล้ว
+                    </div>
+                    <div style="margin-top:8px; font-size:0.84rem; color:#A7F3D0;">
+                        💡 สามารถใช้โค้ด <code>WELCOME10</code> ในการสั่งซื้อเพื่อรับส่วนลด 10% ได้ทันทีครับ
+                    </div>
+                `;
+            }
+
+            // ล้างค่าในฟอร์ม
+            const inputE = document.getElementById('subscribeEmailInput');
+            const inputN = document.getElementById('subscribeNameInput');
+            if (inputE) inputE.value = '';
+            if (inputN) inputN.value = '';
+            const mInputE = document.getElementById('modalSubscribeEmail');
+            const mInputN = document.getElementById('modalSubscribeName');
+            if (mInputE) mInputE.value = '';
+            if (mInputN) mInputN.value = '';
         }
 
         let toastTimeout = null;
