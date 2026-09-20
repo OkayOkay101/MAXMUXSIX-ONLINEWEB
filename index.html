@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="referrer" content="no-referrer">
     <title>MAXMUXSIX - ข้าวหลาม หลามหร่อยเร้าใจ</title>
-    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
     <!-- Google Fonts: Prompt -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1412,7 +1411,6 @@
         </div>
     </div>
 
-
     <!-- Modal 8: ระบบอ่านอีเมลต้อนรับ (Welcome Email Viewer) -->
     <div class="modal" id="welcomeEmailModal">
         <div class="modal-box email-modal-box">
@@ -1489,7 +1487,6 @@
         </div>
     </div>
 
-
     <!-- Modal 10: ตั้งค่าการส่งอีเมลจริง (Real Email Settings Modal) -->
     <div class="modal" id="realEmailSettingsModal">
         <div class="modal-box" style="max-width: 620px;">
@@ -1515,24 +1512,10 @@
                         </div>
                     </label>
                     <label style="display: flex; align-items: flex-start; gap: 10px; font-size: 0.9rem; cursor: pointer; background: #0A1C14; padding: 10px 12px; border-radius: 8px; border: 1px solid #1E543C;">
-                        <input type="radio" name="emailProviderRadio" value="local_server" id="radioLocalServer" onchange="switchProviderView('local_server')">
-                        <div>
-                            <strong style="color: #FCD34D;">🖥️ วิธีที่ 2: Python Server ในเครื่อง (Local SMTP)</strong><br>
-                            <span style="color: #8BA89B; font-size: 0.8rem;">ส่งผ่านโปรแกรม email_server.py บนเครื่องคอมพิวเตอร์ของคุณ (ต้องเปิดโปรแกรมค้างไว้)</span>
-                        </div>
-                    </label>
-                    <label style="display: flex; align-items: flex-start; gap: 10px; font-size: 0.9rem; cursor: pointer; background: #0A1C14; padding: 10px 12px; border-radius: 8px; border: 1px solid #1E543C;">
                         <input type="radio" name="emailProviderRadio" value="web3forms" id="radioWeb3Forms" onchange="switchProviderView('web3forms')">
                         <div>
                             <strong style="color: #38BDF8;">🌐 วิธีที่ 3: Web3Forms API</strong><br>
                             <span style="color: #8BA89B; font-size: 0.8rem;">ส่งตรงจากหน้าเว็บ (สรุปข้อความฟอร์มเข้าเมลเจ้าของเว็บ ไม่รองรับดีไซน์ HTML กราฟิก)</span>
-                        </div>
-                    </label>
-                    <label style="display: flex; align-items: flex-start; gap: 10px; font-size: 0.9rem; cursor: pointer; background: #0A1C14; padding: 10px 12px; border-radius: 8px; border: 1px solid #1E543C;">
-                        <input type="radio" name="emailProviderRadio" value="emailjs" id="radioEmailJs" onchange="switchProviderView('emailjs')">
-                        <div>
-                            <strong style="color: #A855F7;">⚡ วิธีที่ 4: EmailJS SDK</strong><br>
-                            <span style="color: #8BA89B; font-size: 0.8rem;">ส่งผ่านบริการ EmailJS สำหรับฝังโค้ด HTML</span>
                         </div>
                     </label>
                 </div>
@@ -1602,70 +1585,6 @@
                     ℹ️ <strong>ทำไมวิธีนี้ถึงส่งเป็นข้อความธรรมดา?</strong> บริการ Web3Forms ฟรีเป็น Form Collector ที่นำข้อมูลไปจัดลงในตารางข้อความมาตรฐาน จึงไม่สามารถแสดงกราฟิกสีดำทอง กล่องคูปอง และภาพสินค้าของไฟล์ <code>subscribe_welcome_email.html</code> ได้ (แนะนำให้เลือก <strong>วิธีที่ 2 ด้านล่าง</strong> เพื่อส่งแบบสวยงาม 100%)
                 </div>
             </div>
-
-            <!-- Provider 2: Local Python Server Options -->
-            <div id="providerLocalServerPanel" style="display: none; background: #091D13; border: 1px solid #10B981; border-radius: 10px; padding: 14px; margin-bottom: 1rem;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                    <div style="font-size: 0.88rem; color: #34D399; font-weight: 700;">
-                        🖥️ ระบบ Python Server (ส่ง HTML แท้เหมือน subscribe_welcome_email)
-                    </div>
-                    <span id="localServerStatusBadge" style="font-size: 0.78rem; padding: 2px 8px; border-radius: 10px; background: #374151; color: #9CA3AF;">กำลังตรวจสอบ...</span>
-                </div>
-                
-                <div style="background: rgba(16, 185, 129, 0.1); border-left: 3px solid #10B981; padding: 8px 12px; border-radius: 4px; font-size: 0.82rem; color: #D1FAE5; margin-bottom: 12px; line-height: 1.5;">
-                    ✨ <strong>วิธีนี้จะส่งอีเมลดีไซน์สวยหรู 100%</strong> ตามไฟล์ <code>subscribe_welcome_email.html</code> มีสีเตาถ่าน สีดำ-ทอง กล่องโค้ดส่วนลด และฝังรูปภาพสินค้าครบทุกเมนูเข้า Inbox ผู้รับจริง!
-                </div>
-
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
-                    <div>
-                        <label style="font-size: 0.8rem; color: #FAA307; font-weight: 600; display: block; margin-bottom: 4px;">
-                            📧 อีเมล Gmail ของคุณ (ผู้ส่ง):
-                        </label>
-                        <input type="email" id="settingGmailUser" placeholder="เช่น yourname@gmail.com" style="width: 100%; padding: 8px 10px; background: #0A1C14; border: 1px solid #1E543C; border-radius: 6px; color: var(--cream); font-size: 0.85rem;">
-                    </div>
-                    <div>
-                        <label style="font-size: 0.8rem; color: #FAA307; font-weight: 600; display: block; margin-bottom: 4px;">
-                            🔑 Google App Password 16 หลัก:
-                        </label>
-                        <input type="password" id="settingGmailPass" placeholder="เช่น abcd efgh ijkl mnop" style="width: 100%; padding: 8px 10px; background: #0A1C14; border: 1px solid #1E543C; border-radius: 6px; color: var(--cream); font-size: 0.85rem; font-family: monospace;">
-                    </div>
-                </div>
-
-                <div style="font-size: 0.78rem; color: #8BA89B; line-height: 1.4; margin-bottom: 10px; background: #05140C; padding: 8px 10px; border-radius: 6px;">
-                    💡 <strong>วิธีเอา App Password 16 หลักจาก Google:</strong><br>
-                    1. เข้าไปที่ <a href="https://myaccount.google.com/apppasswords" target="_blank" style="color: #38BDF8; font-weight: 700; text-decoration: underline;">myaccount.google.com/apppasswords</a><br>
-                    2. ตั้งชื่อ เช่น <code>MAXMUXSIX</code> แล้วกดปุ่ม "สร้าง" (Create)<br>
-                    3. คัดลอกรหัสผ่าน 16 ตัวอักษรสีเหลืองมาวางที่นี่ แล้วกดปุ่ม <strong>"💾 บันทึกตั้งค่า Gmail"</strong>
-                </div>
-
-                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
-                    <div style="display: flex; align-items: center; gap: 6px;">
-                        <span style="font-size: 0.78rem; color: #8BA89B;">URL เซิร์ฟเวอร์:</span>
-                        <input type="text" id="settingLocalServerUrl" value="http://localhost:5000" style="width: 150px; padding: 4px 8px; background: #0A1C14; border: 1px solid #1E543C; border-radius: 4px; color: var(--cream); font-size: 0.78rem;">
-                        <button class="btn-nav-action" style="padding: 3px 8px; font-size: 0.75rem;" onclick="checkLocalServerHealth()">🔄 รีเฟรช</button>
-                    </div>
-                    <button class="btn-consent-accept" style="padding: 6px 16px; font-size: 0.82rem;" onclick="saveGmailToPythonServer()">💾 บันทึกตั้งค่า Gmail</button>
-                </div>
-            </div>
-
-            <!-- Provider 3: EmailJS Options -->
-            <div id="providerEmailJsPanel" style="display: none; background: #091D13; border: 1px solid #1E543C; border-radius: 10px; padding: 12px 14px; margin-bottom: 1rem;">
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 6px;">
-                    <div>
-                        <label style="font-size: 0.8rem; color: #8BA89B;">Service ID:</label>
-                        <input type="text" id="settingEmailjsService" placeholder="service_xxx" style="width: 100%; padding: 6px 8px; background: #0A1C14; border: 1px solid #1E543C; border-radius: 6px; color: var(--cream); font-size: 0.82rem;">
-                    </div>
-                    <div>
-                        <label style="font-size: 0.8rem; color: #8BA89B;">Template ID:</label>
-                        <input type="text" id="settingEmailjsTemplate" placeholder="template_xxx" style="width: 100%; padding: 6px 8px; background: #0A1C14; border: 1px solid #1E543C; border-radius: 6px; color: var(--cream); font-size: 0.82rem;">
-                    </div>
-                </div>
-                <div>
-                    <label style="font-size: 0.8rem; color: #8BA89B;">Public Key (User ID):</label>
-                    <input type="text" id="settingEmailjsKey" placeholder="public_xxx" style="width: 100%; padding: 6px 8px; background: #0A1C14; border: 1px solid #1E543C; border-radius: 6px; color: var(--cream); font-size: 0.82rem;">
-                </div>
-            </div>
-
             <!-- Test Sending Card -->
             <div style="background: #07150E; border: 1px dashed #38BDF8; border-radius: 10px; padding: 12px; margin-bottom: 1rem;">
                 <div style="font-size: 0.85rem; font-weight: 700; color: #38BDF8; margin-bottom: 6px;">🧪 ทดสอบส่งอีเมลจริงทันที</div>
@@ -1792,7 +1711,6 @@
 <html lang="th" xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
 <head>
 <meta charset="UTF-8">
-<base href="./">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <title>ยินดีต้อนรับสู่ครอบครัว MAXMUXSIX</title>
@@ -1991,7 +1909,7 @@
                                 <a href="{{WEBSITE_URL}}?promo=WELCOME10" target="_blank" style="text-decoration:none; display:block; color:inherit;">
                                 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#07150E; border:2px solid #FF5A4E; border-radius:12px;">
                                     <tr><td>
-                                        <img src="max_1.jpg" width="270" alt="ข้าวหลามถั่วดำเข้มข้น" style="width:100%; border-radius:10px 10px 0 0;">
+                                        <img src="https://raw.githubusercontent.com/OkayOkay101/MAXMUXSIX-ONLINEWEB/main/max_1.jpg" width="270" alt="ข้าวหลามถั่วดำเข้มข้น" style="width:100%; border-radius:10px 10px 0 0;">
                                     </td></tr>
                                     <tr><td style="padding:12px 14px 16px;">
                                         <div style="display:inline-block; background-color:#FF5A4E; color:#2A0500; font-family:'Segoe UI',Tahoma,Arial,sans-serif; font-size:10px; font-weight:800; padding:3px 10px; border-radius:10px; margin-bottom:6px;">🫘 ยอดฮิต</div>
@@ -2006,7 +1924,7 @@
                                 <a href="{{WEBSITE_URL}}?promo=WELCOME10" target="_blank" style="text-decoration:none; display:block; color:inherit;">
                                 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#07150E; border:2px solid #FAA307; border-radius:12px;">
                                     <tr><td>
-                                        <img src="max_4.jpg" width="270" alt="ข้าวหลามสังขยาลาวาไข่เป็ด" style="width:100%; border-radius:10px 10px 0 0;">
+                                        <img src="https://raw.githubusercontent.com/OkayOkay101/MAXMUXSIX-ONLINEWEB/main/max_4.jpg" width="270" alt="ข้าวหลามสังขยาลาวาไข่เป็ด" style="width:100%; border-radius:10px 10px 0 0;">
                                     </td></tr>
                                     <tr><td style="padding:12px 14px 16px;">
                                         <div style="display:inline-block; background-color:#FAA307; color:#3A2200; font-family:'Segoe UI',Tahoma,Arial,sans-serif; font-size:10px; font-weight:800; padding:3px 10px; border-radius:10px; margin-bottom:6px;">👑 พรีเมียม</div>
@@ -2023,7 +1941,7 @@
                                 <a href="{{WEBSITE_URL}}?promo=WELCOME10" target="_blank" style="text-decoration:none; display:block; color:inherit;">
                                 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#07150E; border:2px solid #4ADE80; border-radius:12px;">
                                     <tr><td>
-                                        <img src="max_2.jpg" width="270" alt="ข้าวหลามมะพร้าวอ่อน" style="width:100%; border-radius:10px 10px 0 0;">
+                                        <img src="https://raw.githubusercontent.com/OkayOkay101/MAXMUXSIX-ONLINEWEB/main/max_2.jpg" width="270" alt="ข้าวหลามมะพร้าวอ่อน" style="width:100%; border-radius:10px 10px 0 0;">
                                     </td></tr>
                                     <tr><td style="padding:12px 14px 16px;">
                                         <div style="display:inline-block; background-color:#4ADE80; color:#04372C; font-family:'Segoe UI',Tahoma,Arial,sans-serif; font-size:10px; font-weight:800; padding:3px 10px; border-radius:10px; margin-bottom:6px;">🥥 หวานมัน</div>
@@ -2038,7 +1956,7 @@
                                 <a href="{{WEBSITE_URL}}?promo=WELCOME10" target="_blank" style="text-decoration:none; display:block; color:inherit;">
                                 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#07150E; border:2px solid #C084FC; border-radius:12px;">
                                     <tr><td>
-                                        <img src="max_3.jpg" width="270" alt="ข้าวหลามเผือกหอมกวน" style="width:100%; border-radius:10px 10px 0 0;">
+                                        <img src="https://raw.githubusercontent.com/OkayOkay101/MAXMUXSIX-ONLINEWEB/main/max_3.jpg" width="270" alt="ข้าวหลามเผือกหอมกวน" style="width:100%; border-radius:10px 10px 0 0;">
                                     </td></tr>
                                     <tr><td style="padding:12px 14px 16px;">
                                         <div style="display:inline-block; background-color:#C084FC; color:#2E0A4E; font-family:'Segoe UI',Tahoma,Arial,sans-serif; font-size:10px; font-weight:800; padding:3px 10px; border-radius:10px; margin-bottom:6px;">🍠 หอมกวน</div>
@@ -2118,7 +2036,6 @@
 <html lang="th" xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
 <head>
 <meta charset="UTF-8">
-<base href="./">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <title>ใบเสร็จและสรุปข้อมูลคำสั่งซื้อ - MAXMUXSIX ข้าวหลามเตาถ่าน</title>
@@ -2526,10 +2443,6 @@
             provider: 'gas',
             gasUrl: '',
             web3formsKey: '',
-            localServerUrl: 'http://localhost:5000',
-            emailjsServiceId: '',
-            emailjsTemplateId: '',
-            emailjsPublicKey: '',
             websiteUrl: 'https://okayokay101.github.io/MAXMUXSIX-ONLINEWEB/'
         };
         if (!emailSettings.websiteUrl) {
@@ -3586,7 +3499,7 @@
             sentEmails.unshift(emailRecord);
             syncStorage();
 
-            // ส่งอีเมลจริงผ่าน Provider ที่เลือก (Web3Forms, Local Server หรือ EmailJS)
+            // ส่งอีเมลจริงผ่าน Provider ที่เลือก (Google Apps Script หรือ Web3Forms)
             dispatchRealEmail(emailRecord).then(res => {
                 const toastBody = document.querySelector('.email-toast-body');
                 if (toastBody && res.success) {
@@ -4103,7 +4016,6 @@
             document.getElementById('emailInboxModal').classList.add('active');
         }
 
-
         // ==========================================
         // ฟังก์ชันระบบส่งอีเมลจริง (Real Email Dispatching)
         // ==========================================
@@ -4238,65 +4150,7 @@
                             message: `เชื่อมต่อ Web3Forms ไม่สำเร็จ: ${err.message}` 
                         };
                     }
-                }
-            }
-            // 2. ส่งผ่าน Local Python Server
-            else if (emailSettings.provider === 'local_server') {
-                try {
-                    const serverUrl = emailSettings.localServerUrl || 'http://localhost:5000';
-                    const txtContent = emailRecord.orderId 
-                        ? `สวัสดีคุณ ${emailRecord.toName} คำสั่งซื้อ #${emailRecord.orderId} ยอดชำระ ${emailRecord.total || 0} บาท กำลังจัดเตรียมเผาเตาถ่านไฟแรง ขอบคุณสำหรับการสั่งซื้อกับ MAXMUXSIX`
-                        : `สวัสดีคุณ ${emailRecord.toName} ยินดีต้อนรับสู่ MAXMUXSIX โค้ดลด 10% คือ ${emailRecord.promoCode}`;
-
-                    const resp = await fetch(`${serverUrl}/api/send-email`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            to: emailRecord.to,
-                            toName: emailRecord.toName,
-                            subject: emailRecord.subject,
-                            htmlContent: emailRecord.htmlContent,
-                            textContent: txtContent
-                        }),
-                        signal: AbortSignal.timeout(6000)
-                    });
-                    const data = await resp.json();
-                    if (data.success) {
-                        result = { success: true, method: 'Local Python Server', message: data.message };
-                    } else {
-                        result = { success: false, method: 'Local Python Server', message: data.message };
-                    }
-                } catch (err) {
-                    result = { 
-                        success: false, 
-                        method: 'Local Server', 
-                        message: 'ไม่สามารถเชื่อมต่อ Python Server ได้ (กรุณารัน python email_server.py หรือสลับเป็น Web3Forms)' 
-                    };
-                }
-            }
-            // 3. ส่งผ่าน EmailJS
-            else if (emailSettings.provider === 'emailjs') {
-                if (!emailSettings.emailjsPublicKey || !emailSettings.emailjsServiceId) {
-                    result = {
-                        success: false,
-                        method: 'EmailJS',
-                        message: 'ยังไม่ได้ระบุ Service ID หรือ Public Key ของ EmailJS'
-                    };
-                } else if (window.emailjs) {
-                    try {
-                        emailjs.init(emailSettings.emailjsPublicKey);
-                        await emailjs.send(emailSettings.emailjsServiceId, emailSettings.emailjsTemplateId, {
-                            to_email: emailRecord.to,
-                            to_name: emailRecord.toName,
-                            promo_code: emailRecord.promoCode,
-                            referral_code: emailRecord.referralCode,
-                            message: emailRecord.subject
-                        });
-                        result = { success: true, method: 'EmailJS', message: 'ส่งผ่าน EmailJS สำเร็จ!' };
-                    } catch (err) {
-                        result = { success: false, method: 'EmailJS', message: err.text || err.message || 'EmailJS ส่งไม่สำเร็จ' };
-                    }
-                }
+                 }
             }
 
             // อัปเดตสถานะในตัวเรคคอร์ด
@@ -4405,7 +4259,7 @@ function doGet(e) {
             const url = input ? input.value.trim() : '';
 
             if (!url || !url.startsWith('http')) {
-                alert('กรุณากรอก Web App URL ของ Google Apps Script ก่อนทดสอบครับ');
+                showEmailToast('⚠️ กรุณากรอก Web App URL ของ Google Apps Script ก่อนทดสอบครับ');
                 if (input) input.focus();
                 return;
             }
@@ -4424,21 +4278,21 @@ function doGet(e) {
                     badge.style.color = '#34D399';
                     badge.textContent = '🟢 ออนไลน์ 24 ชม. พร้อมใช้งาน';
                 }
-                alert('🎉 ตรวจสอบสำเร็จ! Google Apps Script Web App ออนไลน์ 24 ชม.\nพร้อมส่งอีเมลยืนยันคำสั่งซื้อและอีเมลต้อนรับเข้า Gmail ผู้รับจริงได้ตลอดเวลาโดยไม่ต้องเปิดคอมพิวเตอร์ครับ');
+                showEmailToast('🎉 Google Apps Script ออนไลน์ 24 ชม. พร้อมส่งอีเมลทันที!');
             } catch (err) {
                 if (badge) {
                     badge.style.background = '#065F46';
                     badge.style.color = '#34D399';
                     badge.textContent = '🟢 บันทึก URL แล้ว (พร้อมส่ง)';
                 }
-                alert('💡 บันทึก URL เรียบร้อยแล้ว!\nแนะนำให้กดปุ่ม "🚀 ส่งทดสอบ" ด้านล่างเพื่อทดลองส่งอีเมลจริงเข้ากล่องจดหมาย Gmail ทันทีครับ');
+                showEmailToast('💡 บันทึก URL แล้ว! กดปุ่ม "🚀 ส่งทดสอบ" ด้านล่างเพื่อทดลองส่งอีเมลจริงครับ');
             }
         }
 
         function copyGasScriptToClipboard() {
             if (navigator.clipboard && navigator.clipboard.writeText) {
                 navigator.clipboard.writeText(GAS_SCRIPT_CODE).then(() => {
-                    alert('📋 คัดลอกโค้ด Google Apps Script เรียบร้อยแล้ว!\n\nขั้นตอนต่อไป:\n1. ไปที่แท็บ script.google.com\n2. ลบโค้ดเดิมทั้งหมด\n3. กด Ctrl + V เพื่อวาง แล้วกด Deploy ได้เลยครับ');
+                    showEmailToast('📋 คัดลอกโค้ด GAS แล้ว! ไปที่ script.google.com วางโค้ดแล้วกด Deploy ได้เลย');
                 }).catch(() => {
                     prompt('คัดลอกโค้ด Google Apps Script ด้านล่างนี้:', GAS_SCRIPT_CODE);
                 });
@@ -4458,9 +4312,6 @@ function doGet(e) {
                     badge.style.color = '#FAA307';
                     badge.textContent = `☁️ Google Apps Script (รอวาง Web App URL)`;
                 }
-            } else if (emailSettings.provider === 'local_server') {
-                badge.style.color = '#34D399';
-                badge.textContent = `⭐ โหมด Python Server (ส่ง HTML 100% ตาม subscribe_welcome_email)`;
             } else if (emailSettings.provider === 'web3forms') {
                 if (emailSettings.web3formsKey && emailSettings.web3formsKey.length >= 8) {
                     badge.style.color = '#38BDF8';
@@ -4469,9 +4320,6 @@ function doGet(e) {
                     badge.style.color = '#EF4444';
                     badge.textContent = `🔴 ยังไม่ได้ใส่ Access Key (กดปุ่มด้านขวาเพื่อใส่ Key ฟรี)`;
                 }
-            } else {
-                badge.style.color = '#A855F7';
-                badge.textContent = `⚡ โหมด EmailJS`;
             }
         }
 
@@ -4479,12 +4327,8 @@ function doGet(e) {
             const radioVal = emailSettings.provider || 'gas';
             const rGas = document.getElementById('radioGas');
             const rWeb = document.getElementById('radioWeb3Forms');
-            const rLocal = document.getElementById('radioLocalServer');
-            const rEmailJs = document.getElementById('radioEmailJs');
 
             if (radioVal === 'gas' && rGas) rGas.checked = true;
-            else if (radioVal === 'local_server' && rLocal) rLocal.checked = true;
-            else if (radioVal === 'emailjs' && rEmailJs) rEmailJs.checked = true;
             else if (rWeb) rWeb.checked = true;
 
             const gasInput = document.getElementById('settingGasUrl');
@@ -4499,15 +4343,7 @@ function doGet(e) {
                 autoSaveWeb3FormsKey(keyInput.value);
             }
 
-            document.getElementById('settingLocalServerUrl').value = emailSettings.localServerUrl || 'http://localhost:5000';
-            document.getElementById('settingEmailjsService').value = emailSettings.emailjsServiceId || '';
-            document.getElementById('settingEmailjsTemplate').value = emailSettings.emailjsTemplateId || '';
-            document.getElementById('settingEmailjsKey').value = emailSettings.emailjsPublicKey || '';
-
             switchProviderView(radioVal);
-            if (radioVal === 'local_server') {
-                checkLocalServerHealth();
-            }
 
             if (currentUser) {
                 document.getElementById('testRecipientEmailInput').value = currentUser.email;
@@ -4524,8 +4360,6 @@ function doGet(e) {
         function switchProviderView(provider) {
             document.getElementById('providerGasPanel').style.display = provider === 'gas' ? 'block' : 'none';
             document.getElementById('providerWeb3FormsPanel').style.display = provider === 'web3forms' ? 'block' : 'none';
-            document.getElementById('providerLocalServerPanel').style.display = provider === 'local_server' ? 'block' : 'none';
-            document.getElementById('providerEmailJsPanel').style.display = provider === 'emailjs' ? 'block' : 'none';
         }
 
         function saveEmailSettings() {
@@ -4542,99 +4376,16 @@ function doGet(e) {
                 provider: chosen,
                 gasUrl: gasVal,
                 web3formsKey: keyVal,
-                localServerUrl: document.getElementById('settingLocalServerUrl').value.trim() || 'http://localhost:5000',
-                emailjsServiceId: document.getElementById('settingEmailjsService').value.trim(),
-                emailjsTemplateId: document.getElementById('settingEmailjsTemplate').value.trim(),
-                emailjsPublicKey: document.getElementById('settingEmailjsKey').value.trim()
+                websiteUrl: emailSettings.websiteUrl || 'https://okayokay101.github.io/MAXMUXSIX-ONLINEWEB/'
             };
 
             localStorage.setItem('maxmuxsix_email_settings', JSON.stringify(emailSettings));
             if (keyVal) autoSaveWeb3FormsKey(keyVal);
             if (gasVal) autoSaveGasUrl(gasVal);
             updateQuickBarStatus();
-            alert('💾 บันทึกการตั้งค่าระบบส่งอีเมลจริงเรียบร้อยแล้ว!');
             closeRealEmailSettingsModal();
+            showEmailToast('💾 บันทึกการตั้งค่าระบบส่งอีเมลจริงเรียบร้อยแล้ว!');
         }
-
-        async function checkLocalServerHealth() {
-            const badge = document.getElementById('localServerStatusBadge');
-            if (!badge) return;
-            badge.style.background = '#374151';
-            badge.style.color = '#9CA3AF';
-            badge.textContent = 'กำลังตรวจสอบ...';
-
-            const serverUrl = document.getElementById('settingLocalServerUrl').value.trim() || 'http://localhost:5000';
-            try {
-                const resp = await fetch(`${serverUrl}/api/status`, { signal: AbortSignal.timeout(2500) });
-                const data = await resp.json();
-                if (data.status === 'online') {
-                    if (data.smtp_configured) {
-                        badge.style.background = '#065F46';
-                        badge.style.color = '#34D399';
-                        badge.textContent = `🟢 พร้อมส่ง HTML 100% (${data.smtp_user || 'Gmail'})`;
-                    } else {
-                        badge.style.background = '#92400E';
-                        badge.style.color = '#FCD34D';
-                        badge.textContent = '🟡 Server Online (รอใส่ Gmail & App Password ด้านล่าง)';
-                    }
-                    const gUser = document.getElementById('settingGmailUser');
-                    if (gUser && !gUser.value && data.smtp_user) {
-                        gUser.value = data.smtp_user;
-                    }
-                }
-            } catch (e) {
-                badge.style.background = '#7F1D1D';
-                badge.style.color = '#FCA5A5';
-                badge.textContent = '🔴 ออฟไลน์ (รัน python email_server.py)';
-            }
-        }
-
-        async function saveGmailToPythonServer() {
-            const serverUrl = document.getElementById('settingLocalServerUrl').value.trim() || 'http://localhost:5000';
-            const gmailUser = document.getElementById('settingGmailUser').value.trim();
-            const gmailPass = document.getElementById('settingGmailPass').value.trim().replace(/\s+/g, '');
-            
-            if (!gmailUser || !gmailUser.includes('@')) {
-                alert('กรุณากรอกอีเมล Gmail ของคุณ (เช่น yourname@gmail.com)');
-                document.getElementById('settingGmailUser').focus();
-                return;
-            }
-            if (!gmailPass) {
-                alert('กรุณากรอก Google App Password 16 หลัก (สร้างได้ที่ myaccount.google.com/apppasswords)');
-                document.getElementById('settingGmailPass').focus();
-                return;
-            }
-
-            try {
-                const resp = await fetch(`${serverUrl}/api/save-config`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        smtp_user: gmailUser,
-                        smtp_pass: gmailPass,
-                        from_email: gmailUser,
-                        from_name: 'MAXMUXSIX ข้าวหลามเตาถ่าน',
-                        enabled: true
-                    })
-                });
-                const data = await resp.json();
-                if (data.success) {
-                    const rLocal = document.getElementById('radioLocalServer');
-                    if (rLocal) rLocal.checked = true;
-                    emailSettings.provider = 'local_server';
-                    localStorage.setItem('maxmuxsix_email_settings', JSON.stringify(emailSettings));
-
-                    alert('🎉 บันทึกตั้งค่า Gmail เข้าเซิร์ฟเวอร์เรียบร้อย!\nระบบพร้อมส่งอีเมลดีไซน์ HTML 100% ตามไฟล์ subscribe_welcome_email.html ทันทีครับ');
-                    checkLocalServerHealth();
-                    updateQuickBarStatus();
-                } else {
-                    alert('⚠️ ไม่สามารถบันทึกได้: ' + (data.message || 'Unknown error'));
-                }
-            } catch (err) {
-                alert(`❌ เชื่อมต่อ Python Server ไม่สำเร็จ: ${err.message}\nกรุณาตรวจสอบว่ารัน 'python email_server.py' อยู่หรือไม่`);
-            }
-        }
-
         async function testSendRealEmailFromSettings() {
             const keyInput = document.getElementById('settingWeb3FormsKey');
             if (keyInput && keyInput.value.trim()) {
@@ -4671,14 +4422,6 @@ function doGet(e) {
                 return;
             }
 
-            if (emailSettings.provider === 'local_server') {
-                const gPass = document.getElementById('settingGmailPass');
-                const gUser = document.getElementById('settingGmailUser');
-                if (gPass && gPass.value.trim() && gUser && gUser.value.trim()) {
-                    await saveGmailToPythonServer();
-                }
-            }
-
             btn.disabled = true;
             btn.textContent = '⏳ กำลังส่ง...';
             statusDiv.style.color = '#FAA307';
@@ -4704,11 +4447,9 @@ function doGet(e) {
             if (res.success) {
                 statusDiv.style.color = '#10B981';
                 statusDiv.innerHTML = `✅ ${res.message}`;
-                alert(`🎉 ${res.message}`);
             } else {
                 statusDiv.style.color = '#EF4444';
                 statusDiv.innerHTML = `⚠️ ${res.message}`;
-                alert(`⚠️ แจ้งเตือน: ${res.message}`);
             }
         }
 
@@ -4737,11 +4478,7 @@ function doGet(e) {
                 btn.textContent = '🚀 ส่งเข้าอีเมลนี้ทันที';
             }
 
-            if (res.success) {
-                alert(`🎉 ${res.message}`);
-            } else {
-                alert(`⚠️ แจ้งเตือน: ${res.message}`);
-            }
+            showEmailToast(res.success ? `✅ ${res.message}` : `⚠️ ${res.message}`);
         }
 
         function closeEmailInboxModal() {
