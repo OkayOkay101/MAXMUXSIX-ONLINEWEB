@@ -4,6 +4,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="referrer" content="no-referrer">
+    <!-- Security Headers -->
+    <meta http-equiv="Content-Security-Policy" content="
+        default-src 'self';
+        script-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+        style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.gstatic.com;
+        font-src 'self' https://fonts.gstatic.com;
+        img-src 'self' data: blob: https://raw.githubusercontent.com https://fonts.gstatic.com;
+        connect-src 'self' https://script.google.com https://api.web3forms.com;
+        frame-ancestors 'none';
+        form-action 'self';
+        base-uri 'self';
+    ">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="X-Frame-Options" content="DENY">
+    <meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=()">
     <title>MAXMUXSIX - ข้าวหลาม หลามหร่อยเร้าใจ</title>
     <!-- Google Fonts: Prompt -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1161,6 +1176,11 @@
                         <label for="regConsentCheckbox" style="margin: 0; cursor: pointer;">
                             ฉันยินยอมรับข้อกำหนดและเงื่อนไขการให้บริการ รวมทั้งยินยอมให้ MAXMUXSIX จัดเก็บและประมวลผลข้อมูลส่วนบุคคลตาม พ.ร.บ. คุ้มครองข้อมูลส่วนบุคคล (PDPA) เพื่อการจัดส่งสินค้าและสิทธิประโยชน์
                         </label>
+                    </div>
+                    <!-- Honeypot: hidden from humans, bots fill this -->
+                    <div style="position:absolute;left:-9999px;top:-9999px;opacity:0;pointer-events:none;" aria-hidden="true" tabindex="-1">
+                        <label for="regWebsite">Website (leave blank)</label>
+                        <input type="text" id="regWebsite" name="website" autocomplete="off" tabindex="-1">
                     </div>
 
                     <div class="modal-foot">
@@ -2565,20 +2585,41 @@
         // ==========================================
         // ระบบแนะนำเพื่อน (Affiliate / Referral System)
         // ==========================================
-        function handleRegister(e) {
+        async function handleRegister(e) {
             e.preventDefault();
-            const name = document.getElementById('regName').value.trim();
-            const email = document.getElementById('regEmail').value.trim().toLowerCase();
-            const phone = document.getElementById('regPhone').value.trim();
+
+            // 🤖 Honeypot check — บอทจะกรอก field นี้, คนจริงจะไม่กรอก
+            const honeypot = document.getElementById('regWebsite');
+            if (honeypot && honeypot.value.trim() !== '') {
+                logSecurityEvent('bot_detected', 'register honeypot triggered');
+                showEmailToast('⚠️ ตรวจพบกิจกรรมผิดปกติ กรุณาลองใหม่อีกครั้ง');
+                return;
+            }
+
+            // 🛡️ Rate Limit check
+            const rl = checkRateLimit('register');
+            if (!rl.allowed) {
+                logSecurityEvent('register_blocked', rl.message);
+                showEmailToast(rl.message);
+                return;
+            }
+
+            const name     = document.getElementById('regName').value.trim();
+            const email    = document.getElementById('regEmail').value.trim().toLowerCase();
+            const phone    = document.getElementById('regPhone').value.trim();
             const password = document.getElementById('regPassword').value;
-            const address = document.getElementById('regAddress').value.trim();
+            const address  = document.getElementById('regAddress').value.trim();
             const consentGiven = document.getElementById('regConsentCheckbox').checked;
-            
-            // อ่านค่ารหัสผู้แนะนำ
             const referrerCodeInput = document.getElementById('regReferrerCode').value.trim().toUpperCase();
 
             if (!consentGiven) {
                 alert('กรุณายินยอมรับข้อกำหนดและนโยบายคุ้มครองข้อมูลส่วนบุคคล (PDPA)');
+                return;
+            }
+
+            // ตรวจสอบความยาวรหัสผ่าน
+            if (password.length < 6) {
+                showEmailToast('⚠️ รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร');
                 return;
             }
 
@@ -2589,7 +2630,10 @@
                 return;
             }
 
-            // ตรวจสอบรหัสผู้แนะนำ และเพิ่มแต้มให้คนแนะนำ
+            // บันทึก attempt
+            recordRateLimitAttempt('register');
+
+            // ตรวจสอบรหัสผู้แนะนำ
             if (referrerCodeInput) {
                 const referrerUser = users.find(u => u.referralCode === referrerCodeInput);
                 if (referrerUser) {
@@ -2599,12 +2643,18 @@
                 }
             }
 
-            // สร้าง Referral Code ส่วนตัวให้สมาชิกใหม่
+            // 🔐 Hash รหัสผ่านด้วย SHA-256 ก่อนเก็บ
+            const hashedPassword = await hashPassword(password);
+
             const myNewReferralCode = 'MAX' + Math.floor(1000 + Math.random() * 9000);
 
             const newUser = {
                 id: 'USR-' + Date.now(),
-                name, email, phone, password, address,
+                name: sanitizeHtml(name),
+                email,
+                phone,
+                password: hashedPassword,   // เก็บแบบ hash เท่านั้น
+                address: sanitizeHtml(address),
                 referralCode: myNewReferralCode,
                 referredCount: 0,
                 registeredDate: new Date().toISOString(),
@@ -2614,7 +2664,6 @@
             users.push(newUser);
             currentUser = newUser;
             syncStorage();
-
             closeAuthModal();
 
             // ส่งอีเมลต้อนรับสมาชิกใหม่อัตโนมัติ พร้อมโค้ดส่วนลด 10%
@@ -2650,18 +2699,45 @@
             });
         }
 
-        function handleLogin(e) {
+        async function handleLogin(e) {
             e.preventDefault();
-            const userKey = document.getElementById('loginUserKey').value.trim().toLowerCase();
+            const userKey  = document.getElementById('loginUserKey').value.trim().toLowerCase();
             const password = document.getElementById('loginPassword').value;
 
-            const user = users.find(u => (u.email === userKey || u.phone === userKey) && u.password === password);
-            if (user) {
-                currentUser = user;
+            // 🛡️ Brute-force protection
+            const rl = checkRateLimit('login_fail');
+            if (!rl.allowed) {
+                logSecurityEvent('login_blocked', `user tried: ${userKey}`);
+                showEmailToast(rl.message);
+                return;
+            }
+
+            // หาผู้ใช้ตาม email หรือ phone
+            const candidate = users.find(u => u.email === userKey || u.phone === userKey);
+
+            let loginOk = false;
+            if (candidate) {
+                if (isHashed(candidate.password)) {
+                    // รหัสผ่าน hash แล้ว — เปรียบเทียบกับ hash ของที่กรอก
+                    const inputHash = await hashPassword(password);
+                    loginOk = (inputHash === candidate.password);
+                } else {
+                    // รหัสผ่าน plaintext เก่า — เปรียบเทียบตรง แล้ว migrate ทันที
+                    loginOk = (candidate.password === password);
+                    if (loginOk) await migratePasswordIfNeeded(candidate, password);
+                }
+            }
+
+            if (loginOk) {
+                currentUser = candidate;
                 syncStorage();
-                alert(`🔥 ยินดีต้อนรับกลับ คุณ ${user.name}! เข้าสู่ระบบสำเร็จ`);
+                clearRateLimitBlock('login_fail');
+                logSecurityEvent('login_ok', candidate.email);
+                showEmailToast(`🔥 ยินดีต้อนรับกลับ คุณ ${sanitizeHtml(candidate.name)}!`);
                 closeAuthModal();
             } else {
+                recordRateLimitAttempt('login_fail');
+                logSecurityEvent('login_fail', `tried: ${userKey}`);
                 alert('❌ ข้อมูลเข้าสู่ระบบไม่ถูกต้อง กรุณาตรวจสอบอีเมล เบอร์โทร หรือรหัสผ่าน');
             }
         }
@@ -3527,11 +3603,11 @@
 
             if (source === 'modal') {
                 email = (document.getElementById('modalSubscribeEmail').value || '').trim();
-                name = (document.getElementById('modalSubscribeName').value || '').trim();
+                name  = (document.getElementById('modalSubscribeName').value || '').trim();
                 submitBtn = document.getElementById('modalBtnSubmitSubscribe');
             } else {
                 email = (document.getElementById('subscribeEmailInput').value || '').trim();
-                name = (document.getElementById('subscribeNameInput').value || '').trim();
+                name  = (document.getElementById('subscribeNameInput').value || '').trim();
                 submitBtn = document.getElementById('btnSubmitSubscribe');
             }
 
@@ -3539,6 +3615,15 @@
                 alert('กรุณากรอกอีเมลที่ถูกต้อง เช่น yourname@gmail.com');
                 return;
             }
+
+            // 🛡️ Rate Limit — ป้องกัน Bot spam subscribe
+            const rl = checkRateLimit('subscribe');
+            if (!rl.allowed) {
+                logSecurityEvent('subscribe_blocked', email);
+                showEmailToast(rl.message);
+                return;
+            }
+            recordRateLimitAttempt('subscribe');
 
             const originalBtnText = submitBtn ? submitBtn.innerHTML : '';
             if (submitBtn) {
@@ -4565,7 +4650,126 @@ function doGet(e) {
             }
         }
 
+        // ==========================================
+        // ระบบความปลอดภัย (Security System)
+        // ==========================================
+
+        // --- 1. Input Sanitization ---
+        // ป้องกัน XSS โดย escape HTML characters ก่อน render
+        function sanitizeHtml(str) {
+            if (typeof str !== 'string') return '';
+            return str
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#x27;')
+                .replace(/\//g, '&#x2F;');
+        }
+
+        // --- 2. SHA-256 Password Hashing (Web Crypto API) ---
+        async function hashPassword(password) {
+            const encoder = new TextEncoder();
+            // เพิ่ม site-specific salt เพื่อป้องกัน rainbow table
+            const salted = 'maxmuxsix_2026_' + password;
+            const data = encoder.encode(salted);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        }
+
+        // ตรวจสอบว่า string นี้เป็น SHA-256 hash แล้วหรือยัง (64 hex chars)
+        function isHashed(str) {
+            return typeof str === 'string' && /^[0-9a-f]{64}$/.test(str);
+        }
+
+        // --- 3. Rate Limiting (localStorage-based) ---
+        const RATE_LIMITS = {
+            register:  { max: 3,  windowMs: 10 * 60 * 1000 },  // 3 ครั้ง / 10 นาที
+            subscribe: { max: 5,  windowMs: 60 * 60 * 1000  },  // 5 ครั้ง / 1 ชั่วโมง
+            login_fail:{ max: 5,  windowMs:  5 * 60 * 1000  },  // block 5 นาที หลังผิด 5 ครั้ง
+        };
+
+        function getRateLimitKey(action) {
+            return `maxmuxsix_rl_${action}`;
+        }
+
+        function checkRateLimit(action) {
+            const cfg = RATE_LIMITS[action];
+            if (!cfg) return { allowed: true };
+            const key = getRateLimitKey(action);
+            const now = Date.now();
+            let data = JSON.parse(localStorage.getItem(key) || '{"attempts":[],"blocked":false,"blockedUntil":0}');
+
+            // ถ้า blocked อยู่
+            if (data.blocked && now < data.blockedUntil) {
+                const remainSec = Math.ceil((data.blockedUntil - now) / 1000);
+                const remainMin = Math.ceil(remainSec / 60);
+                return {
+                    allowed: false,
+                    message: `⏳ ระบบล็อคชั่วคราว กรุณารออีก ${remainMin > 1 ? remainMin + ' นาที' : remainSec + ' วินาที'}`
+                };
+            }
+
+            // ล้าง attempts เก่าที่เกิน window
+            data.attempts = (data.attempts || []).filter(t => now - t < cfg.windowMs);
+
+            if (data.attempts.length >= cfg.max) {
+                data.blocked = true;
+                data.blockedUntil = now + cfg.windowMs;
+                localStorage.setItem(key, JSON.stringify(data));
+                const blockMin = Math.ceil(cfg.windowMs / 60000);
+                return {
+                    allowed: false,
+                    message: `🚫 ทำรายการบ่อยเกินไป กรุณารอ ${blockMin} นาทีแล้วลองใหม่`
+                };
+            }
+
+            return { allowed: true, data, key };
+        }
+
+        function recordRateLimitAttempt(action) {
+            const result = checkRateLimit(action);
+            if (result.key) {
+                result.data.attempts.push(Date.now());
+                localStorage.setItem(result.key, JSON.stringify(result.data));
+            }
+        }
+
+        function clearRateLimitBlock(action) {
+            localStorage.removeItem(getRateLimitKey(action));
+        }
+
+        // --- 4. Security Audit Log ---
+        const AUDIT_LOG_KEY = 'maxmuxsix_security_log';
+        const MAX_LOG_ENTRIES = 50;
+
+        function logSecurityEvent(type, detail = '') {
+            const log = JSON.parse(localStorage.getItem(AUDIT_LOG_KEY) || '[]');
+            log.unshift({
+                t: new Date().toISOString(),
+                type,    // 'login_fail' | 'register_blocked' | 'subscribe_blocked' | 'bot_detected' | 'login_ok'
+                detail,
+                ua: navigator.userAgent.substring(0, 80)
+            });
+            // เก็บแค่ MAX_LOG_ENTRIES รายการล่าสุด
+            localStorage.setItem(AUDIT_LOG_KEY, JSON.stringify(log.slice(0, MAX_LOG_ENTRIES)));
+        }
+
+        // --- 5. Password Migration (plaintext -> hashed) on login ---
+        // จะถูกเรียกใน handleLogin() หลังตรวจสอบ password สำเร็จ
+        async function migratePasswordIfNeeded(user, rawPassword) {
+            if (!isHashed(user.password)) {
+                user.password = await hashPassword(rawPassword);
+                const idx = users.findIndex(u => u.id === user.id);
+                if (idx !== -1) users[idx].password = user.password;
+                syncStorage();
+            }
+        }
+
+        // ==========================================
         // เริ่มต้นการทำงาน (Initial Boot)
+        // ==========================================
         checkCookieConsent();
         syncStorage();
         applyFilters(); 
