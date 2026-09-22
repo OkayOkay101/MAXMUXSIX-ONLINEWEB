@@ -41,6 +41,17 @@
  * =========================================================================
  */
 
+// =========================================================================
+// 🔒 การตั้งค่าความปลอดภัย (Security Configuration)
+// =========================================================================
+var SECURITY_CONFIG = {
+  // รหัสลับเฉพาะของร้าน MAXMUXSIX (ต้องตรงกับในหน้าเว็บ)
+  SECRET_TOKEN: "MAXMUXSIX_SECURE_TOKEN_2026",
+  MAX_SUBJECT_LEN: 150,
+  MAX_BODY_LEN: 100000,
+  ALLOWED_FROM_NAME: "MAXMUXSIX ข้าวหลามเตาถ่าน"
+};
+
 function doPost(e) {
   var lock = LockService.getScriptLock();
   lock.tryLock(15000);
@@ -57,17 +68,50 @@ function doPost(e) {
       data = e.parameter;
     }
 
-    var to = data.to;
-    var subject = data.subject || "MAXMUXSIX ข้าวหลามเตาถ่าน";
-    var htmlContent = data.html || data.htmlContent || "";
-    var textContent = data.text || data.textContent || "ขอบคุณสำหรับการสั่งซื้อกับ MAXMUXSIX";
-    var fromName = data.fromName || "MAXMUXSIX ข้าวหลามเตาถ่าน";
-
-    if (!to || to.indexOf("@") === -1) {
+    // 🔒 1. ตรวจสอบรหัสลับ (Secret Token) ป้องกันบุคคลภายนอกแอบใช้ส่งสแปม
+    var clientToken = data.token || (e && e.parameter && e.parameter.token) || "";
+    if (SECURITY_CONFIG.SECRET_TOKEN && clientToken !== SECURITY_CONFIG.SECRET_TOKEN) {
       return makeJsonResponse({
         status: "error",
         success: false,
-        message: "กรุณาระบุอีเมลผู้รับที่ถูกต้อง (Missing valid recipient 'to')"
+        message: "⛔ ไม่อนุญาต: รหัสความปลอดภัย (Secret Token) ไม่ถูกต้องหรือขาดหายไป"
+      });
+    }
+
+    // 🛡️ 2. ตรวจสอบโควตาคงเหลือของ Google Mail
+    var remainingQuota = MailApp.getRemainingDailyQuota();
+    if (remainingQuota < 1) {
+      return makeJsonResponse({
+        status: "error",
+        success: false,
+        message: "⚠️ โควตาส่งอีเมลประจำวันของ Google หมดแล้ว (กรุณารอ 24 ชม.)"
+      });
+    }
+
+    var to = (data.to || "").toString().trim();
+    var subject = (data.subject || "MAXMUXSIX ข้าวหลามเตาถ่าน").toString().trim();
+    var htmlContent = data.html || data.htmlContent || "";
+    var textContent = (data.text || data.textContent || "ขอบคุณสำหรับการสั่งซื้อกับ MAXMUXSIX").toString().trim();
+    var fromName = SECURITY_CONFIG.ALLOWED_FROM_NAME;
+
+    // 🛡️ 3. ตรวจสอบความถูกต้องของอีเมลผู้รับ
+    if (!to || to.indexOf("@") === -1 || to.length > 100) {
+      return makeJsonResponse({
+        status: "error",
+        success: false,
+        message: "กรุณาระบุอีเมลผู้รับที่ถูกต้อง (Missing or invalid recipient 'to')"
+      });
+    }
+
+    // 🛡️ 4. ป้องกัน Payload ขนาดใหญ่เกินปกติ
+    if (subject.length > SECURITY_CONFIG.MAX_SUBJECT_LEN) {
+      subject = subject.substring(0, SECURITY_CONFIG.MAX_SUBJECT_LEN);
+    }
+    if (htmlContent.length > SECURITY_CONFIG.MAX_BODY_LEN) {
+      return makeJsonResponse({
+        status: "error",
+        success: false,
+        message: "เนื้อหาอีเมลมีขนาดใหญ่เกินกว่าที่กำหนด"
       });
     }
 
@@ -85,6 +129,7 @@ function doPost(e) {
       success: true,
       message: "ส่งอีเมลสำเร็จผ่าน Google Apps Script ไปยัง " + to,
       recipient: to,
+      remainingQuota: remainingQuota - 1,
       timestamp: new Date().toISOString()
     });
 

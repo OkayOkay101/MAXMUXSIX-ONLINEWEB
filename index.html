@@ -1020,7 +1020,7 @@
                 🛒 ตะกร้า
                 <span class="cart-badge" id="cartCount">0</span>
             </button>
-            <button class="btn-add-main" onclick="openCrudModal()">+ เพิ่มเมนู</button>
+            <button class="btn-add-main" id="btnHeaderAddProduct" style="display: none;" onclick="openCrudModal()">+ เพิ่มเมนู</button>
         </div>
     </header>
 
@@ -1099,6 +1099,11 @@
     <footer style="text-align: center; padding: 2.5rem 1rem; color: #8BA89B; font-size: 0.95rem; border-top: 1px dashed #1E543C; max-width: 1200px; margin: 1rem auto 3rem;">
         จัดทำโดย: <strong style="color: var(--flame-yellow); font-size: 1.05rem;">นายธณาเทพ พรมที</strong> | 
         รหัสนักศึกษา: <strong style="color: var(--flame-yellow); font-size: 1.05rem;">66040233114</strong>
+        <div style="margin-top: 14px; font-size: 0.82rem;">
+            <a href="#admin" id="adminToggleLink" onclick="promptAdminMode(event)" style="color: #6B8076; text-decoration: none; border: 1px solid #1A3D2C; padding: 4px 12px; border-radius: 20px; transition: all 0.2s;">
+                🔒 โหมดผู้ดูแลร้าน
+            </a>
+        </div>
     </footer>
 
     <div class="consent-banner" id="cookieConsentBanner">
@@ -1479,7 +1484,7 @@
 
             <!-- Email Live Preview Frame -->
             <div class="email-preview-wrapper">
-                <iframe id="emailPreviewFrame" title="Welcome Email Preview" style="width: 100%;"></iframe>
+                <iframe id="emailPreviewFrame" title="Welcome Email Preview" sandbox="allow-popups allow-popups-to-escape-sandbox" style="width: 100%;"></iframe>
             </div>
 
             <div class="modal-foot" style="margin-top: 14px; justify-content: space-between;">
@@ -1559,6 +1564,14 @@
                         🔗 Web App URL ของ Google Apps Script:
                     </label>
                     <input type="text" id="settingGasUrl" placeholder="วาง Web App URL ที่ลงท้ายด้วย /exec เช่น https://script.google.com/macros/s/.../exec" oninput="autoSaveGasUrl(this.value)" style="width: 100%; padding: 10px 12px; background: #0A1C14; border: 2px solid #1E543C; border-radius: 8px; color: var(--cream); font-size: 0.85rem; font-family: monospace;">
+                </div>
+
+                <div style="margin-bottom: 10px;">
+                    <label style="font-size: 0.85rem; color: #FAA307; font-weight: 700; display: block; margin-bottom: 4px;">
+                        🔑 Secret Token (รหัสลับความปลอดภัย):
+                    </label>
+                    <input type="password" id="settingGasToken" placeholder="MAXMUXSIX_SECURE_TOKEN_2026" style="width: 100%; padding: 8px 12px; background: #0A1C14; border: 2px solid #1E543C; border-radius: 8px; color: var(--cream); font-size: 0.85rem; font-family: monospace;">
+                    <div style="font-size: 0.75rem; color: #8BA89B; margin-top: 3px;">* รหัสความปลอดภัยเพื่อป้องกันผู้อื่นแอบใช้ Web App URL ของคุณส่งอีเมลสแปม (ต้องตรงกับใน google_apps_script.js)</div>
                 </div>
 
                 <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; margin-bottom: 12px;">
@@ -1666,7 +1679,7 @@
 
             <!-- Receipt Live Preview Frame -->
             <div class="email-preview-wrapper" style="height: 520px;">
-                <iframe id="orderReceiptPreviewFrame" title="Order Receipt Preview" style="width: 100%;"></iframe>
+                <iframe id="orderReceiptPreviewFrame" title="Order Receipt Preview" sandbox="allow-popups allow-popups-to-escape-sandbox" style="width: 100%;"></iframe>
             </div>
 
             <div class="modal-foot" style="margin-top: 14px; justify-content: space-between;">
@@ -2462,6 +2475,7 @@
         let emailSettings = JSON.parse(localStorage.getItem('maxmuxsix_email_settings')) || {
             provider: 'gas',
             gasUrl: '',
+            gasToken: 'MAXMUXSIX_SECURE_TOKEN_2026',
             web3formsKey: '',
             websiteUrl: 'https://okayokay101.github.io/MAXMUXSIX-ONLINEWEB/'
         };
@@ -2471,6 +2485,62 @@
         if (emailSettings.gasUrl === undefined) {
             emailSettings.gasUrl = '';
         }
+        if (!emailSettings.gasToken) {
+            emailSettings.gasToken = 'MAXMUXSIX_SECURE_TOKEN_2026';
+        }
+
+        // ==========================================
+        // 🔒 โหมดผู้ดูแลร้าน (Admin Mode Control)
+        // ==========================================
+        let isAdminMode = sessionStorage.getItem('maxmuxsix_admin_mode') === 'true';
+
+        function renderAdminControls() {
+            const btnAdd = document.getElementById('btnHeaderAddProduct');
+            if (btnAdd) {
+                btnAdd.style.display = isAdminMode ? 'inline-flex' : 'none';
+            }
+            const link = document.getElementById('adminToggleLink');
+            if (link) {
+                if (isAdminMode) {
+                    link.innerHTML = '🔓 ออกจากโหมดผู้ดูแลร้าน (Admin Active)';
+                    link.style.color = '#34D399';
+                    link.style.borderColor = '#10B981';
+                } else {
+                    link.innerHTML = '🔒 โหมดผู้ดูแลร้าน';
+                    link.style.color = '#6B8076';
+                    link.style.borderColor = '#1A3D2C';
+                }
+            }
+            // รีเฟรชรายการสินค้าเพื่อแสดง/ซ่อนปุ่มแก้ไข/ลบ
+            if (typeof applyFilters === 'function') {
+                applyFilters();
+            }
+        }
+
+        function promptAdminMode(e) {
+            if (e) e.preventDefault();
+            if (isAdminMode) {
+                if (confirm('คุณต้องการออกจากโหมดผู้ดูแลร้านหรือไม่?')) {
+                    isAdminMode = false;
+                    sessionStorage.removeItem('maxmuxsix_admin_mode');
+                    renderAdminControls();
+                    showEmailToast('🔒 ออกจากโหมดผู้ดูแลร้านแล้ว');
+                }
+            } else {
+                const pin = prompt('กรุณาระบุรหัส PIN ผู้ดูแลร้าน (ค่าเริ่มต้น: 1234):');
+                if (pin === null) return;
+                const expectedPin = localStorage.getItem('maxmuxsix_admin_pin') || '1234';
+                if (pin.trim() === expectedPin) {
+                    isAdminMode = true;
+                    sessionStorage.setItem('maxmuxsix_admin_mode', 'true');
+                    renderAdminControls();
+                    showEmailToast('🔓 ยินดีต้อนรับสู่โหมดผู้ดูแลร้าน');
+                } else {
+                    alert('❌ รหัส PIN ไม่ถูกต้อง');
+                }
+            }
+        }
+
         let activeCategory = 'all';
         let appliedDiscountRate = 0;
         let uploadedImageBase64 = "";
@@ -3008,25 +3078,34 @@
                 const card = document.createElement('div');
                 card.className = 'card';
                 
+                const safeName = sanitizeHtml(p.name || '');
+                const safeDesc = sanitizeHtml(p.desc || '');
+                const safeCategory = sanitizeHtml(p.category || '');
+                const safeTag = p.tag ? sanitizeHtml(p.tag) : '';
+                const safeRating = sanitizeHtml(p.rating || '4.9 ★★★★★');
+                const adminButtons = isAdminMode ? `
+                    <button class="btn-act edit" title="แก้ไข" onclick="editProduct('${p.id}')">✏️</button>
+                    <button class="btn-act delete" title="ลบ" onclick="deleteProduct('${p.id}')">🗑️</button>
+                ` : '';
+
                 card.innerHTML = `
                     <div class="card-img-wrapper">
-                        <img src="${p.image}" alt="${p.name}" loading="lazy" onerror="this.onerror=null; this.src='${fallbackImageBase64}';">
-                        ${p.tag ? `<div class="card-ribbon-tag">${p.tag}</div>` : ''}
+                        <img src="${p.image}" alt="${safeName}" loading="lazy" onerror="this.onerror=null; this.src='${fallbackImageBase64}';">
+                        ${safeTag ? `<div class="card-ribbon-tag">${safeTag}</div>` : ''}
                         <div class="stock-badge">คงเหลือ ${stockCount} กระบอก</div>
                     </div>
                     <div class="card-body">
                         <div class="card-category-rating">
-                            <span class="card-category">${p.category}</span>
-                            <span class="card-rating">${p.rating || '4.9 ★★★★★'}</span>
+                            <span class="card-category">${safeCategory}</span>
+                            <span class="card-rating">${safeRating}</span>
                         </div>
-                        <h2 class="card-title">${p.name}</h2>
-                        <p class="card-desc">${p.desc}</p>
+                        <h2 class="card-title">${safeName}</h2>
+                        <p class="card-desc">${safeDesc}</p>
                         <div class="card-footer">
                             <div class="card-price">${p.price} <span style="font-size:0.85rem; color:var(--cream);">บาท</span></div>
                             <div class="card-btns">
                                 <button class="btn-order" onclick="addToCart('${p.id}')">🛒 สั่งซื้อ</button>
-                                <button class="btn-act edit" title="แก้ไข" onclick="editProduct('${p.id}')">✏️</button>
-                                <button class="btn-act delete" title="ลบ" onclick="deleteProduct('${p.id}')">🗑️</button>
+                                ${adminButtons}
                             </div>
                         </div>
                     </div>
@@ -3315,19 +3394,22 @@
                 displayOrders.forEach(ord => {
                     const div = document.createElement('div');
                     div.className = 'order-card';
-                    const itemsSummary = ord.items.map(i => `${i.name} (x${i.qty})`).join(', ');
+                    const itemsSummary = (ord.items || []).map(i => `${sanitizeHtml(i.name || 'เมนู')} (x${i.qty || 1})`).join(', ');
+                    const safeOrderId = sanitizeHtml(ord.id || '');
+                    const safeStatus = sanitizeHtml(ord.status || 'กำลังดำเนินการ');
+                    const safeDate = sanitizeHtml(ord.date || '');
                     div.innerHTML = `
                         <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
-                            <strong>รหัส: ${ord.id}</strong>
-                            <span class="order-badge status-cooking">${ord.status}</span>
+                            <strong>รหัส: ${safeOrderId}</strong>
+                            <span class="order-badge status-cooking">${safeStatus}</span>
                         </div>
-                        <div style="font-size: 0.85rem; color: #8BA89B; margin-bottom: 6px;">วันที่สั่ง: ${ord.date}</div>
+                        <div style="font-size: 0.85rem; color: #8BA89B; margin-bottom: 6px;">วันที่สั่ง: ${safeDate}</div>
                         <div style="font-size: 0.9rem; margin-bottom: 6px;">รายการ: ${itemsSummary}</div>
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 8px;">
                             <div style="font-size: 0.95rem; font-weight: 700; color: var(--flame-yellow);">
                                 ยอดชำระรวม: ${ord.total} บาท
                             </div>
-                            <button class="btn-nav-action" style="padding: 4px 10px; font-size: 0.8rem; border-color: #38BDF8; color: #38BDF8;" onclick="closeOrderHistoryModal(); openOrderReceiptModal('${ord.id}')">🧾 ดูใบเสร็จ & อีเมลสรุป</button>
+                            <button class="btn-nav-action" style="padding: 4px 10px; font-size: 0.8rem; border-color: #38BDF8; color: #38BDF8;" onclick="closeOrderHistoryModal(); openOrderReceiptModal('${safeOrderId}')">🧾 ดูใบเสร็จ & อีเมลสรุป</button>
                         </div>
                     `;
                     container.appendChild(div);
@@ -3379,6 +3461,10 @@
         }
 
         function openCrudModal(isEdit = false) {
+            if (!isAdminMode) {
+                promptAdminMode();
+                if (!isAdminMode) return;
+            }
             document.getElementById('crudModal').classList.add('active');
             document.getElementById('modalHeading').textContent = isEdit ? 'แก้ไขเมนู MAXMUXSIX' : 'เพิ่มเมนูข้าวหลามใหม่';
             document.getElementById('btnSubmitForm').textContent = isEdit ? 'บันทึกการแก้ไข' : 'เพิ่มเมนูเร้าใจ';
@@ -3394,13 +3480,17 @@
 
         function saveProduct(e) {
             e.preventDefault();
+            if (!isAdminMode) {
+                alert('⛔ เฉพาะผู้ดูแลระบบเท่านั้นที่สามารถเพิ่มหรือแก้ไขเมนูได้');
+                return;
+            }
             const id = document.getElementById('editItemId').value;
-            const name = document.getElementById('itemName').value.trim();
-            const category = document.getElementById('itemCategory').value;
+            const name = sanitizeHtml(document.getElementById('itemName').value.trim());
+            const category = sanitizeHtml(document.getElementById('itemCategory').value);
             const price = Number(document.getElementById('itemPrice').value);
             const stock = Number(document.getElementById('itemStock').value) || 20;
-            const tag = document.getElementById('itemTag').value.trim();
-            const desc = document.getElementById('itemDesc').value.trim();
+            const tag = sanitizeHtml(document.getElementById('itemTag').value.trim());
+            const desc = sanitizeHtml(document.getElementById('itemDesc').value.trim());
             const imageUrl = document.getElementById('itemImageUrl').value.trim();
 
             const finalImage = uploadedImageBase64 || imageUrl || "max_1.jpg";
@@ -3430,6 +3520,10 @@
         }
 
         function editProduct(id) {
+            if (!isAdminMode) {
+                promptAdminMode();
+                if (!isAdminMode) return;
+            }
             const item = currentProducts.find(p => p.id === id);
             if (!item) return;
 
@@ -3446,6 +3540,10 @@
         }
 
         function deleteProduct(id) {
+            if (!isAdminMode) {
+                promptAdminMode();
+                if (!isAdminMode) return;
+            }
             const item = currentProducts.find(p => p.id === id);
             if (!item) return;
 
@@ -3541,9 +3639,9 @@
             if (!tmpl) return '';
             let html = tmpl.innerHTML;
             
-            // แทนที่ตัวแปรไดนามิกในเนื้อหาอีเมล
-            const userName = user.name || 'สมาชิกร้าน MAXMUXSIX';
-            const userRefCode = user.referralCode || 'MAX1000';
+            // แทนที่ตัวแปรไดนามิกในเนื้อหาอีเมล (พร้อม sanitize ป้องกัน XSS)
+            const userName = sanitizeHtml(user.name || 'สมาชิกร้าน MAXMUXSIX');
+            const userRefCode = sanitizeHtml(user.referralCode || 'MAX1000');
             const websiteUrl = (window.emailSettings && window.emailSettings.websiteUrl) || 'https://okayokay101.github.io/MAXMUXSIX-ONLINEWEB/';
             
             html = html.replace(/{{USER_NAME}}/g, userName);
@@ -3631,7 +3729,7 @@
                 submitBtn.innerHTML = '⏳ กำลังส่งโค้ดลด...';
             }
 
-            const displayName = name || email.split('@')[0];
+            const displayName = sanitizeHtml(name || email.split('@')[0]);
             const referralCode = 'WELCOME' + Math.floor(1000 + Math.random() * 9000);
 
             // บันทึกลง subscribers ใน localStorage
@@ -3752,16 +3850,17 @@
                 order.items.forEach(item => {
                     const lineTotal = (item.price || 0) * (item.qty || 1);
                     const imgFile = item.image || item.img || 'max_1.jpg';
+                    const safeName = sanitizeHtml(item.name || 'เมนูข้าวหลาม');
                     itemsRows += `
                         <tr style="border-bottom:1px solid #143526;">
                             <td style="padding:10px 14px; vertical-align:middle;">
                                 <table role="presentation" cellpadding="0" cellspacing="0">
                                     <tr>
                                         <td width="55" valign="middle">
-                                            <img class="order-item-img" src="${imgFile}" alt="${item.name}" width="50" height="50" style="width:50px; height:50px; object-fit:cover; border-radius:8px; border:1px solid #1E543C; display:block;">
+                                            <img class="order-item-img" src="${imgFile}" alt="${safeName}" width="50" height="50" style="width:50px; height:50px; object-fit:cover; border-radius:8px; border:1px solid #1E543C; display:block;">
                                         </td>
                                         <td style="padding-left:10px; vertical-align:middle;">
-                                            <div style="font-size:13px; font-weight:700; color:#FEE8BE;">${item.name}</div>
+                                            <div style="font-size:13px; font-weight:700; color:#FEE8BE;">${safeName}</div>
                                             <div style="font-size:11px; color:#8BA89B;">ราคาชิ้นละ ${item.price} บาท</div>
                                         </td>
                                     </tr>
@@ -3780,13 +3879,13 @@
 
             const websiteUrl = (window.emailSettings && window.emailSettings.websiteUrl) || 'https://okayokay101.github.io/MAXMUXSIX-ONLINEWEB/';
             html = html.replace(/{{WEBSITE_URL}}/g, websiteUrl);
-            html = html.replace(/{{ORDER_ID}}/g, order.id || '');
-            html = html.replace(/{{ORDER_DATE}}/g, order.date || new Date().toLocaleString('th-TH'));
-            html = html.replace(/{{ORDER_STATUS}}/g, order.status || 'กำลังเผาไฟแรง 🔥');
-            html = html.replace(/{{CUST_NAME}}/g, order.name || 'ลูกค้าผู้มีอุปการคุณ');
-            html = html.replace(/{{CUST_PHONE}}/g, order.phone || '-');
-            html = html.replace(/{{CUST_EMAIL}}/g, order.email || (currentUser ? currentUser.email : '-'));
-            html = html.replace(/{{CUST_ADDRESS}}/g, order.address || '-');
+            html = html.replace(/{{ORDER_ID}}/g, sanitizeHtml(order.id || ''));
+            html = html.replace(/{{ORDER_DATE}}/g, sanitizeHtml(order.date || new Date().toLocaleString('th-TH')));
+            html = html.replace(/{{ORDER_STATUS}}/g, sanitizeHtml(order.status || 'กำลังเผาไฟแรง 🔥'));
+            html = html.replace(/{{CUST_NAME}}/g, sanitizeHtml(order.name || 'ลูกค้าผู้มีอุปการคุณ'));
+            html = html.replace(/{{CUST_PHONE}}/g, sanitizeHtml(order.phone || '-'));
+            html = html.replace(/{{CUST_EMAIL}}/g, sanitizeHtml(order.email || (currentUser ? currentUser.email : '-')));
+            html = html.replace(/{{CUST_ADDRESS}}/g, sanitizeHtml(order.address || '-'));
             html = html.replace(/{{ORDER_ITEMS_ROWS}}/g, itemsRows);
             html = html.replace(/{{SUBTOTAL}}/g, order.subtotal !== undefined ? order.subtotal : order.total);
             html = html.replace(/{{SHIPPING_COST}}/g, order.shippingCost !== undefined ? order.shippingCost : 0);
@@ -4151,7 +4250,8 @@
                                 subject: emailRecord.subject,
                                 html: cloudHtml,
                                 text: txtContent,
-                                fromName: 'MAXMUXSIX ข้าวหลามเตาถ่าน'
+                                fromName: 'MAXMUXSIX ข้าวหลามเตาถ่าน',
+                                token: emailSettings.gasToken || 'MAXMUXSIX_SECURE_TOKEN_2026'
                             })
                         });
 
@@ -4279,7 +4379,14 @@
             updateQuickBarStatus();
         }
 
-        const GAS_SCRIPT_CODE = `function doPost(e) {
+        const GAS_SCRIPT_CODE = `var SECURITY_CONFIG = {
+  SECRET_TOKEN: "MAXMUXSIX_SECURE_TOKEN_2026",
+  MAX_SUBJECT_LEN: 150,
+  MAX_BODY_LEN: 100000,
+  ALLOWED_FROM_NAME: "MAXMUXSIX ข้าวหลามเตาถ่าน"
+};
+
+function doPost(e) {
   var lock = LockService.getScriptLock();
   lock.tryLock(15000);
   try {
@@ -4289,14 +4396,37 @@
     } else if (e && e.parameter) {
       data = e.parameter;
     }
-    var to = data.to;
-    var subject = data.subject || "MAXMUXSIX ข้าวหลามเตาถ่าน";
-    var htmlContent = data.html || data.htmlContent || "";
-    var textContent = data.text || data.textContent || "ขอบคุณสำหรับการสั่งซื้อกับ MAXMUXSIX";
-    var fromName = data.fromName || "MAXMUXSIX ข้าวหลามเตาถ่าน";
-    if (!to || to.indexOf("@") === -1) {
-      return ContentService.createTextOutput(JSON.stringify({ status: "error", success: false, message: "Missing recipient 'to'" })).setMimeType(ContentService.MimeType.JSON);
+
+    // 🔒 1. ตรวจสอบรหัสลับ (Secret Token)
+    var clientToken = data.token || (e && e.parameter && e.parameter.token) || "";
+    if (SECURITY_CONFIG.SECRET_TOKEN && clientToken !== SECURITY_CONFIG.SECRET_TOKEN) {
+      return ContentService.createTextOutput(JSON.stringify({
+        status: "error", success: false, message: "⛔ ไม่อนุญาต: รหัสลับ (Secret Token) ไม่ถูกต้อง"
+      })).setMimeType(ContentService.MimeType.JSON);
     }
+
+    // 🛡️ 2. ตรวจสอบโควตาคงเหลือของ Google
+    var remainingQuota = MailApp.getRemainingDailyQuota();
+    if (remainingQuota < 1) {
+      return ContentService.createTextOutput(JSON.stringify({
+        status: "error", success: false, message: "⚠️ โควตาส่งอีเมลประจำวันของ Google หมดแล้ว"
+      })).setMimeType(ContentService.MimeType.JSON);
+    }
+
+    var to = (data.to || "").toString().trim();
+    var subject = (data.subject || "MAXMUXSIX ข้าวหลามเตาถ่าน").toString().trim();
+    var htmlContent = data.html || data.htmlContent || "";
+    var textContent = (data.text || data.textContent || "ขอบคุณสำหรับการสั่งซื้อกับ MAXMUXSIX").toString().trim();
+    var fromName = SECURITY_CONFIG.ALLOWED_FROM_NAME;
+
+    if (!to || to.indexOf("@") === -1) {
+      return ContentService.createTextOutput(JSON.stringify({ status: "error", success: false, message: "Missing valid recipient 'to'" })).setMimeType(ContentService.MimeType.JSON);
+    }
+
+    if (subject.length > SECURITY_CONFIG.MAX_SUBJECT_LEN) {
+      subject = subject.substring(0, SECURITY_CONFIG.MAX_SUBJECT_LEN);
+    }
+
     MailApp.sendEmail({
       to: to,
       subject: subject,
@@ -4304,15 +4434,22 @@
       htmlBody: htmlContent,
       body: textContent
     });
-    return ContentService.createTextOutput(JSON.stringify({ status: "success", success: true, message: "ส่งอีเมลสำเร็จไปยัง " + to })).setMimeType(ContentService.MimeType.JSON);
+
+    return ContentService.createTextOutput(JSON.stringify({
+      status: "success", success: true, message: "ส่งอีเมลสำเร็จไปยัง " + to, recipient: to, remainingQuota: remainingQuota - 1
+    })).setMimeType(ContentService.MimeType.JSON);
+
   } catch(err) {
     return ContentService.createTextOutput(JSON.stringify({ status: "error", success: false, message: err.toString() })).setMimeType(ContentService.MimeType.JSON);
   } finally {
     lock.releaseLock();
   }
 }
+
 function doGet(e) {
-  return ContentService.createTextOutput(JSON.stringify({ status: "online", message: "MAXMUXSIX Email Web App กำลังทำงาน 24 ชม." })).setMimeType(ContentService.MimeType.JSON);
+  return ContentService.createTextOutput(JSON.stringify({
+    status: "online", message: "MAXMUXSIX Email Web App กำลังทำงาน 24 ชม. (พร้อมระบบ Secret Token)"
+  })).setMimeType(ContentService.MimeType.JSON);
 }`;
 
         function autoSaveGasUrl(val) {
@@ -4409,6 +4546,11 @@ function doGet(e) {
         }
 
         function openRealEmailSettingsModal() {
+            if (!isAdminMode) {
+                promptAdminMode();
+                if (!isAdminMode) return;
+            }
+
             const radioVal = emailSettings.provider || 'gas';
             const rGas = document.getElementById('radioGas');
             const rWeb = document.getElementById('radioWeb3Forms');
@@ -4420,6 +4562,11 @@ function doGet(e) {
             if (gasInput) {
                 gasInput.value = emailSettings.gasUrl || '';
                 autoSaveGasUrl(gasInput.value);
+            }
+
+            const tokenInput = document.getElementById('settingGasToken');
+            if (tokenInput) {
+                tokenInput.value = emailSettings.gasToken || 'MAXMUXSIX_SECURE_TOKEN_2026';
             }
 
             const keyInput = document.getElementById('settingWeb3FormsKey');
@@ -4448,6 +4595,11 @@ function doGet(e) {
         }
 
         function saveEmailSettings() {
+            if (!isAdminMode) {
+                alert('⛔ เฉพาะผู้ดูแลระบบเท่านั้นที่สามารถบันทึกการตั้งค่าได้');
+                return;
+            }
+
             const radios = document.getElementsByName('emailProviderRadio');
             let chosen = 'gas';
             for (const r of radios) {
@@ -4456,10 +4608,12 @@ function doGet(e) {
 
             const keyVal = document.getElementById('settingWeb3FormsKey') ? document.getElementById('settingWeb3FormsKey').value.trim() : '';
             const gasVal = document.getElementById('settingGasUrl') ? document.getElementById('settingGasUrl').value.trim() : '';
+            const tokenVal = document.getElementById('settingGasToken') ? document.getElementById('settingGasToken').value.trim() : (emailSettings.gasToken || 'MAXMUXSIX_SECURE_TOKEN_2026');
 
             emailSettings = {
                 provider: chosen,
                 gasUrl: gasVal,
+                gasToken: tokenVal || 'MAXMUXSIX_SECURE_TOKEN_2026',
                 web3formsKey: keyVal,
                 websiteUrl: emailSettings.websiteUrl || 'https://okayokay101.github.io/MAXMUXSIX-ONLINEWEB/'
             };
@@ -4576,11 +4730,12 @@ function doGet(e) {
         function showPromoToast(promoCode) {
             const toastArea = document.getElementById('emailToastArea');
             if (!toastArea) return;
+            const safePromo = sanitizeHtml(promoCode);
             toastArea.innerHTML = `
                 <div class="email-toast">
                     <div class="email-toast-icon">🎁</div>
                     <div class="email-toast-body">
-                        <strong>ใส่โค้ดส่วนลด ${promoCode} สำเร็จ!</strong><br>
+                        <strong>ใส่โค้ดส่วนลด ${safePromo} สำเร็จ!</strong><br>
                         รับส่วนลด 10% พร้อมสั่งซื้อข้าวหลามเตาถ่านได้ทันที
                     </div>
                     <button class="email-toast-btn" onclick="scrollToProducts(); closeEmailToast();">เลือกเมนูเลย</button>
@@ -4772,9 +4927,15 @@ function doGet(e) {
         // ==========================================
         checkCookieConsent();
         syncStorage();
+        renderAdminControls();
         applyFilters(); 
         renderAuthUI();
         handleUrlParametersOnLoad();
+
+        // ตรวจสอบว่าเปิดมาด้วย #admin หรือไม่
+        if (window.location.hash === '#admin') {
+            setTimeout(promptAdminMode, 500);
+        }
     </script>
 </body>
 </html>
