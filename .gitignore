@@ -43,3 +43,10 @@ temp_*.json
 # Node (if added later)
 node_modules/
 npm-debug.log*
+
+# AI Agent Skills (local machine only)
+.agents/
+.agent/
+_agents/
+_agent/
+
