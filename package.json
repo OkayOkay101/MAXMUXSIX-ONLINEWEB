@@ -1,0 +1,18 @@
+{
+  "name": "maxmuxsix-onlineweb",
+  "version": "1.0.2",
+  "description": "MAXMUXSIX Online Store - Automated Unit Test Suite",
+  "private": true,
+  "scripts": {
+    "test": "node --test tests/unit/*.test.js",
+    "test:verbose": "node --test --test-reporter=spec tests/unit/*.test.js"
+  },
+  "keywords": [
+    "ecommerce",
+    "unit-testing",
+    "security",
+    "responsive"
+  ],
+  "author": "MAXMUXSIX Team",
+  "license": "UNLICENSED"
+}
