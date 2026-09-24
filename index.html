@@ -3231,7 +3231,7 @@
                     area.innerHTML = `
                         <div class="user-nav-box">
                             <span>👤</span>
-                            <span class="user-nav-name">${currentUser.name}</span>
+                            <span class="user-nav-name">${escapeStoredText(currentUser.name)}</span>
                             <button class="btn-nav-action" style="padding: 4px 12px; border-color: var(--flame-yellow); color: var(--flame-yellow);" onclick="openReferralModal()">🤝 ชวนเพื่อน</button>
                             <button class="btn-nav-action" style="padding: 4px 12px; border-color: #38BDF8; color: #38BDF8;" onclick="openEmailInboxModal()">
                                 📧 กล่องอีเมล
@@ -3246,8 +3246,8 @@
                         <div style="background: #102B1E; border: 1.5px solid var(--flame-yellow); padding: 12px 14px; border-radius: 12px; margin-bottom: 12px;">
                             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
                                 <div>
-                                    <div style="font-weight: 700; color: var(--flame-yellow); font-size: 1rem;">👤 ${currentUser.name}</div>
-                                    <div style="font-size: 0.8rem; color: #A7F3D0;">${currentUser.email || currentUser.phone || ''}</div>
+                                    <div style="font-weight: 700; color: var(--flame-yellow); font-size: 1rem;">👤 ${escapeStoredText(currentUser.name)}</div>
+                                    <div style="font-size: 0.8rem; color: #A7F3D0;">${sanitizeHtml(String(currentUser.email || currentUser.phone || ''))}</div>
                                 </div>
                                 <button onclick="handleLogout()" style="background: none; border: 1px solid #EF4444; color: #FCA5A5; padding: 4px 10px; border-radius: 8px; font-size: 0.8rem; cursor: pointer;">ออกจากระบบ</button>
                             </div>
@@ -3504,7 +3504,7 @@
                 syncStorage();
                 clearRateLimitBlock('login_fail');
                 logSecurityEvent('login_ok', candidate.email);
-                showEmailToast(`🔥 ยินดีต้อนรับกลับ คุณ ${sanitizeHtml(candidate.name)}!`);
+                showEmailToast(`🔥 ยินดีต้อนรับกลับ คุณ ${candidate.name}!`);
                 closeAuthModal();
             } else {
                 recordRateLimitAttempt('login_fail');
@@ -3556,13 +3556,13 @@
                 html += `
                     <div class="card rec-card">
                         <div class="card-img-wrapper" style="height: 160px;">
-                            <img src="${p.image}" alt="${p.name}" loading="lazy" onerror="this.onerror=null; this.src='${fallbackImageBase64}';">
-                            ${p.tag ? `<div class="card-ribbon-tag" style="background: var(--success);">${p.tag}</div>` : ''}
+                            <img src="${safeImageAttribute(p.image)}" alt="${escapeStoredText(p.name)}" loading="lazy" onerror="this.onerror=null; this.src='${fallbackImageBase64}';">
+                            ${p.tag ? `<div class="card-ribbon-tag" style="background: var(--success);">${escapeStoredText(p.tag)}</div>` : ''}
                         </div>
                         <div class="card-body" style="padding: 1rem;">
-                            <h3 style="font-size: 1.15rem; margin-bottom: 5px; color: var(--cream); font-weight: 700;">${p.name}</h3>
-                            <div style="color: var(--flame-yellow); font-weight: 800; font-size: 1.3rem;">${p.price} บาท</div>
-                            <button class="btn-order" onclick="addToCart('${p.id}')" style="width: 100%; margin-top: 10px;">🛒 เพิ่มลงตะกร้า</button>
+                            <h3 style="font-size: 1.15rem; margin-bottom: 5px; color: var(--cream); font-weight: 700;">${escapeStoredText(p.name)}</h3>
+                            <div style="color: var(--flame-yellow); font-weight: 800; font-size: 1.3rem;">${safeDisplayNumber(p.price)} บาท</div>
+                            <button class="btn-order" onclick="addToCart(${htmlJsArg(p.id)})" style="width: 100%; margin-top: 10px;">🛒 เพิ่มลงตะกร้า</button>
                         </div>
                     </div>
                 `;
@@ -3733,14 +3733,14 @@
             const cardsHtml = top.map(p => `
                 <div class="card quiz-result-card">
                     <div class="card-img-wrapper" style="height: 150px;">
-                        <img src="${p.image}" alt="${p.name}" loading="lazy" onerror="this.onerror=null; this.src='${fallbackImageBase64}';">
+                        <img src="${safeImageAttribute(p.image)}" alt="${escapeStoredText(p.name)}" loading="lazy" onerror="this.onerror=null; this.src='${fallbackImageBase64}';">
                         ${maxScore > 0 && p._score === maxScore ? `<div class="quiz-match-badge">✨ ตรงใจที่สุด</div>` : ''}
-                        ${p.tag ? `<div class="card-ribbon-tag">${p.tag}</div>` : ''}
+                        ${p.tag ? `<div class="card-ribbon-tag">${escapeStoredText(p.tag)}</div>` : ''}
                     </div>
                     <div class="card-body" style="padding: 1rem;">
-                        <h3 style="font-size: 1.08rem; color: var(--cream); margin-bottom: 4px;">${p.name}</h3>
-                        <div style="color: var(--flame-yellow); font-weight: 800; font-size: 1.2rem; margin-bottom: 10px;">${p.price} บาท</div>
-                        <button class="btn-order" style="width: 100%;" onclick="addToCart('${p.id}'); closeQuizModal();">🛒 เพิ่มลงตะกร้าเลย</button>
+                        <h3 style="font-size: 1.08rem; color: var(--cream); margin-bottom: 4px;">${escapeStoredText(p.name)}</h3>
+                        <div style="color: var(--flame-yellow); font-weight: 800; font-size: 1.2rem; margin-bottom: 10px;">${safeDisplayNumber(p.price)} บาท</div>
+                        <button class="btn-order" style="width: 100%;" onclick="addToCart(${htmlJsArg(p.id)}); closeQuizModal();">🛒 เพิ่มลงตะกร้าเลย</button>
                     </div>
                 </div>
             `).join('');
@@ -3779,21 +3779,21 @@
                 const card = document.createElement('div');
                 card.className = 'card';
                 
-                const safeName = sanitizeHtml(p.name || '');
-                const safeDesc = sanitizeHtml(p.desc || '');
-                const safeCategory = sanitizeHtml(p.category || '');
-                const safeTag = p.tag ? sanitizeHtml(p.tag) : '';
+                const safeName = escapeStoredText(p.name);
+                const safeDesc = escapeStoredText(p.desc);
+                const safeCategory = escapeStoredText(p.category);
+                const safeTag = p.tag ? escapeStoredText(p.tag) : '';
                 const safeRating = sanitizeHtml(p.rating || '4.9 ★★★★★');
                 const adminButtons = isAdminMode ? `
-                    <button class="btn-act edit" title="แก้ไข" onclick="editProduct('${p.id}')">✏️</button>
-                    <button class="btn-act delete" title="ลบ" onclick="deleteProduct('${p.id}')">🗑️</button>
+                    <button class="btn-act edit" title="แก้ไข" onclick="editProduct(${htmlJsArg(p.id)})">✏️</button>
+                    <button class="btn-act delete" title="ลบ" onclick="deleteProduct(${htmlJsArg(p.id)})">🗑️</button>
                 ` : '';
 
                 card.innerHTML = `
                     <div class="card-img-wrapper">
-                        <img src="${p.image}" alt="${safeName}" loading="lazy" onerror="this.onerror=null; this.src='${fallbackImageBase64}';">
+                        <img src="${safeImageAttribute(p.image)}" alt="${safeName}" loading="lazy" onerror="this.onerror=null; this.src='${fallbackImageBase64}';">
                         ${safeTag ? `<div class="card-ribbon-tag">${safeTag}</div>` : ''}
-                        <div class="stock-badge">คงเหลือ ${stockCount} กระบอก</div>
+                        <div class="stock-badge">คงเหลือ ${safeDisplayNumber(stockCount)} กระบอก</div>
                     </div>
                     <div class="card-body">
                         <div class="card-category-rating">
@@ -3803,9 +3803,9 @@
                         <h2 class="card-title">${safeName}</h2>
                         <p class="card-desc">${safeDesc}</p>
                         <div class="card-footer">
-                            <div class="card-price">${p.price} <span style="font-size:0.85rem; color:var(--cream);">บาท</span></div>
+                            <div class="card-price">${safeDisplayNumber(p.price)} <span style="font-size:0.85rem; color:var(--cream);">บาท</span></div>
                             <div class="card-btns">
-                                <button class="btn-order" onclick="addToCart('${p.id}')">🛒 สั่งซื้อ</button>
+                                <button class="btn-order" onclick="addToCart(${htmlJsArg(p.id)})">🛒 สั่งซื้อ</button>
                                 ${adminButtons}
                             </div>
                         </div>
@@ -3878,13 +3878,13 @@
                 itemRow.className = 'cart-item';
                 itemRow.innerHTML = `
                     <div>
-                        <div class="cart-item-name">${item.name}</div>
-                        <div class="cart-item-price">${item.price} บาท × ${item.qty} = <strong>${subtotal}</strong> บาท</div>
+                        <div class="cart-item-name">${escapeStoredText(item.name)}</div>
+                        <div class="cart-item-price">${safeDisplayNumber(item.price)} บาท × ${safeDisplayNumber(item.qty)} = <strong>${safeDisplayNumber(subtotal)}</strong> บาท</div>
                     </div>
                     <div class="qty-controls">
-                        <button class="qty-btn" onclick="changeQty('${item.id}', -1)">-</button>
-                        <span>${item.qty}</span>
-                        <button class="qty-btn" onclick="changeQty('${item.id}', 1)">+</button>
+                        <button class="qty-btn" onclick="changeQty(${htmlJsArg(item.id)}, -1)">-</button>
+                        <span>${safeDisplayNumber(item.qty)}</span>
+                        <button class="qty-btn" onclick="changeQty(${htmlJsArg(item.id)}, 1)">+</button>
                     </div>
                 `;
                 listContainer.appendChild(itemRow);
@@ -3920,12 +3920,12 @@
             recommendations.forEach(p => {
                 html += `
                 <div class="cross-sell-item">
-                    <img src="${p.image}" onerror="this.onerror=null; this.src='${fallbackImageBase64}';" style="width:50px; height:50px; border-radius:8px; object-fit:cover; border:1px solid #23583F;">
+                    <img src="${safeImageAttribute(p.image)}" onerror="this.onerror=null; this.src='${fallbackImageBase64}';" style="width:50px; height:50px; border-radius:8px; object-fit:cover; border:1px solid #23583F;">
                     <div style="flex:1;">
-                        <div style="font-size:0.85rem; font-weight:600; color:var(--cream);">${p.name}</div>
-                        <div style="color:var(--flame-yellow); font-size:0.9rem; font-weight:700;">${p.price} บาท</div>
+                        <div style="font-size:0.85rem; font-weight:600; color:var(--cream);">${escapeStoredText(p.name)}</div>
+                        <div style="color:var(--flame-yellow); font-size:0.9rem; font-weight:700;">${safeDisplayNumber(p.price)} บาท</div>
                     </div>
-                    <button onclick="addToCart('${p.id}'); renderCartItems(); calculateTotalOrder();" style="background:var(--flame-orange); color:#fff; border:1px solid var(--cream); padding:5px 12px; border-radius:20px; cursor:pointer; font-weight:700; font-size:0.85rem; transition:0.2s;">
+                    <button onclick="addToCart(${htmlJsArg(p.id)}); renderCartItems(); calculateTotalOrder();" style="background:var(--flame-orange); color:#fff; border:1px solid var(--cream); padding:5px 12px; border-radius:20px; cursor:pointer; font-weight:700; font-size:0.85rem; transition:0.2s;">
                         + เพิ่ม
                     </button>
                 </div>`;
@@ -4095,7 +4095,7 @@
                 displayOrders.forEach(ord => {
                     const div = document.createElement('div');
                     div.className = 'order-card';
-                    const itemsSummary = (ord.items || []).map(i => `${sanitizeHtml(i.name || 'เมนู')} (x${i.qty || 1})`).join(', ');
+                    const itemsSummary = (ord.items || []).map(i => `${escapeStoredText(i.name || 'เมนู')} (x${safeDisplayNumber(i.qty || 1)})`).join(', ');
                     const safeOrderId = sanitizeHtml(ord.id || '');
                     const safeStatus = sanitizeHtml(ord.status || 'กำลังดำเนินการ');
                     const safeDate = sanitizeHtml(ord.date || '');
@@ -4108,9 +4108,9 @@
                         <div style="font-size: 0.9rem; margin-bottom: 6px;">รายการ: ${itemsSummary}</div>
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 8px;">
                             <div style="font-size: 0.95rem; font-weight: 700; color: var(--flame-yellow);">
-                                ยอดชำระรวม: ${ord.total} บาท
+                                ยอดชำระรวม: ${safeDisplayNumber(ord.total)} บาท
                             </div>
-                            <button class="btn-nav-action" style="padding: 4px 10px; font-size: 0.8rem; border-color: #38BDF8; color: #38BDF8;" onclick="closeOrderHistoryModal(); openOrderReceiptModal('${safeOrderId}')">🧾 ดูใบเสร็จ & อีเมลสรุป</button>
+                            <button class="btn-nav-action" style="padding: 4px 10px; font-size: 0.8rem; border-color: #38BDF8; color: #38BDF8;" onclick="closeOrderHistoryModal(); openOrderReceiptModal(${htmlJsArg(ord.id)})">🧾 ดูใบเสร็จ & อีเมลสรุป</button>
                         </div>
                     `;
                     container.appendChild(div);
@@ -4341,7 +4341,7 @@
             let html = tmpl.innerHTML;
             
             // แทนที่ตัวแปรไดนามิกในเนื้อหาอีเมล (พร้อม sanitize ป้องกัน XSS)
-            const userName = sanitizeHtml(user.name || 'สมาชิกร้าน MAXMUXSIX');
+            const userName = escapeStoredText(user.name || 'สมาชิกร้าน MAXMUXSIX');
             const userRefCode = sanitizeHtml(user.referralCode || 'MAX1000');
             const websiteUrl = (window.emailSettings && window.emailSettings.websiteUrl) || 'https://okayokay101.github.io/MAXMUXSIX-ONLINEWEB/';
             
@@ -4378,7 +4378,7 @@
             dispatchRealEmail(emailRecord).then(res => {
                 const toastBody = document.querySelector('.email-toast-body');
                 if (toastBody && res.success) {
-                    toastBody.innerHTML = `<strong>ส่งอีเมลจริงสำเร็จ!</strong><br>ส่งเข้า Inbox ของ <span>${user.email}</span> แล้ว`;
+                    toastBody.innerHTML = `<strong>ส่งอีเมลจริงสำเร็จ!</strong><br>ส่งเข้า Inbox ของ <span>${sanitizeHtml(String(user.email || ''))}</span> แล้ว`;
                 }
             });
 
@@ -4483,7 +4483,7 @@
                         <strong style="color:var(--flame-yellow); font-size:1rem;">สมัครรับข่าวสารและโค้ดลดสำเร็จ!</strong>
                     </div>
                     <div>
-                        ระบบได้จัดส่งอีเมลต้อนรับพร้อมโค้ดส่วนลด <strong>WELCOME10</strong> ไปยัง <span style="color:#38BDF8; font-weight:700;">${subRecord.email}</span> เรียบร้อยแล้ว
+                        ระบบได้จัดส่งอีเมลต้อนรับพร้อมโค้ดส่วนลด <strong>WELCOME10</strong> ไปยัง <span style="color:#38BDF8; font-weight:700;">${sanitizeHtml(String(subRecord.email || ''))}</span> เรียบร้อยแล้ว
                     </div>
                     <div style="margin-top:8px; font-size:0.84rem; color:#A7F3D0;">
                         💡 สามารถใช้โค้ด <code>WELCOME10</code> ในการสั่งซื้อเพื่อรับส่วนลด 10% ได้ทันทีครับ
@@ -4511,16 +4511,16 @@
 
             const isOrder = emailId && emailId.startsWith('ORD-EML');
             const displayTitle = title || (isOrder ? 'ส่งใบเสร็จคำสั่งซื้อแล้ว!' : 'ส่งอีเมลต้อนรับแล้ว!');
-            const displaySub = subText || `ส่งไปยัง <span>${email}</span> เรียบร้อย`;
+            const displaySub = subText || `ส่งไปยัง ${email || ''} เรียบร้อย`;
 
             toastArea.innerHTML = `
                 <div class="email-toast">
                     <div class="email-toast-icon">${isOrder ? '🧾' : '📬'}</div>
                     <div class="email-toast-body">
-                        <strong>${displayTitle}</strong><br>
-                        ${displaySub}
+                        <strong>${escapeStoredText(displayTitle)}</strong><br>
+                        ${escapeStoredText(displaySub)}
                     </div>
-                    <button class="email-toast-btn" onclick="${isOrder ? `openOrderReceiptModalFromEmailId('${emailId}')` : `openWelcomeEmailModal('${emailId}')`}">${isOrder ? 'เปิดดูใบเสร็จ' : 'เปิดดูอีเมล'}</button>
+                    <button class="email-toast-btn" onclick="${isOrder ? `openOrderReceiptModalFromEmailId(${htmlJsArg(emailId)})` : `openWelcomeEmailModal(${htmlJsArg(emailId)})`}">${isOrder ? 'เปิดดูใบเสร็จ' : 'เปิดดูอีเมล'}</button>
                     <button class="email-toast-close" onclick="closeEmailToast()">&times;</button>
                 </div>
             `;
@@ -4550,8 +4550,8 @@
             if (Array.isArray(order.items)) {
                 order.items.forEach(item => {
                     const lineTotal = (item.price || 0) * (item.qty || 1);
-                    const imgFile = item.image || item.img || 'max_1.jpg';
-                    const safeName = sanitizeHtml(item.name || 'เมนูข้าวหลาม');
+                    const imgFile = safeImageAttribute(item.image || item.img || 'max_1.jpg');
+                    const safeName = escapeStoredText(item.name || 'เมนูข้าวหลาม');
                     itemsRows += `
                         <tr style="border-bottom:1px solid #143526;">
                             <td style="padding:10px 14px; vertical-align:middle;">
@@ -4562,16 +4562,16 @@
                                         </td>
                                         <td style="padding-left:10px; vertical-align:middle;">
                                             <div style="font-size:13px; font-weight:700; color:#FEE8BE;">${safeName}</div>
-                                            <div style="font-size:11px; color:#8BA89B;">ราคาชิ้นละ ${item.price} บาท</div>
+                                            <div style="font-size:11px; color:#8BA89B;">ราคาชิ้นละ ${safeDisplayNumber(item.price)} บาท</div>
                                         </td>
                                     </tr>
                                 </table>
                             </td>
                             <td align="center" style="padding:10px 8px; font-size:13px; color:#FAA307; font-weight:700; vertical-align:middle;">
-                                x${item.qty}
+                                x${safeDisplayNumber(item.qty)}
                             </td>
                             <td align="right" style="padding:10px 14px; font-size:13px; color:#FEE8BE; font-weight:700; vertical-align:middle;">
-                                ${lineTotal} บาท
+                                ${safeDisplayNumber(lineTotal)} บาท
                             </td>
                         </tr>
                     `;
@@ -4583,15 +4583,15 @@
             html = html.replace(/{{ORDER_ID}}/g, sanitizeHtml(order.id || ''));
             html = html.replace(/{{ORDER_DATE}}/g, sanitizeHtml(order.date || new Date().toLocaleString('th-TH')));
             html = html.replace(/{{ORDER_STATUS}}/g, sanitizeHtml(order.status || 'กำลังเผาไฟแรง 🔥'));
-            html = html.replace(/{{CUST_NAME}}/g, sanitizeHtml(order.name || 'ลูกค้าผู้มีอุปการคุณ'));
+            html = html.replace(/{{CUST_NAME}}/g, escapeStoredText(order.name || 'ลูกค้าผู้มีอุปการคุณ'));
             html = html.replace(/{{CUST_PHONE}}/g, sanitizeHtml(order.phone || '-'));
             html = html.replace(/{{CUST_EMAIL}}/g, sanitizeHtml(order.email || (currentUser ? currentUser.email : '-')));
-            html = html.replace(/{{CUST_ADDRESS}}/g, sanitizeHtml(order.address || '-'));
+            html = html.replace(/{{CUST_ADDRESS}}/g, escapeStoredText(order.address || '-'));
             html = html.replace(/{{ORDER_ITEMS_ROWS}}/g, itemsRows);
-            html = html.replace(/{{SUBTOTAL}}/g, order.subtotal !== undefined ? order.subtotal : order.total);
-            html = html.replace(/{{SHIPPING_COST}}/g, order.shippingCost !== undefined ? order.shippingCost : 0);
-            html = html.replace(/{{DISCOUNT_AMOUNT}}/g, order.discountAmount !== undefined ? order.discountAmount : 0);
-            html = html.replace(/{{GRAND_TOTAL}}/g, order.total || 0);
+            html = html.replace(/{{SUBTOTAL}}/g, safeDisplayNumber(order.subtotal !== undefined ? order.subtotal : order.total));
+            html = html.replace(/{{SHIPPING_COST}}/g, safeDisplayNumber(order.shippingCost !== undefined ? order.shippingCost : 0));
+            html = html.replace(/{{DISCOUNT_AMOUNT}}/g, safeDisplayNumber(order.discountAmount !== undefined ? order.discountAmount : 0));
+            html = html.replace(/{{GRAND_TOTAL}}/g, safeDisplayNumber(order.total));
 
             return html;
         }
@@ -4623,9 +4623,9 @@
                     const metaStatus = document.getElementById('receiptMetaStatus');
                     if (metaStatus) {
                         if (res.success) {
-                            metaStatus.innerHTML = `<span style="color:#10B981; font-weight:700;">✅ จัดส่งเข้าอีเมลจริงแล้ว (${res.method})</span>`;
+                            metaStatus.innerHTML = `<span style="color:#10B981; font-weight:700;">✅ จัดส่งเข้าอีเมลจริงแล้ว (${sanitizeHtml(String(res.method || ''))})</span>`;
                         } else {
-                            metaStatus.innerHTML = `<span style="color:#FCD34D;">📬 บันทึกในกล่องอีเมลบนเว็บ (${res.message || 'รอดำเนินการ'})</span>`;
+                            metaStatus.innerHTML = `<span style="color:#FCD34D;">📬 บันทึกในกล่องอีเมลบนเว็บ (${sanitizeHtml(String(res.message || 'รอดำเนินการ'))})</span>`;
                         }
                     }
                 });
@@ -4633,7 +4633,7 @@
 
             // แสดง Toast แจ้งเตือนส่งอีเมลใบเสร็จ
             if (targetEmail) {
-                showEmailToast(targetEmail, emailRecord.id, 'ส่งใบเสร็จคำสั่งซื้อแล้ว!', `รหัส #${order.id} ส่งไปยัง <span>${targetEmail}</span>`);
+                showEmailToast(targetEmail, emailRecord.id, 'ส่งใบเสร็จคำสั่งซื้อแล้ว!', `รหัส #${order.id} ส่งไปยัง ${targetEmail}`);
             }
 
             return emailRecord;
@@ -4775,13 +4775,13 @@
             targetEmail.isRead = true;
             syncStorage();
 
-            document.getElementById('emailMetaTo').textContent = `${targetEmail.toName} <${targetEmail.to}>`;
-            document.getElementById('emailMetaSubject').textContent = targetEmail.subject;
+            document.getElementById('emailMetaTo').textContent = `${decodeStoredText(targetEmail.toName)} <${targetEmail.to}>`;
+            document.getElementById('emailMetaSubject').textContent = decodeStoredText(targetEmail.subject);
             document.getElementById('emailMetaDate').textContent = targetEmail.date;
             
             const statusEl = document.getElementById('emailMetaStatus');
             if (statusEl) {
-                statusEl.innerHTML = `<span style="color:${targetEmail.dispatchStatus && targetEmail.dispatchStatus.includes('✅') ? '#10B981' : '#FAA307'}; font-weight:700;">${targetEmail.dispatchStatus || '📬 ส่งในระบบเรียบร้อย'}</span>`;
+                statusEl.innerHTML = `<span style="color:${targetEmail.dispatchStatus && targetEmail.dispatchStatus.includes('✅') ? '#10B981' : '#FAA307'}; font-weight:700;">${sanitizeHtml(String(targetEmail.dispatchStatus || '📬 ส่งในระบบเรียบร้อย'))}</span>`;
             }
             
             const targetInput = document.getElementById('targetRealEmailInput');
@@ -4856,7 +4856,7 @@
 
             setTimeout(() => {
                 statusDiv.style.color = '#10B981';
-                statusDiv.innerHTML = `✅ จัดส่งอีเมลต้อนรับไปยัง <b>${emailVal}</b> สำเร็จเรียบร้อย! (บันทึกลงระบบประวัติเรียบร้อย)`;
+                statusDiv.textContent = `✅ จัดส่งอีเมลต้อนรับไปยัง ${emailVal} สำเร็จเรียบร้อย! (บันทึกลงระบบประวัติเรียบร้อย)`;
                 alert(`🚀 ส่งข้อมูลอีเมลต้อนรับไปยัง ${emailVal} เรียบร้อยแล้วครับ!\n\n(จำลองการยิงผ่าน API Mail Service และบันทึกประวัติลงระบบฐานข้อมูลสำเร็จ)`);
             }, 1200);
         }
@@ -4885,14 +4885,14 @@
                         }
                     };
                     const subInfo = isOrder 
-                        ? `ถึง: ${item.toName} (${item.to}) • คำสั่งซื้อ: <strong>#${item.orderId}</strong>`
-                        : `ถึง: ${item.toName} (${item.to}) • โค้ดส่วนลด: <strong>${item.promoCode}</strong>`;
+                        ? `ถึง: ${escapeStoredText(item.toName)} (${sanitizeHtml(String(item.to || ''))}) • คำสั่งซื้อ: <strong>#${sanitizeHtml(String(item.orderId || ''))}</strong>`
+                        : `ถึง: ${escapeStoredText(item.toName)} (${sanitizeHtml(String(item.to || ''))}) • โค้ดส่วนลด: <strong>${sanitizeHtml(String(item.promoCode || ''))}</strong>`;
                     div.innerHTML = `
                         <div>
-                            <div class="inbox-item-title">${item.isRead ? (isOrder ? '🧾' : '📩') : (isOrder ? '🧾' : '📬')} ${item.subject}</div>
+                            <div class="inbox-item-title">${item.isRead ? (isOrder ? '🧾' : '📩') : (isOrder ? '🧾' : '📬')} ${escapeStoredText(item.subject)}</div>
                             <div class="inbox-item-sub">${subInfo}</div>
                         </div>
-                        <div class="inbox-item-date">${item.date}</div>
+                        <div class="inbox-item-date">${sanitizeHtml(String(item.date || ''))}</div>
                     `;
                     container.appendChild(div);
                 });
@@ -5062,9 +5062,9 @@
 
             if (statusMeta) {
                 if (result.success) {
-                    statusMeta.innerHTML = `<span style="color:#10B981; font-weight:700;">${emailRecord.dispatchStatus}</span>`;
+                    statusMeta.innerHTML = `<span style="color:#10B981; font-weight:700;">${sanitizeHtml(String(emailRecord.dispatchStatus))}</span>`;
                 } else {
-                    statusMeta.innerHTML = `<span style="color:#F59E0B;">${emailRecord.dispatchStatus}</span> <button class="btn-nav-action" style="display:inline-flex; padding:2px 8px; font-size:0.75rem; margin-left:6px;" onclick="openRealEmailSettingsModal()">⚙️ ตั้งค่าส่งจริง</button>`;
+                    statusMeta.innerHTML = `<span style="color:#F59E0B;">${sanitizeHtml(String(emailRecord.dispatchStatus))}</span> <button class="btn-nav-action" style="display:inline-flex; padding:2px 8px; font-size:0.75rem; margin-left:6px;" onclick="openRealEmailSettingsModal()">⚙️ ตั้งค่าส่งจริง</button>`;
                 }
             }
 
@@ -5081,7 +5081,7 @@
             if (badge) {
                 if (key.length >= 8) {
                     badge.style.color = '#10B981';
-                    badge.innerHTML = `✅ บันทึก Access Key แล้ว (${key.substring(0, 8)}...) พร้อมใช้งานทันที`;
+                    badge.textContent = `✅ บันทึก Access Key แล้ว (${key.substring(0, 8)}...) พร้อมใช้งานทันที`;
                 } else if (key.length > 0) {
                     badge.style.color = '#FAA307';
                     badge.innerHTML = `⚠️ Access Key สั้นเกินไป กรุณาตรวจสอบ`;
@@ -5399,10 +5399,10 @@ function doGet(e) {
 
             if (res.success) {
                 statusDiv.style.color = '#10B981';
-                statusDiv.innerHTML = `✅ ${res.message}`;
+                statusDiv.textContent = `✅ ${res.message}`;
             } else {
                 statusDiv.style.color = '#EF4444';
-                statusDiv.innerHTML = `⚠️ ${res.message}`;
+                statusDiv.textContent = `⚠️ ${res.message}`;
             }
         }
 
@@ -5534,6 +5534,39 @@ function doGet(e) {
                 .replace(/"/g, '&quot;')
                 .replace(/'/g, '&#x27;')
                 .replace(/\//g, '&#x2F;');
+        }
+
+        // Older records were HTML-escaped before storage. Normalize one layer,
+        // then escape for the current HTML context to avoid showing entities.
+        function decodeStoredText(value) {
+            return String(value ?? '')
+                .replace(/&#x2F;/gi, '/')
+                .replace(/&#x27;/gi, "'")
+                .replace(/&quot;/gi, '"')
+                .replace(/&gt;/gi, '>')
+                .replace(/&lt;/gi, '<')
+                .replace(/&amp;/gi, '&');
+        }
+
+        function escapeStoredText(value) {
+            return sanitizeHtml(decodeStoredText(value));
+        }
+
+        function htmlJsArg(value) {
+            return sanitizeHtml(JSON.stringify(String(value ?? '')));
+        }
+
+        function safeDisplayNumber(value) {
+            const number = Number(value);
+            return Number.isFinite(number) ? number : 0;
+        }
+
+        function safeImageAttribute(value) {
+            const image = typeof value === 'string' ? value.trim() : '';
+            const isLocal = /^(?:\.\/)?(?:[a-z0-9_-]+\/)*[a-z0-9_-]+\.(?:png|jpe?g|gif|webp)$/i.test(image);
+            const isHttps = /^https:\/\/[^\s"'<>]+$/i.test(image);
+            const isUploaded = /^data:image\/(?:png|jpeg|gif|webp);base64,[a-z0-9+/=]+$/i.test(image);
+            return sanitizeHtml(isLocal || isHttps || isUploaded ? image : 'max_1.jpg');
         }
 
         // --- 2. SHA-256 Password Hashing (Web Crypto API) ---
