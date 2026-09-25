@@ -1545,10 +1545,534 @@
             .brand-title {
                 font-size: 1.15rem;
             }
-            .storage-btns {
+        /* =========================================================================
+           Storefront & Contact Mockup (หน้าร้านจริง & ช่องทางการติดต่อ)
+           ========================================================================= */
+        .store-contact-section {
+            padding: 4rem 1.5rem;
+            background: linear-gradient(180deg, #0A0705 0%, #0F2318 50%, #070D09 100%);
+            border-top: 2px solid #1E543C;
+            border-bottom: 2px solid #1E543C;
+            position: relative;
+        }
+        .store-contact-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .store-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-top: 2.2rem;
+        }
+        @media (max-width: 900px) {
+            .store-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+        }
+        .store-info-card, .store-contact-card {
+            background: #091D13;
+            border: 2px solid #1E543C;
+            border-radius: 18px;
+            padding: 1.75rem;
+            box-shadow: 0 12px 30px rgba(0,0,0,0.5);
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+        }
+        .store-img-box {
+            position: relative;
+            border-radius: 12px;
+            overflow: hidden;
+            height: 230px;
+            border: 2px solid #143A29;
+            background: #05140D;
+        }
+        .store-feature-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.4s ease;
+        }
+        .store-info-card:hover .store-feature-img {
+            transform: scale(1.03);
+        }
+        .store-status-pill {
+            position: absolute;
+            bottom: 12px;
+            left: 12px;
+            background: rgba(10, 28, 20, 0.9);
+            backdrop-filter: blur(8px);
+            border: 1px solid #10B981;
+            color: #34D399;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+        }
+        .pulse-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #10B981;
+            box-shadow: 0 0 10px #10B981;
+            animation: pulseDotAnim 1.5s infinite;
+        }
+        @keyframes pulseDotAnim {
+            0% { transform: scale(0.9); opacity: 0.8; }
+            50% { transform: scale(1.25); opacity: 1; }
+            100% { transform: scale(0.9); opacity: 0.8; }
+        }
+        .store-name {
+            font-size: 1.45rem;
+            color: var(--flame-yellow);
+            margin-bottom: 0.4rem;
+            font-weight: 700;
+        }
+        .store-story {
+            font-size: 0.92rem;
+            color: #CBD5E1;
+            line-height: 1.6;
+        }
+        .store-meta-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.85rem;
+            border-top: 1px dashed #1E543C;
+            padding-top: 1rem;
+        }
+        .store-meta-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            font-size: 0.88rem;
+        }
+        .store-meta-item .meta-icon {
+            font-size: 1.3rem;
+            line-height: 1.2;
+            flex-shrink: 0;
+        }
+        .store-meta-item strong {
+            color: var(--flame-yellow);
+            display: block;
+        }
+        .store-meta-item p {
+            color: #E2E8F0;
+            margin: 2px 0 0 0;
+        }
+
+        /* LINE OA Highlight Card */
+        .line-oa-box {
+            background: linear-gradient(135deg, #062817 0%, #093E23 100%);
+            border: 2px solid #06C755;
+            border-radius: 14px;
+            padding: 1.25rem;
+            box-shadow: 0 8px 24px rgba(6, 199, 85, 0.15);
+        }
+        .line-oa-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 8px;
+        }
+        .line-logo-badge {
+            background: #06C755;
+            color: #FFF;
+            font-weight: 900;
+            font-size: 0.95rem;
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(6, 199, 85, 0.4);
+            letter-spacing: 0.5px;
+            flex-shrink: 0;
+        }
+        .line-oa-name {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #FFF;
+        }
+        .line-oa-id {
+            font-size: 0.88rem;
+            color: #A7F3D0;
+        }
+        .line-oa-id strong {
+            color: #FAA307;
+            font-size: 0.95rem;
+        }
+        .badge-verified {
+            background: rgba(16, 185, 129, 0.25);
+            color: #34D399;
+            font-size: 0.72rem;
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-weight: 600;
+            border: 1px solid #059669;
+            margin-left: 4px;
+        }
+        .line-oa-desc {
+            font-size: 0.86rem;
+            color: #D1FAE5;
+            margin: 8px 0 12px 0;
+            line-height: 1.5;
+        }
+        .line-oa-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .btn-line-add {
+            background: #06C755;
+            color: #FFF;
+            text-decoration: none;
+            padding: 10px 16px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 14px rgba(6, 199, 85, 0.35);
+            flex: 1;
+            justify-content: center;
+            min-width: 170px;
+        }
+        .btn-line-add:hover {
+            background: #05B34C;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(6, 199, 85, 0.5);
+            color: #FFF;
+        }
+        .btn-line-qr {
+            background: #0B331F;
+            color: #34D399;
+            border: 1.5px solid #059669;
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .btn-line-qr:hover {
+            background: #10B981;
+            color: #FFF;
+        }
+
+        /* Contact Channels Grid */
+        .contact-channels-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        @media (max-width: 500px) {
+            .contact-channels-grid {
                 grid-template-columns: 1fr;
             }
         }
+        .contact-btn-card {
+            background: #0B2418;
+            border: 1.5px solid #1E543C;
+            border-radius: 10px;
+            padding: 12px;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: all 0.2s ease;
+        }
+        .contact-btn-card:hover {
+            border-color: var(--flame-yellow);
+            transform: translateY(-2px);
+            background: #103322;
+        }
+        .contact-btn-card .channel-icon {
+            font-size: 1.6rem;
+            line-height: 1;
+            flex-shrink: 0;
+        }
+        .channel-text {
+            display: flex;
+            flex-direction: column;
+        }
+        .channel-title {
+            font-size: 0.75rem;
+            color: #8BA89B;
+        }
+        .channel-val {
+            font-size: 0.88rem;
+            color: var(--cream);
+            word-break: break-word;
+        }
+
+        /* Interactive Map Mockup */
+        .map-mockup-wrapper {
+            background: #07170F;
+            border: 1.5px solid #1A4732;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        .map-mockup-header {
+            padding: 8px 12px;
+            background: #092216;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.82rem;
+            color: #A7F3D0;
+            border-bottom: 1px solid #1A4732;
+        }
+        .btn-open-gmaps {
+            color: #FAA307;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.78rem;
+        }
+        .btn-open-gmaps:hover {
+            text-decoration: underline;
+        }
+        .map-canvas-mockup {
+            height: 140px;
+            position: relative;
+            background: #081D13;
+            cursor: pointer;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .map-grid-lines {
+            position: absolute;
+            inset: 0;
+            background-image: 
+                linear-gradient(to right, rgba(30, 84, 60, 0.35) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(30, 84, 60, 0.35) 1px, transparent 1px);
+            background-size: 24px 24px;
+        }
+        .map-road-sukhumvit {
+            position: absolute;
+            bottom: 30px;
+            width: 100%;
+            height: 28px;
+            background: #143525;
+            border-top: 2px dashed #FAA307;
+            border-bottom: 2px solid #1E543C;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.72rem;
+            color: #FEE8BE;
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+        .map-pin-pulse {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+        .pin-marker {
+            font-size: 1.8rem;
+            animation: bouncePin 1.5s infinite ease-in-out;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.6));
+        }
+        @keyframes bouncePin {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+        .pin-label {
+            background: #E85D04;
+            color: #FFF;
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+            white-space: nowrap;
+        }
+        .map-hint-overlay {
+            position: absolute;
+            bottom: 4px;
+            font-size: 0.7rem;
+            color: #A7F3D0;
+            background: rgba(0,0,0,0.65);
+            padding: 2px 8px;
+            border-radius: 4px;
+            z-index: 3;
+        }
+
+        /* LINE Link Generator Helper */
+        .line-link-builder-box {
+            background: #082215;
+            border: 1px dashed #10B981;
+            border-radius: 12px;
+            padding: 1rem;
+        }
+        .builder-title {
+            font-size: 0.92rem;
+            color: #34D399;
+            margin-bottom: 4px;
+        }
+        .builder-desc {
+            font-size: 0.78rem;
+            color: #9CA3AF;
+            margin-bottom: 10px;
+        }
+        .builder-controls {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .builder-select {
+            flex: 1;
+            min-width: 180px;
+            background: #0A1C14;
+            border: 1.5px solid #1E543C;
+            border-radius: 6px;
+            color: var(--cream);
+            padding: 6px 10px;
+            font-size: 0.85rem;
+        }
+        .btn-copy-generated {
+            background: #10B981;
+            color: #FFF;
+            border: none;
+            border-radius: 6px;
+            padding: 6px 14px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-copy-generated:hover {
+            background: #059669;
+        }
+        .generated-url-preview {
+            margin-top: 8px;
+            font-family: monospace;
+            font-size: 0.74rem;
+            color: #FCD34D;
+            background: #04120B;
+            padding: 6px 8px;
+            border-radius: 4px;
+            word-break: break-all;
+            user-select: all;
+        }
+
+        /* LINE Selection & Highlighting */
+        .card.line-selected-pulse {
+            border-color: #06C755 !important;
+            box-shadow: 0 0 0 4px rgba(6, 199, 85, 0.4), 0 16px 36px rgba(250, 163, 7, 0.45) !important;
+            animation: pulseLineCard 1.8s infinite alternate ease-in-out;
+            transform: scale(1.02);
+            transition: all 0.3s ease;
+        }
+        @keyframes pulseLineCard {
+            0% {
+                box-shadow: 0 0 0 3px rgba(6, 199, 85, 0.3), 0 10px 25px rgba(232, 93, 4, 0.3);
+            }
+            100% {
+                box-shadow: 0 0 0 8px rgba(6, 199, 85, 0.6), 0 18px 40px rgba(250, 163, 7, 0.6);
+            }
+        }
+        .line-oa-pick-badge {
+            background: linear-gradient(135deg, #06C755 0%, #059669 100%);
+            color: #FFFFFF;
+            font-size: 0.82rem;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: 0 4px 12px rgba(6, 199, 85, 0.35);
+            border: 1px solid #34D399;
+            width: fit-content;
+        }
+        .btn-share-line {
+            background: #092B19;
+            color: #34D399;
+            border: 1px solid #10B981;
+            padding: 5px 10px;
+            border-radius: 6px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .btn-share-line:hover {
+            background: #06C755;
+            color: #FFFFFF;
+            border-color: #06C755;
+            transform: translateY(-1px);
+        }
+
+        /* LINE Welcome Banner */
+        .line-welcome-banner {
+            background: linear-gradient(90deg, #04381C 0%, #064E3B 50%, #0A2E1A 100%);
+            border-bottom: 2px solid #06C755;
+            padding: 10px 16px;
+            color: #FAF7F2;
+            position: sticky;
+            top: 64px;
+            z-index: 95;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            animation: slideDownBanner 0.4s ease-out;
+        }
+        @keyframes slideDownBanner {
+            from { transform: translateY(-100%); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .line-welcome-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            font-size: 0.88rem;
+        }
+        .line-welcome-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .line-badge-pill {
+            background: #06C755;
+            color: #FFFFFF;
+            font-weight: 800;
+            font-size: 0.75rem;
+            padding: 2px 8px;
+            border-radius: 12px;
+            letter-spacing: 0.5px;
+        }
+        .btn-close-line-banner {
+            background: transparent;
+            border: none;
+            color: #9CA3AF;
+            font-size: 1.4rem;
+            cursor: pointer;
+            line-height: 1;
+            padding: 0 4px;
+            transition: color 0.2s;
+        }
+        .btn-close-line-banner:hover { color: #FFF; }
     </style>
 </head>
 <body>
@@ -1570,6 +2094,10 @@
         <div class="header-actions">
             <button class="btn-nav-action" style="background: linear-gradient(135deg, #E85D04, #D00000); color: #FFF; border-color: #FAA307; font-weight: 700;" onclick="openSubscribeModal()">
                 🎁 รับส่วนลด 10%
+            </button>
+
+            <button class="btn-nav-action" onclick="scrollToStoreContact()">
+                📍 หน้าร้าน & ติดต่อ
             </button>
 
             <div id="authNavArea">
@@ -1599,6 +2127,10 @@
             <div class="mobile-menu-links">
                 <button class="mobile-menu-item promo-item" onclick="closeMobileMenu(); openSubscribeModal();">
                     <span>🎁 รับโค้ดส่วนลด 10% (ลูกค้าใหม่)</span>
+                    <span>→</span>
+                </button>
+                <button class="mobile-menu-item" onclick="closeMobileMenu(); scrollToStoreContact();">
+                    <span>📍 หน้าร้านจริง & ติดต่อเรา</span>
                     <span>→</span>
                 </button>
                 <button class="mobile-menu-item" onclick="closeMobileMenu(); openOrderHistoryModal();">
@@ -1676,6 +2208,146 @@
         </div>
     </main>
 
+    <!-- Section: หน้าร้านจริง & ช่องทางการติดต่อ (Storefront & Contact Mockup) -->
+    <section id="storeContactSection" class="store-contact-section">
+        <div class="store-contact-container">
+            <div style="text-align: center; margin-bottom: 2rem;">
+                <span class="badge-tag" style="background: rgba(16, 185, 129, 0.2); color: #34D399; border: 1px solid #10B981; padding: 4px 12px; border-radius: 20px; font-size: 0.88rem; font-weight: 600;">
+                    📍 หน้าร้านจริง & จุดเผาเตาถ่านโบราณ
+                </span>
+                <h2 style="font-size: 2rem; color: var(--flame-yellow); margin-top: 10px; font-weight: 800;">แวะมาเยือนหน้าร้าน หรือสั่งส่งตรงถึงบ้าน</h2>
+                <p style="color: #9CA3AF; max-width: 650px; margin: 8px auto 0; font-size: 0.95rem;">
+                    ต้นตำรับข้าวหลามเผาเตาถ่านไฟแรง กลิ่นหอมฟุ้งริมถนนสุขุมวิท ตลาดหนองมน จ.ชลบุรี พร้อมจัดส่งเดลิเวอรีทั่วประเทศ
+                </p>
+            </div>
+
+            <div class="store-grid">
+                <!-- คอลัมน์ที่ 1: บรรยากาศหน้าร้านจริง และข้อมูลสาขา -->
+                <div class="store-info-card">
+                    <div class="store-img-box">
+                        <img src="OIP-625661642.jpg" alt="หน้าร้านข้าวหลาม MAXMUXSIX เตาถ่านแท้ หนองมน" onerror="this.onerror=null; this.src='max_1.jpg';" class="store-feature-img">
+                        <div class="store-status-pill">
+                            <span class="pulse-dot"></span> เปิดบริการทุกวัน 06:00 - 18:00 น.
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="store-name">🎋 ร้าน MAXMUXSIX ข้าวหลามเตาถ่าน</h3>
+                        <p class="store-story">
+                            เราสืบทอดภูมิปัญญาการเผาข้าวหลามด้วยรางเตาถ่านไม้โกงกางไฟแรงยาวกว่า 10 เมตร ข้าวเหนียวเขี้ยวงูคัดเกรดพิเศษจากเชียงราย กะทิสดคั้นเข้มข้น และกระบอกไม้ไผ่ป่าสดใหม่ทุกวัน เพื่อให้ได้รสชาติหวานมัน หอมกลิ่นกระบอกไม้ไผ่แท้ 100%
+                        </p>
+
+                        <div class="store-meta-list">
+                            <div class="store-meta-item">
+                                <span class="meta-icon">📍</span>
+                                <div>
+                                    <strong>ที่อยู่หน้าร้าน:</strong>
+                                    <p>123/45 ถนนสุขุมวิท (เยื้องตลาดหนองมน) ต.แสนสุข อ.เมือง จ.ชลบุรี 20130</p>
+                                </div>
+                            </div>
+                            <div class="store-meta-item">
+                                <span class="meta-icon">⏰</span>
+                                <div>
+                                    <strong>เวลาเผาเตาถ่าน & เปิดบริการ:</strong>
+                                    <p>ทุกวันจันทร์ - อาทิตย์ 06:00 - 18:00 น. (เผาร้อนๆ จากเตาวันละ 4 รอบ)</p>
+                                </div>
+                            </div>
+                            <div class="store-meta-item">
+                                <span class="meta-icon">🚗</span>
+                                <div>
+                                    <strong>การเดินทางและที่จอดรถ:</strong>
+                                    <p>มีที่จอดรถหน้าร้านสะดวกสบาย รองรับทั้งรถยนต์ส่วนตัวและรถตู้ท่องเที่ยว</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- คอลัมน์ที่ 2: ช่องทางการติดต่อ & แผนที่จำลอง Google Maps -->
+                <div class="store-contact-card">
+                    <h3 style="font-size: 1.3rem; color: var(--flame-yellow); margin-bottom: 0.2rem; font-weight: 700;">📞 ติดต่อสั่งซื้อ / สอบถามเส้นทาง</h3>
+                    
+                    <!-- LINE Official Account Highlight Card -->
+                    <div class="line-oa-box">
+                        <div class="line-oa-header">
+                            <div class="line-logo-badge">LINE</div>
+                            <div>
+                                <div class="line-oa-name">LINE Official Account</div>
+                                <div class="line-oa-id">ID: <strong>@MAXMUXSIX</strong> <span class="badge-verified">✓ บัญชีรับรอง</span></div>
+                            </div>
+                        </div>
+                        <p class="line-oa-desc">
+                            แอดไลน์คุยกับเราโดยตรง สอบถามรอบเตาถ่าน สั่งข้าวหลามล่วงหน้า หรือรับสิทธิพิเศษและโปรโมชันเฉพาะสมาชิก LINE OA
+                        </p>
+                        <div class="line-oa-actions">
+                            <a href="https://line.me/R/ti/p/@maxmuxsix" target="_blank" rel="noopener noreferrer" class="btn-line-add">
+                                💬 แอด LINE: @MAXMUXSIX
+                            </a>
+                            <button type="button" class="btn-line-qr" onclick="openLineQrModal()">
+                                📱 สแกน QR Code
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Contact Channels Grid -->
+                    <div class="contact-channels-grid">
+                        <a href="tel:0812345678" class="contact-btn-card">
+                            <span class="channel-icon">📞</span>
+                            <div class="channel-text">
+                                <span class="channel-title">โทรสั่งด่วน / จองกระบอก</span>
+                                <strong class="channel-val">081-234-5678</strong>
+                            </div>
+                        </a>
+                        <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" class="contact-btn-card">
+                            <span class="channel-icon">📘</span>
+                            <div class="channel-text">
+                                <span class="channel-title">Facebook Fanpage</span>
+                                <strong class="channel-val">MAXMUXSIX เตาถ่านแท้</strong>
+                            </div>
+                        </a>
+                    </div>
+
+                    <!-- แผนที่จำลอง Google Maps (Interactive Map Mockup) -->
+                    <div class="map-mockup-wrapper">
+                        <div class="map-mockup-header">
+                            <span>🗺️ แผนที่พิกัดร้าน (ตลาดหนองมน ชลบุรี)</span>
+                            <a href="https://maps.google.com/?q=13.2798,100.9328" target="_blank" rel="noopener noreferrer" class="btn-open-gmaps">
+                                เปิดใน Google Maps ↗
+                            </a>
+                        </div>
+                        <div class="map-canvas-mockup" onclick="window.open('https://maps.google.com/?q=13.2798,100.9328', '_blank')">
+                            <div class="map-grid-lines"></div>
+                            <div class="map-pin-pulse">
+                                <div class="pin-marker">🎋</div>
+                                <div class="pin-label">ร้าน MAXMUXSIX (หนองมน)</div>
+                            </div>
+                            <div class="map-road-sukhumvit">ถนนสุขุมวิท (มุ่งหน้าพัทยา)</div>
+                            <div class="map-hint-overlay">
+                                <span>📍 พิกัด GPS: 13.2798° N, 100.9328° E (คลิกเพื่อเปิดแผนที่นำทาง)</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- เครื่องมือสร้างลิงก์สำหรับใส่ใน LINE OA Rich Menu -->
+                    <div class="line-link-builder-box">
+                        <div class="builder-title">
+                            🎋 <strong>เครื่องมือสร้างลิงก์สำหรับ LINE OA (Rich Menu & Chat)</strong>
+                        </div>
+                        <p class="builder-desc">เลือกเมนูข้าวหลามที่ต้องการ เพื่อสร้าง URL สำหรับนำไปใส่ในปุ่ม LINE Rich Menu หรือ Broadcast ให้ลูกค้ากดแล้วเลือกเมนูนั้นทันที</p>
+                        <div class="builder-controls">
+                            <select id="lineProductSelect" class="builder-select" onchange="updateGeneratedLineLink()">
+                                <!-- สร้างโดย JavaScript -->
+                            </select>
+                            <button type="button" class="btn-copy-generated" onclick="copyCurrentGeneratedLineLink()">
+                                📋 คัดลอกลิงก์
+                            </button>
+                        </div>
+                        <div class="generated-url-preview" id="generatedLineUrlPreview"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- Section: สมัครรับข่าวสาร & โค้ดส่วนลด (Newsletter Subscribe โดยไม่ต้อง Login) -->
     <section class="subscribe-section" id="newsletterSection">
         <div class="subscribe-card">
@@ -1718,6 +2390,44 @@
         <div class="consent-actions">
             <button class="btn-consent-accept" onclick="acceptCookieConsent()">ยอมรับทั้งหมด</button>
             <button class="btn-consent-decline" onclick="dismissCookieConsent()">จำเป็นเท่านั้น</button>
+        </div>
+    </div>
+
+    <!-- Modal: LINE OA QR Code -->
+    <div class="modal" id="lineQrModal">
+        <div class="modal-box" style="max-width: 400px; text-align: center;">
+            <div class="modal-head">
+                <h3 id="lineQrModalTitle">💬 LINE Official Account</h3>
+                <button class="btn-close" onclick="closeLineQrModal()">&times;</button>
+            </div>
+            <div style="padding: 24px 16px;">
+                <div style="background: #FFF; padding: 16px; border-radius: 12px; display: inline-block; box-shadow: 0 4px 16px rgba(0,0,0,0.4);">
+                    <svg width="200" height="200" viewBox="0 0 200 200" aria-label="QR Code LINE OA @MAXMUXSIX">
+                        <rect width="200" height="200" fill="#FFFFFF"/>
+                        <path d="M20 20h50v50h-50z M30 30h30v30h-30z M40 40h10v10h-10z" fill="#06C755"/>
+                        <path d="M130 20h50v50h-50z M140 30h30v30h-30z M150 40h10v10h-10z" fill="#06C755"/>
+                        <path d="M20 130h50v50h-50z M30 140h30v30h-30z M40 150h10v10h-10z" fill="#06C755"/>
+                        <rect x="85" y="25" width="10" height="40" fill="#111"/>
+                        <rect x="105" y="35" width="15" height="15" fill="#111"/>
+                        <rect x="25" y="85" width="30" height="10" fill="#111"/>
+                        <rect x="65" y="85" width="20" height="20" fill="#111"/>
+                        <rect x="110" y="80" width="20" height="10" fill="#111"/>
+                        <rect x="140" y="85" width="40" height="15" fill="#111"/>
+                        <rect x="85" y="140" width="20" height="30" fill="#111"/>
+                        <rect x="115" y="130" width="30" height="15" fill="#111"/>
+                        <rect x="150" y="150" width="30" height="30" fill="#111"/>
+                        <circle cx="100" cy="100" r="22" fill="#06C755"/>
+                        <text x="100" y="106" font-size="13" font-family="'Prompt', sans-serif" font-weight="bold" text-anchor="middle" fill="#FFF">LINE</text>
+                    </svg>
+                </div>
+                <h4 style="color: var(--flame-yellow); margin-top: 16px; font-size: 1.15rem;">LINE ID: @MAXMUXSIX</h4>
+                <p style="color: #A7F3D0; font-size: 0.88rem; margin-top: 4px;">สแกน QR Code เพื่อเพิ่มเพื่อนและรับสิทธิ์พิเศษ</p>
+                <div style="margin-top: 18px;">
+                    <a href="https://line.me/R/ti/p/@maxmuxsix" target="_blank" rel="noopener noreferrer" class="btn-save" style="display: block; width: 100%; text-decoration: none; background: #06C755; color: #FFF; font-weight: 700; border: none; padding: 10px; border-radius: 8px;">
+                        🟢 แอดเพื่อนทันทีผ่านแอป LINE
+                    </a>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -3779,6 +4489,8 @@
                 const stockCount = (typeof p.stock === 'number' && !isNaN(p.stock)) ? p.stock : 25;
                 const card = document.createElement('div');
                 card.className = 'card';
+                card.id = 'product-card-' + p.id;
+                card.setAttribute('data-product-id', p.id);
                 
                 const safeName = escapeStoredText(p.name);
                 const safeDesc = escapeStoredText(p.desc);
@@ -3807,6 +4519,7 @@
                             <div class="card-price">${safeDisplayNumber(p.price)} <span style="font-size:0.85rem; color:var(--cream);">บาท</span></div>
                             <div class="card-btns">
                                 <button class="btn-order" onclick="addToCart(${htmlJsArg(p.id)})">🛒 สั่งซื้อ</button>
+                                <button class="btn-share-line" title="คัดลอกลิงก์สำหรับใส่ใน LINE OA" onclick="copyLineProductLink(${htmlJsArg(p.id)}, event)">🔗 ลิงก์ LINE</button>
                                 ${adminButtons}
                             </div>
                         </div>
@@ -5577,10 +6290,204 @@ function testRun() {
                             openOrderHistoryModal();
                         }
                     }, 500);
+                } else if (hash === '#store' || hash === '#contact') {
+                    setTimeout(() => {
+                        scrollToStoreContact();
+                    }, 400);
+                }
+
+                // 4. ตรวจสอบว่าเปิดมาจาก LINE Official Account หรือไม่ เช่น ?from=line หรือ ?ref=line
+                const fromSource = urlParams.get('from') || urlParams.get('ref') || urlParams.get('source');
+                if (fromSource && (fromSource.toLowerCase() === 'line' || fromSource.toLowerCase() === 'line_oa')) {
+                    showLineWelcomeBanner();
+                }
+
+                // 5. นำทางไปยังหน้าร้านและการติดต่อ เช่น ?action=store
+                const targetAction = urlParams.get('action') || urlParams.get('section');
+                if (targetAction === 'store' || targetAction === 'contact') {
+                    setTimeout(() => {
+                        scrollToStoreContact();
+                    }, 400);
+                }
+
+                // 6. เลือกหมวดหมู่จาก LINE เช่น ?category=สูตรเตาถ่านแท้
+                const targetCategory = urlParams.get('category');
+                if (targetCategory) {
+                    const catButtons = Array.from(document.querySelectorAll('.btn-filter-tag, .btn-filter'));
+                    const targetBtn = catButtons.find(b => b.textContent.trim().includes(targetCategory));
+                    if (targetBtn && typeof selectCategory === 'function') {
+                        selectCategory(targetCategory, targetBtn);
+                    }
+                }
+
+                // 7. เลือกข้าวหลามกระบอกที่สนใจจาก LINE เช่น ?product=max_1 หรือ ?pid=max_1
+                const targetProductId = urlParams.get('product') || urlParams.get('pid');
+                if (targetProductId) {
+                    highlightLineProduct(targetProductId);
                 }
             } catch (err) {
                 console.warn('URL Parameter Handler Error:', err);
             }
+        }
+
+        // ==========================================
+        // 🎋 ระบบหน้าร้านจริง และเชื่อมโยง LINE Official Account
+        // ==========================================
+        function scrollToStoreContact() {
+            if (typeof closeMobileMenu === 'function') closeMobileMenu();
+            const section = document.getElementById('storeContactSection');
+            if (section) {
+                section.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+        function openLineQrModal() {
+            const modal = document.getElementById('lineQrModal');
+            if (modal) modal.classList.add('active');
+        }
+
+        function closeLineQrModal() {
+            const modal = document.getElementById('lineQrModal');
+            if (modal) modal.classList.remove('active');
+        }
+
+        function showLineWelcomeBanner() {
+            let banner = document.getElementById('lineWelcomeBanner');
+            if (banner && banner.classList && banner.classList.contains('line-welcome-banner') && (banner.parentNode || banner.parentElement)) return;
+            if (!banner) {
+                banner = document.createElement('div');
+                banner.id = 'lineWelcomeBanner';
+            }
+            if (banner.classList) banner.classList.add('line-welcome-banner');
+            banner.className = 'line-welcome-banner';
+            banner.innerHTML = `
+                <div class="line-welcome-content">
+                    <div class="line-welcome-left">
+                        <span class="line-badge-pill">LINE OA</span>
+                        <strong>สวัสดีเพื่อนๆ จาก LINE Official Account!</strong>
+                        <span>แวะมาเลือกข้าวหลามเตาถ่านแท้ หรือสั่งจองกระบอกร้อนๆ ได้ทันที 🔥 ใช้โค้ด <b style="color:var(--flame-yellow);">WELCOME10</b> ลด 10%</span>
+                    </div>
+                    <button class="btn-close-line-banner" title="ปิดการแจ้งเตือน" onclick="dismissLineBanner()">&times;</button>
+                </div>
+            `;
+            const header = document.querySelector('header');
+            if (header && header.parentNode) {
+                header.parentNode.insertBefore(banner, header.nextSibling);
+                banner.parentNode = header.parentNode;
+            }
+        }
+
+        function dismissLineBanner() {
+            const banner = document.getElementById('lineWelcomeBanner');
+            if (banner) {
+                if (typeof banner.remove === 'function') banner.remove();
+                banner.innerHTML = '';
+                if (banner.classList) banner.classList.remove('line-welcome-banner');
+                delete banner.parentNode;
+                delete banner.parentElement;
+            }
+        }
+
+        function copyLineProductLink(productId, event) {
+            if (event) event.stopPropagation();
+            const prod = currentProducts.find(p => p.id === productId);
+            const prodName = prod ? prod.name : 'ข้าวหลาม';
+            const baseUrl = window.location.origin + window.location.pathname;
+            const url = `${baseUrl}?product=${encodeURIComponent(productId)}&from=line`;
+            
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(url).then(() => {
+                    showEmailToast(`📋 คัดลอกลิงก์ LINE สำหรับ "${prodName}" แล้ว! นำไปใส่ใน Rich Menu ได้ทันที`);
+                }).catch(() => {
+                    prompt('คัดลอกลิงก์สำหรับใส่ใน LINE OA ด้านล่างนี้:', url);
+                });
+            } else {
+                prompt('คัดลอกลิงก์สำหรับใส่ใน LINE OA ด้านล่างนี้:', url);
+            }
+        }
+
+        function populateLineProductSelect() {
+            const select = document.getElementById('lineProductSelect');
+            if (!select) return;
+            select.innerHTML = '';
+            
+            const defaultOpt = document.createElement('option');
+            defaultOpt.value = '';
+            defaultOpt.textContent = '🌟 หน้ารวมสินค้าทั้งหมด (All Products)';
+            select.appendChild(defaultOpt);
+
+            currentProducts.forEach(p => {
+                const opt = document.createElement('option');
+                opt.value = p.id;
+                opt.textContent = `${p.name} (${p.price} บาท)`;
+                select.appendChild(opt);
+            });
+
+            updateGeneratedLineLink();
+        }
+
+        function updateGeneratedLineLink() {
+            const select = document.getElementById('lineProductSelect');
+            const preview = document.getElementById('generatedLineUrlPreview');
+            if (!preview) return;
+            const prodId = select ? select.value : '';
+            const baseUrl = window.location.origin + window.location.pathname;
+            const finalUrl = prodId ? `${baseUrl}?product=${encodeURIComponent(prodId)}&from=line` : `${baseUrl}?from=line`;
+            preview.textContent = finalUrl;
+        }
+
+        function copyCurrentGeneratedLineLink() {
+            const preview = document.getElementById('generatedLineUrlPreview');
+            const url = preview ? preview.textContent.trim() : '';
+            if (!url) return;
+
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(url).then(() => {
+                    showEmailToast('📋 คัดลอกลิงก์สำหรับ LINE OA สำเร็จแล้ว! นำไปใส่ใน Rich Menu ได้เลย');
+                }).catch(() => {
+                    prompt('คัดลอกลิงก์สำหรับใส่ใน LINE OA:', url);
+                });
+            } else {
+                prompt('คัดลอกลิงก์สำหรับใส่ใน LINE OA:', url);
+            }
+        }
+
+        function highlightLineProduct(productId) {
+            const targetProd = currentProducts.find(p => p.id === productId);
+            if (!targetProd) return;
+
+            // ถ้าเมนูปัจจุบันถูกกรองอยู่จนไม่เห็นสินค้า ให้รีเซ็ตกลับเป็น 'all'
+            if (activeCategory !== 'all' && targetProd.category !== activeCategory) {
+                activeCategory = 'all';
+                const catButtons = Array.from(document.querySelectorAll('.btn-filter-tag, .btn-filter'));
+                catButtons.forEach(b => b.classList.remove('active'));
+                const allBtn = catButtons.find(b => b.textContent.includes('ทั้งหมด') || (b.dataset && b.dataset.category === 'all'));
+                if (allBtn) allBtn.classList.add('active');
+                if (typeof applyFilters === 'function') {
+                    applyFilters();
+                }
+            }
+
+            setTimeout(() => {
+                const cardElem = document.getElementById('product-card-' + productId) || document.querySelector(`[data-product-id="${productId}"]`);
+                if (cardElem) {
+                    cardElem.classList.add('line-selected-pulse');
+                    cardElem.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+                    // เพิ่ม Badge ไฮไลท์
+                    if (!cardElem.querySelector('.line-oa-pick-badge')) {
+                        const badge = document.createElement('div');
+                        badge.className = 'line-oa-pick-badge';
+                        badge.innerHTML = '<span>🎯</span> เมนูที่คุณเลือกจาก LINE';
+                        const cardBody = cardElem.querySelector('.card-body');
+                        if (cardBody) {
+                            cardBody.insertBefore(badge, cardBody.firstChild);
+                        }
+                    }
+
+                    showEmailToast(`🎯 คุณเลือกดู "${targetProd.name}" จาก LINE Official Account`);
+                }
+            }, 600);
         }
 
         // ==========================================
@@ -5741,6 +6648,7 @@ function testRun() {
         renderAdminControls();
         applyFilters(); 
         renderAuthUI();
+        populateLineProductSelect();
         handleUrlParametersOnLoad();
 
         // ตรวจสอบว่าเปิดมาด้วย #admin หรือไม่
