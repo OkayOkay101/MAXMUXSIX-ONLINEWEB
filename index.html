@@ -367,10 +367,12 @@
             align-items: center;
             border-top: 2px dashed #1E543C;
             padding-top: 12px;
+            gap: 8px;
+            flex-wrap: wrap;
         }
         .card-price { font-size: 1.5rem; font-weight: 800; color: var(--flame-yellow); }
         
-        .card-btns { display: flex; gap: 6px; align-items: center; }
+        .card-btns { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
         .btn-order {
             background: var(--flame-orange);
             color: white;
@@ -1545,6 +1547,11 @@
             .brand-title {
                 font-size: 1.15rem;
             }
+            .storage-btns {
+                grid-template-columns: 1fr;
+            }
+        }
+
         /* =========================================================================
            Storefront & Contact Mockup (หน้าร้านจริง & ช่องทางการติดต่อ)
            ========================================================================= */
