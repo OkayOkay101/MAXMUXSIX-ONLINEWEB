@@ -4,40 +4,28 @@
  * =========================================================================
  * 
  * 📌 วัตถุประสงค์:
- * ส่งอีเมลยืนยันการสั่งซื้อ (Order Confirmation) และอีเมลต้อนรับสมาชิกใหม่ (Welcome Email)
+ * ส่งอีเมลยืนยันการสั่งซื้อ (Order Confirmation), ใบเสร็จรับเงิน และอีเมลต้อนรับสมาชิกใหม่
  * พร้อมดีไซน์ HTML สีดำ-ทองเตาถ่าน และรูปภาพสินค้าครบ 100% เข้าสู่ Gmail ผู้รับจริง
  * โดยทำงานบนเซิร์ฟเวอร์ Cloud ของ Google ตลอด 24 ชม. ไม่ต้องเปิดคอมพิวเตอร์ทิ้งไว้
  * 
  * -------------------------------------------------------------------------
- * 🚀 วิธีติดตั้งใน 2 นาที (ทำเพียงครั้งเดียว):
+ * 🚀 วิธีอัปเดต / ติดตั้งใน Google Apps Script (ทำเพียงครั้งเดียว):
  * -------------------------------------------------------------------------
  * 1. เปิดเว็บเบราว์เซอร์แล้วไปที่: https://script.google.com
- *    (ล็อกอินด้วยบัญชี Gmail ของคุณ เช่น yourname@gmail.com)
+ *    (เปิดโปรเจกต์เดิมของคุณ หรือกด "+ โครงการใหม่")
  * 
- * 2. กดปุ่ม "+ โครงการใหม่" (New project) ที่มุมซ้ายบน
+ * 2. ลบโค้ดเดิมในหน้าต่างออกทั้งหมด แล้ว "คัดลอกโค้ดทั้งหมดในไฟล์นี้" ไปวางแทนที่
  * 
- * 3. ลบโค้ดเริ่มต้นในหน้าต่างออกทั้งหมด แล้ว "คัดลอกโค้ดทั้งหมดในไฟล์นี้" ไปวางแทนที่
+ * 3. กดปุ่มรูปแผ่นดิสก์ "บันทึกโครงการ" (Save project หรือ Ctrl + S)
  * 
- * 4. กดปุ่มรูปแผ่นดิสก์ "บันทึกโครงการ" (Save project) หรือกด Ctrl + S
+ * 4. กดปุ่มสีน้ำเงินด้านขวาบน: "ทำให้ใช้งานได้" (Deploy) > เลือก "จัดการการทำให้ใช้งานได้" (Manage deployments)
+ *    - กดรูปดินสอ ✏️ (แก้ไข / Edit) ที่การเผยแพร่เดิม
+ *    - ในช่อง "เวอร์ชัน" (Version): เลือก "เวอร์ชันใหม่" (New version) *** สำคัญมาก! เพื่อให้อัปเดตโค้ดล่าสุด ***
+ *    - ตรวจสอบช่อง "ผู้มีสิทธิ์เข้าถึง" (Who has access): ต้องเป็น "ทุกคน" (Anyone)
+ *    - กดปุ่ม "ทำให้ใช้งานได้" (Deploy)
  * 
- * 5. กดปุ่มสีน้ำเงินด้านขวาบน: "ทำให้ใช้งานได้" (Deploy) > เลือก "การทำให้ใช้งานได้ใหม่" (New deployment)
- * 
- * 6. ในหน้าต่างที่เด้งขึ้นมา:
- *    - กดรูปฟันเฟือง ⚙️ ด้านซ้ายคำว่า "เลือกประเภท" แล้วเลือก "เว็บแอป" (Web app)
- *    - ช่อง "คำอธิบาย" (Description): พิมพ์ว่า MAXMUXSIX Email
- *    - ช่อง "ดำเนินการในฐานะ" (Execute as): เลือก "ฉัน (อีเมลของคุณ)"
- *    - ช่อง "ผู้มีสิทธิ์เข้าถึง" (Who has access): *** เลือก "ทุกคน" (Anyone) *** สำคัญมาก!
- * 
- * 7. กดปุ่ม "ทำให้ใช้งานได้" (Deploy)
- *    - Google จะขออนุญาต ให้กด "ให้สิทธิ์การเข้าถึง" (Authorize Access)
- *    - เลือกบัญชี Gmail ของคุณ
- *    - หากขึ้นเตือน "Google ยังไม่ได้ยืนยันแอปนี้" ให้กด "ขั้นสูง" (Advanced) > แล้วกด "ไปที่... (ไม่ปลอดภัย)" (Go to Untitled project)
- *    - กด "อนุญาต" (Allow)
- * 
- * 8. คัดลอก "URL ของเว็บแอป" (Web app URL) ที่ลงท้ายด้วย /exec
- *    เช่น: https://script.google.com/macros/s/AKfycbxxxxxxx/exec
- * 
- * 9. นำ URL มาวางในหน้าเว็บ MAXMUXSIX ในช่อง "Google Apps Script Web App URL" แล้วกดบันทึก!
+ * 5. นำ Web App URL ที่ลงท้ายด้วย /exec มาใช้งานในหน้าเว็บ MAXMUXSIX
+ *    (หรือใช้ URL เริ่มต้นที่ตั้งไว้ในระบบได้ทันที)
  * =========================================================================
  */
 
@@ -88,11 +76,11 @@ function doPost(e) {
       });
     }
 
-    var to = (data.to || "").toString().trim();
+    var to = (data.to || data.email || "").toString().trim();
     var subject = (data.subject || "MAXMUXSIX ข้าวหลามเตาถ่าน").toString().trim();
     var htmlContent = data.html || data.htmlContent || "";
     var textContent = (data.text || data.textContent || "ขอบคุณสำหรับการสั่งซื้อกับ MAXMUXSIX").toString().trim();
-    var fromName = SECURITY_CONFIG.ALLOWED_FROM_NAME;
+    var fromName = (data.fromName || SECURITY_CONFIG.ALLOWED_FROM_NAME || "MAXMUXSIX ข้าวหลามเตาถ่าน").toString().trim();
 
     // 🛡️ 3. ตรวจสอบความถูกต้องของอีเมลผู้รับ
     if (!to || to.indexOf("@") === -1 || to.length > 100) {
@@ -113,6 +101,13 @@ function doPost(e) {
         success: false,
         message: "เนื้อหาอีเมลมีขนาดใหญ่เกินกว่าที่กำหนด"
       });
+    }
+
+    // ถ้าไม่มี HTML ให้แปลง text เป็น HTML แบบง่าย
+    if (!htmlContent && textContent) {
+      htmlContent = '<div style="font-family: sans-serif; padding: 16px; color: #222;">' +
+        textContent.replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\n/g, "<br>") +
+        '</div>';
     }
 
     // ส่งอีเมลจริงผ่าน Google Mail Service
@@ -145,10 +140,16 @@ function doPost(e) {
 }
 
 function doGet(e) {
+  var remaining = 0;
+  try {
+    remaining = MailApp.getRemainingDailyQuota();
+  } catch (ignored) {}
+
   return makeJsonResponse({
     status: "online",
     service: "MAXMUXSIX Email Web App Service",
     timestamp: new Date().toISOString(),
+    remainingDailyQuota: remaining,
     message: "ระบบส่งอีเมลคลาวด์ของ MAXMUXSIX ทำงานปกติ 24 ชั่วโมง พร้อมรับคำสั่งส่งอีเมลจากหน้าเว็บครับ"
   });
 }
@@ -156,4 +157,15 @@ function doGet(e) {
 function makeJsonResponse(data) {
   return ContentService.createTextOutput(JSON.stringify(data))
     .setMimeType(ContentService.MimeType.JSON);
+}
+
+// ฟังก์ชันสำหรับกด "เรียกใช้" (Run) ใน Google Apps Script เพื่อขอสิทธิ์เข้าถึง (Authorization) หรือทดสอบสถานะ
+function testRun() {
+  var quota = 0;
+  try {
+    quota = MailApp.getRemainingDailyQuota();
+  } catch (e) {
+    quota = -1;
+  }
+  return { status: "ready", remainingDailyQuota: quota };
 }

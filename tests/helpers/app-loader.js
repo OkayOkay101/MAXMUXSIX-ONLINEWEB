@@ -171,6 +171,8 @@ globalThis.__getAppState = () => ({
     set orders(v) { orders = v; },
     get sentEmails() { return sentEmails; },
     set sentEmails(v) { sentEmails = v; },
+    get emailSettings() { return emailSettings; },
+    set emailSettings(v) { emailSettings = v; },
     get currentUser() { return currentUser; },
     set currentUser(v) { currentUser = v; },
     get activeCategory() { return activeCategory; },
