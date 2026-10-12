@@ -77,7 +77,7 @@ const assert = require('node:assert/strict');
 test('signup uses only the configured project and redirect', async () => {
   const {buildAuthMessages} = await import('../../supabase/functions/send-auth-email/messages.mjs');
   const config = {projectUrl:'https://lxvxffrexegvqzeojztw.supabase.co',siteUrl:'https://okayokay101.github.io/MAXMUXSIX-ONLINEWEB/'};
-  const rows = buildAuthMessages({user:{email:'buyer@example.test'},email_data:{email_action_type:'signup',token:'123456',token_hash:'fixture-hash',redirect_to:config.siteUrl,site_url:config.siteUrl}},config);
+  const rows = buildAuthMessages({user:{email:'buyer@example.test'},email_data:{email_action_type:'signup',token:'123456',token_hash:'fixture-hash',redirect_to:config.siteUrl,site_url:config.projectUrl}},config);
   assert.equal(rows.length,1);
   assert.equal(rows[0].to,'buyer@example.test');
   assert.match(rows[0].body,/fixture-hash/);
@@ -86,6 +86,7 @@ test('signup uses only the configured project and redirect', async () => {
 ```
 
 - [ ] Add concrete fixture cases for signup/recovery/invite/magiclink/reauthentication; email-change one/two-recipient variants and reversed hash mapping; unsupported actions; missing token/hash/email; comma, semicolon and CRLF in recipient; metadata containing `<img>`; external redirect and site URL. Assert rejection before mail creation, escaping in HTML, plain text preserved, and no links for OTP-only reauthentication.
+- Final-review correction (controller ruling in progress.md, 2026-10-12): hook `site_url` is the Auth API external URL, distinct from frontend `redirect_to`. Accept only the exact project root with/without its trailing slash; reject the frontend URL, userinfo, all explicit ports, query/fragment and all other paths including `/auth/v1`. Generate verify links and redirects only from pinned config, and verify the hosted payload shape before activation.
 - [ ] Run `node --test tests/unit/31-auth-email-messages.test.js` and confirm failure from missing module/assertions.
 - [ ] Implement pure renderer with six explicit action branches, fixed Thai subject/body, URL construction through `URL`/`searchParams`, strict single-recipient validation and allowlisted config. No networking, environment access or logging. Validation throws a stable code (not the full payload).
 - [ ] Run targeted tests to green and `npm test` for regression. Commit only the renderer/test: `feat: render validated MAXMUXSIX auth emails`.

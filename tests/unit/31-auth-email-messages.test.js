@@ -11,7 +11,7 @@ function fixture(action = 'signup') {
         user: { email: 'buyer@example.test', user_metadata: { full_name: 'ผู้ซื้อ' } },
         email_data: {
             email_action_type: action, token: '123456', token_hash: 'fixture-hash',
-            token_new: '', token_hash_new: '', redirect_to: config.siteUrl, site_url: config.siteUrl
+            token_new: '', token_hash_new: '', redirect_to: config.siteUrl, site_url: config.projectUrl
         }
     };
 }
@@ -19,6 +19,20 @@ function link(row) {
     const match = row.body.match(/https:\/\/\S+/);
     assert.ok(match, 'plain text must contain the verification link');
     return new URL(match[0]);
+}
+
+for (const externalUrl of [config.projectUrl, `${config.projectUrl}/`]) {
+    test(`Auth API external URL ${externalUrl} is distinct from the frontend redirect`, async () => {
+        const { buildAuthMessages } = await load();
+        const payload = fixture();
+        payload.email_data.site_url = externalUrl;
+        const [row] = buildAuthMessages(payload, config);
+        const url = link(row);
+        assert.equal(url.origin, config.projectUrl);
+        assert.equal(url.pathname, '/auth/v1/verify');
+        assert.equal(url.searchParams.get('redirect_to'), config.siteUrl);
+        assert.equal(url.searchParams.get('token'), 'fixture-hash');
+    });
 }
 async function rejects(payload, code = 'INVALID_AUTH_PAYLOAD', options) {
     const checkedConfig = arguments.length < 3 ? config : options;
@@ -156,6 +170,19 @@ for (const field of ['redirect_to', 'site_url']) {
             await rejects(payload, 'INVALID_AUTH_URL');
         });
     }
+}
+for (const value of [
+    config.siteUrl, `http://lxvxffrexegvqzeojztw.supabase.co`,
+    `${config.projectUrl}.evil.example.test`, `https://user:pass@lxvxffrexegvqzeojztw.supabase.co`,
+    `${config.projectUrl}:443`, `${config.projectUrl}:8443`, `${config.projectUrl}?next=other`,
+    `${config.projectUrl}#other`, `${config.projectUrl}/auth/v1`, `${config.projectUrl}/auth/v1/`,
+    `${config.projectUrl}/arbitrary`, `${config.projectUrl}/../`, `${config.projectUrl}/?`,
+    `${config.projectUrl}/#`, ` ${config.projectUrl}`, `${config.projectUrl}\n`
+]) {
+    test(`site_url rejects a non-approved Auth API external URL ${JSON.stringify(value)}`, async () => {
+        const payload = fixture(); payload.email_data.site_url = value;
+        await rejects(payload, 'INVALID_AUTH_URL');
+    });
 }
 for (const options of [undefined, {}, { ...config, projectUrl: 'https://other.supabase.co' }, { ...config, siteUrl: 'https://evil.example.test/' }]) {
     test(`untrusted configuration ${JSON.stringify(options)} rejects`, () => rejects(fixture(), 'INVALID_AUTH_CONFIG', options));

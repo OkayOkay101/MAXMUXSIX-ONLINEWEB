@@ -32,6 +32,7 @@
 - รองรับ action ที่ระบบเปิดใช้อยู่: signup, recovery, invite, magiclink, email_change และ reauthentication พร้อม fixture แยกแต่ละชนิด
 - ใช้ข้อมูล `email_data` ของ Supabase และการ mapping token ตามเอกสารปัจจุบัน ไม่สร้าง token ยืนยันเอง
 - จำกัด project เป็น `lxvxffrexegvqzeojztw` และปลายทาง redirect เป็น `https://okayokay101.github.io/MAXMUXSIX-ONLINEWEB/` เท่านั้น ลิงก์ยืนยันต้องชี้ไป Auth verify endpoint ของ project นี้
+- `email_data.redirect_to` ต้องตรง frontend URL ข้างต้น ส่วน `email_data.site_url` คือ Auth API external URL ตาม provider contract รับเฉพาะ `https://lxvxffrexegvqzeojztw.supabase.co` หรือ `https://lxvxffrexegvqzeojztw.supabase.co/` แบบตรงตัว ไม่รับ frontend URL, credentials, ports, query, fragment หรือ path อื่นรวม `/auth/v1` ลิงก์สร้างจาก config ที่ตรึงไว้เท่านั้น ก่อน activation ต้องยืนยันว่า hosted payload ใช้รูปแบบที่อนุญาต (controller ruling ใน progress.md วันที่ 2026-10-12 แก้สมมติฐาน URL เดิมตามเอกสาร provider)
 - Email change แบบยืนยันสองที่อยู่ต้องจับคู่ตามเอกสาร: `token_hash_new` ไปอีเมลปัจจุบันพร้อม `token`; `token_hash` ไปอีเมลใหม่พร้อม `token_new` และทดสอบกรณีตั้งค่าที่ใช้จริงก่อนเปิดใช้งาน
 - Escape ข้อมูลผู้ใช้ทั้งหมดใน HTML พร้อม plain-text fallback ชื่อผู้ส่ง MAXMUXSIX ภาษาไทย และข้อความเตือนไม่ให้แชร์ลิงก์/รหัส
 - ชนิดคำขอไม่รู้จักหรือข้อมูลไม่ครบให้คืนข้อผิดพลาด ไม่ตอบสำเร็จเงียบ ๆ

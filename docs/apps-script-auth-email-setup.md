@@ -4,7 +4,7 @@
 
 ## สถานะและ gate ณ 2026-10-12
 
-Local implementation ผ่าน Node 321/321 และ real Deno 4/4 พร้อม typecheck ตามรายงาน Task 3 แล้ว การทดสอบ Deno ใช้ library จริงและ fixture network; ไม่ได้ส่งเมลหรือพิสูจน์ hosted runtime ผู้ทำ rollout ต้องรันคำสั่งตรวจซ้ำด้านล่างก่อน deploy
+Local implementation ผ่าน Node 349/349 และ real Deno 4/4 พร้อม typecheck หลัง final-review URL contract fix แล้ว การทดสอบ Deno ใช้ library จริงและ fixture network; ไม่ได้ส่งเมลหรือพิสูจน์ hosted runtime ผู้ทำ rollout ต้องรันคำสั่งตรวจซ้ำด้านล่างก่อน deploy
 
 Controller ตรวจแบบ read-only พบ Google/Supabase login แล้ว, Auth Hooks ว่าง, Confirm Email ON, Secure Email Change ON, OTP 8 หลัก อายุ 3600 วินาที และ Site URL/redirect เป็น URL ที่อนุมัติด้านล่าง ยังไม่มีการ deploy Auth mail, ส่งเมล, สมัคร/กู้บัญชีทดสอบ หรือเปิด hook จากงาน local นี้ ต้องอ่าน hosted settings ซ้ำก่อนเขียนจริงและเก็บ prior state ส่วนตัว
 
@@ -23,6 +23,8 @@ Controller ตรวจแบบ read-only พบ Google/Supabase login แล�
 
 Endpoint hook คือ `https://lxvxffrexegvqzeojztw.supabase.co/functions/v1/send-auth-email` และ project URL ในโค้ดตรึงเป็น `https://lxvxffrexegvqzeojztw.supabase.co` ไม่ตั้ง service-role key สำหรับ runbook นี้ Gateway JWT ปิดเฉพาะ function ใหม่นี้ตาม `supabase/config.toml`; ทุก POST ยังต้องผ่าน Standard Webhooks signature ห้ามใช้ publishable key แทนลายเซ็น ห้ามนำ secret ไปใส่ frontend, source, query string, shell arguments, transcript หรือ screenshots
 
+Hook `email_data.site_url` คือ Auth API external URL ซึ่งต่างจาก frontend Site URL/`redirect_to` ตาม [Send Email Hook contract](https://supabase.com/docs/guides/auth/auth-hooks/send-email-hook) และ [Auth sendEmail implementation](https://github.com/supabase/auth/blob/master/internal/api/mail.go) นโยบายปัจจุบันรับแบบตรงตัวเพียง `https://lxvxffrexegvqzeojztw.supabase.co` กับ `https://lxvxffrexegvqzeojztw.supabase.co/` ไม่รับ frontend URL, foreign host, credentials, port แม้ `:443`, query, fragment หรือ path อื่นรวม `/auth/v1` ไม่มีหลักฐาน external API configuration ของ hosted project ที่รองรับ path นั้น ลิงก์ทั้งหมดสร้างจาก config project/site ที่ตรึงไว้ ก่อน activation ต้องยืนยัน hosted payload shape แบบส่วนตัวโดยไม่ log token/body; หากต่างจาก allowlist ให้หยุด gate และตรวจ contract ก่อนแก้ ไม่ขยายจากการเดา
+
 ## 1. ตรวจ local และจด prior state ส่วนตัว
 
 รันจาก repository/worktree ที่มี commit Task 1–3 และ Node/npm พร้อม dependencies ติดตั้งแล้ว:
@@ -35,7 +37,7 @@ git diff --check
 git diff 9e4d50d -- google_apps_script.js tests/unit/06-google-apps-script.test.js index.html assets/js
 ```
 
-ต้องได้ Node 321 passed/0 failed, Deno 4 passed/0 failed, typecheck exit 0, whitespace check exit 0 และ diff สุดท้ายว่าง (baseline `9e4d50d` คือแผนก่อน implementation) ถ้า Deno/dependencies เข้าถึงไม่ได้ ให้หยุดก่อน hosted activation ไม่ทดแทนด้วย mock อย่างเดียว Controller ต้องตรวจ security โดยเฉพาะ frontend secrets, unsigned paths, URL/redirect allowlist และ response/PII logs ก่อน rollout
+ต้องได้ Node 349 passed/0 failed, Deno 4 passed/0 failed, typecheck exit 0, whitespace check exit 0 และ diff สุดท้ายว่าง (baseline `9e4d50d` คือแผนก่อน implementation) ถ้า Deno/dependencies เข้าถึงไม่ได้ ให้หยุดก่อน hosted activation ไม่ทดแทนด้วย mock อย่างเดียว Controller ต้องตรวจ security โดยเฉพาะ frontend secrets, unsigned paths, URL/redirect allowlist และ response/PII logs ก่อน rollout
 
 ใน Supabase project ที่ระบุ อ่าน Auth → Hooks และ URL Configuration/Email settings ซ้ำ เก็บ prior hook enabled state, URI และ signing secret ที่เกี่ยวข้องใน private operator record/password manager เท่านั้น ถ้า hook ว่าง ให้บันทึกว่า rollback คือ disable/remove hook ใหม่นี้ ตรวจและคง Confirm Email, Secure Email Change, OTP length/expiry, Site URL และ redirect allowlist เดิม เก็บ deployment ID/version ใหม่ไว้ใน private operator record โดยไม่บันทึก token/เมล/body เก็บสถานะ order deployment เดิมเพื่อใช้ตรวจว่าไม่ได้แก้
 
@@ -111,6 +113,7 @@ import { Webhook } from 'standardwebhooks';
 import { randomUUID } from 'node:crypto';
 const endpoint = 'https://lxvxffrexegvqzeojztw.supabase.co/functions/v1/send-auth-email';
 const site = 'https://okayokay101.github.io/MAXMUXSIX-ONLINEWEB/';
+const authExternalUrl = 'https://lxvxffrexegvqzeojztw.supabase.co';
 const secret = process.env.AUTH_PROBE_HOOK_SECRET;
 const recipient = process.env.AUTH_TEST_RECIPIENT;
 const mode = process.env.AUTH_PROBE_MODE;
@@ -122,7 +125,7 @@ if (!secret?.startsWith('v1,whsec_') || !recipient || !['negative','send'].inclu
 const verifier = new Webhook(secret.slice(3));
 const fixture = {
   user: { email: recipient, user_metadata: { full_name: '[TEST ONLY] relay probe; 00000000 is not an Auth code' } },
-  email_data: { email_action_type: 'reauthentication', token: '00000000', redirect_to: site, site_url: site }
+  email_data: { email_action_type: 'reauthentication', token: '00000000', redirect_to: site, site_url: authExternalUrl }
 };
 async function probe(kind, expected) {
   const eventId = `probe_${kind}_${randomUUID().replaceAll('-','')}`;

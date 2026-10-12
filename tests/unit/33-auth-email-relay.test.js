@@ -30,7 +30,7 @@ after(() => {
 function payload() {
     return { user: { email: 'buyer@example.test' }, email_data: {
         email_action_type: 'signup', token: '12345678', token_hash: 'private-fixture-hash',
-        redirect_to: config.siteUrl, site_url: config.siteUrl
+        redirect_to: config.siteUrl, site_url: config.projectUrl
     } };
 }
 function request(data = payload(), options = {}) {
@@ -89,6 +89,33 @@ test('valid real-library signature relays a literal UTF8 HMAC envelope accepted 
     assert.equal(sent.version, 1);
     assert.equal(sent.messages[0].messageId, 'primary');
     assert.equal(gas.sentEmails.length, 1);
+});
+
+test('real signed provider payload accepts a distinct Auth external URL and frontend redirect', async () => {
+    const { handler, calls } = await setup();
+    const response = await handler(request());
+    assert.equal(response.status, 200);
+    assert.deepEqual(await response.json(), {});
+    assert.equal(calls.length, 1);
+    const envelope = JSON.parse(calls[0][1].body);
+    const sent = JSON.parse(envelope.payload);
+    const url = new URL(sent.messages[0].body.match(/https:\/\/\S+/)[0]);
+    assert.equal(url.origin, config.projectUrl);
+    assert.equal(url.pathname, '/auth/v1/verify');
+    assert.equal(url.searchParams.get('redirect_to'), config.siteUrl);
+});
+
+for (const [field, value] of [
+    ['redirect_to', config.projectUrl], ['redirect_to', `${config.siteUrl}?next=other`],
+    ['site_url', config.siteUrl], ['site_url', 'https://foreign.supabase.co'],
+    ['site_url', 'https://user:pass@lxvxffrexegvqzeojztw.supabase.co'],
+    ['site_url', `${config.projectUrl}:443`], ['site_url', `${config.projectUrl}?next=other`],
+    ['site_url', `${config.projectUrl}#other`], ['site_url', `${config.projectUrl}/auth/v1`]
+]) test(`signed non-approved ${field} ${value} cannot start upstream`, async () => {
+    const data = payload(); data.email_data[field] = value;
+    const { handler, calls } = await setup();
+    await failure(await handler(request(data)), 400);
+    assert.equal(calls.length, 0);
 });
 
 for (const [name, makeRequest] of [

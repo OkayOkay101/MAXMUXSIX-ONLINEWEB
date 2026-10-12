@@ -5,9 +5,10 @@ import { createAuthEmailHandler } from '../../supabase/functions/send-auth-email
 const webhook = new Webhook(btoa('fixture-runtime-key-32-bytes-long!'));
 const eventId = 'runtime_fixture';
 const siteUrl = 'https://okayokay101.github.io/MAXMUXSIX-ONLINEWEB/';
+const projectUrl = 'https://lxvxffrexegvqzeojztw.supabase.co';
 const raw = JSON.stringify({ user: { email: 'runtime@example.test' }, email_data: {
     email_action_type: 'signup', token: '12345678', token_hash: 'runtime-fixture-hash',
-    redirect_to: siteUrl, site_url: siteUrl
+    redirect_to: siteUrl, site_url: projectUrl
 } });
 
 for (const [name, age, tampered, expected] of [
@@ -25,7 +26,7 @@ for (const [name, age, tampered, expected] of [
                 return new Response(JSON.stringify({ success: true, eventId }));
             },
             now: Date.now,
-            config: { projectUrl: 'https://lxvxffrexegvqzeojztw.supabase.co', siteUrl,
+            config: { projectUrl, siteUrl,
                 gasUrl: 'https://script.google.com/macros/s/runtime_fixture/exec',
                 relaySecret: 'runtime-fixture-literal-secret', upstreamTimeoutMs: 3500 }
         });

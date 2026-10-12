@@ -65,7 +65,10 @@ export function buildAuthMessages(payload, config) {
     if (!record(config) || config.projectUrl !== PROJECT_URL || config.siteUrl !== SITE_URL) invalid('INVALID_AUTH_CONFIG');
     if (!record(payload) || !record(payload.user) || !record(payload.email_data)) invalid();
     const { user, email_data: data } = payload;
-    if (data.redirect_to !== SITE_URL || data.site_url !== SITE_URL) invalid('INVALID_AUTH_URL');
+    // Hook site_url is the Auth API external URL, not the frontend Site URL.
+    // Compare literal root forms so URL normalization cannot hide ports/paths.
+    if (data.redirect_to !== SITE_URL ||
+        (data.site_url !== PROJECT_URL && data.site_url !== `${PROJECT_URL}/`)) invalid('INVALID_AUTH_URL');
     const to = recipient(user.email);
     const candidateName = record(user.user_metadata) ? user.user_metadata.full_name ?? user.user_metadata.name : undefined;
     const name = typeof candidateName === 'string' && candidateName.length > 0 && candidateName.length <= 200
