@@ -16,6 +16,12 @@
   ],
   "author": "MAXMUXSIX Team",
   "license": "UNLICENSED",
-  "dependencies": { "@supabase/supabase-js": "2.117.3" },
-  "devDependencies": { "esbuild": "0.28.2", "@electric-sql/pglite": "0.5.8" }
+  "dependencies": {
+    "@supabase/supabase-js": "2.117.3"
+  },
+  "devDependencies": {
+    "@electric-sql/pglite": "0.5.8",
+    "esbuild": "0.28.2",
+    "standardwebhooks": "1.1.1"
+  }
 }
