@@ -1,0 +1,6 @@
+project_id = "maxmuxsix-onlineweb"
+
+# Handler explicitly calls Auth.getUser(jwt) and checks the private role table.
+# Gateway legacy JWT verification does not support publishable keys.
+[functions.admin-users]
+verify_jwt = false

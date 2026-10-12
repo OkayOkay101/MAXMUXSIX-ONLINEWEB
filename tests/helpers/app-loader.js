@@ -8,7 +8,7 @@ const HTML_PATH = path.resolve(__dirname, '../../index.html');
 /**
  * Creates an isolated mock browser environment and evaluates index.html script.
  */
-function createAppInstance() {
+function createAppInstance(options = {}) {
     const rawHtml = fs.readFileSync(HTML_PATH, 'utf8');
     const scriptMatch = rawHtml.match(/<script>([\s\S]*?)<\/script>/);
     if (!scriptMatch) {
@@ -17,8 +17,8 @@ function createAppInstance() {
     const scriptCode = scriptMatch[1];
 
     const store = {
-        local: {},
-        session: {}
+        local: { ...options.localStorage },
+        session: { ...options.sessionStorage }
     };
 
     const elements = {};
@@ -187,6 +187,8 @@ globalThis.__getAppState = () => ({
 `;
 
     vm.createContext(sandbox);
+    vm.runInContext(fs.readFileSync(path.resolve(__dirname, '../../assets/js/cloud-auth.js'), 'utf8'), sandbox);
+    Object.assign(sandbox, options.globals || {});
     vm.runInContext(scriptCode + '\n' + bridgeCode, sandbox);
 
     const state = sandbox.__getAppState();

@@ -15,7 +15,7 @@
         style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.gstatic.com;
         font-src 'self' https://fonts.gstatic.com;
         img-src 'self' data: blob: https://raw.githubusercontent.com https://fonts.gstatic.com;
-        connect-src 'self' https://script.google.com https://script.googleusercontent.com https://api.web3forms.com;
+        connect-src 'self' https://script.google.com https://script.googleusercontent.com https://api.web3forms.com https://*.supabase.co;
         frame-ancestors 'none';
         form-action 'self';
         base-uri 'self';
@@ -207,9 +207,16 @@
             margin-bottom: 1rem;
         }
         .trailer-copy p { color: var(--cream); margin-bottom: 1.5rem; }
+        .trailer-actions { display: flex; flex-wrap: wrap; gap: 1rem 1.5rem; align-items: center; }
         .trailer-menu-link {
             display: inline-block;
             color: var(--flame-yellow);
+            font-weight: 600;
+            text-underline-offset: 5px;
+        }
+        .trailer-store-link {
+            display: inline-block;
+            color: var(--cream-light);
             font-weight: 600;
             text-underline-offset: 5px;
         }
@@ -223,7 +230,7 @@
             border-radius: 16px;
             object-fit: contain;
         }
-        .trailer-player:focus-visible, .trailer-menu-link:focus-visible {
+        .trailer-player:focus-visible, .trailer-menu-link:focus-visible, .trailer-store-link:focus-visible {
             outline: 3px solid var(--flame-yellow);
             outline-offset: 5px;
         }
@@ -2137,6 +2144,23 @@
             transition: color 0.2s;
         }
         .btn-close-line-banner:hover { color: #FFF; }
+        /* Account dialogs remain above the cookie banner, which stays available after closing. */
+        #authModal, #membersModal { z-index: 400; }
+        .membership-status { color: var(--cream-light); min-height: 1.6em; margin: 16px 0; overflow-wrap: anywhere; }
+        .membership-note { color: var(--cream); font-size: 0.88rem; margin: 16px 0; }
+        .members-box { max-width: 760px; }
+        .members-table-wrap { overflow-x: auto; border: 1px solid var(--green-border); border-radius: 8px; }
+        .members-table { width: 100%; border-collapse: collapse; text-align: left; }
+        .members-table th, .members-table td { padding: 16px; border-bottom: 1px solid var(--green-border); overflow-wrap: anywhere; }
+        .members-table th { color: var(--flame-yellow); background: var(--bg-card); }
+        .members-table td:first-child { min-width: 160px; }
+        .members-table td:nth-child(2) { min-width: 110px; }
+        .members-table th:last-child, .members-table td:last-child { min-width: 88px; white-space: nowrap; }
+        .members-table .btn-nav-action { white-space: nowrap; padding: 8px 12px; min-height: 44px; }
+        .members-pagination { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 16px; }
+        #authModal button:disabled, #membersModal button:disabled { opacity: 0.55; cursor: wait; transform: none; }
+        #authModal :focus-visible, #membersModal :focus-visible { outline: 3px solid var(--flame-yellow); outline-offset: 3px; }
+        @media (max-width: 480px) { .members-table th, .members-table td { padding: 8px; } }
     </style>
 </head>
 <body>
@@ -2177,6 +2201,7 @@
                 🛒 ตะกร้า
                 <span class="cart-badge" id="cartCount">0</span>
             </button>
+            <button class="btn-nav-action" id="btnManageMembers" style="display:none;" onclick="openMembersModal()">👥 จัดการสมาชิก</button>
             <button class="btn-add-main" id="btnHeaderAddProduct" style="display: none;" onclick="openCrudModal()">+ เพิ่มเมนู</button>
             <button class="btn-mobile-menu-toggle" id="btnMobileMenuToggle" onclick="toggleMobileMenu()" aria-label="เปิดเมนู">
                 ☰
@@ -2213,6 +2238,7 @@
                     <span>🤝 ชวนเพื่อนรับค่าคอม</span>
                     <span>→</span>
                 </button>
+                <button class="mobile-menu-item admin-item" id="btnMobileManageMembers" style="display:none;" onclick="closeMobileMenu(); openMembersModal();">👥 จัดการสมาชิก</button>
                 <button class="mobile-menu-item admin-item" id="btnMobileAddProduct" style="display:none;" onclick="closeMobileMenu(); openCrudModal();">
                     <span>➕ เพิ่มเมนูใหม่ (Admin)</span>
                     <span>→</span>
@@ -2246,7 +2272,10 @@
                 <span class="trailer-label">MAXMUXSIX · OFFICIAL TRAILER</span>
                 <h2 id="trailerTitle">ศึกข้าวหลาม<br>ความอร่อยไฟลุก!</h2>
                 <p id="trailerDescription">ชมแอนิเมชันข้าวหลามต่อสู้สุดมันส์ พร้อมเอฟเฟกต์จัดเต็มใน 30 วินาที กดเล่นแล้วพบกับความเร้าใจสไตล์ MAXMUXSIX</p>
-                <a class="trailer-menu-link" href="#productDisplayGrid">ดูเมนูข้าวหลามทั้งหมด →</a>
+                <nav class="trailer-actions" aria-label="ลิงก์เมนูและข้อมูลร้าน">
+                    <a class="trailer-menu-link" href="#productDisplayGrid">🛒 เลือกเมนูและสั่งซื้อ →</a>
+                    <a class="trailer-store-link" href="#storeContactSection">📍 หน้าร้านและติดต่อ →</a>
+                </nav>
             </div>
             <video class="trailer-player" controls playsinline preload="none"
                 poster="assets/video/khaolam-battle-impact-poster.jpg"
@@ -2514,11 +2543,11 @@
     </div>
 
     <!-- Modal 1: ระบบ Authentication -->
-    <div class="modal" id="authModal">
+    <div class="modal" id="authModal" role="dialog" aria-modal="true" aria-labelledby="authModalTitle">
         <div class="modal-box">
             <div class="modal-head">
                 <h3 id="authModalTitle">บัญชีสมาชิก MAXMUXSIX</h3>
-                <button class="btn-close" onclick="closeAuthModal()">&times;</button>
+                <button class="btn-close" aria-label="ปิดบัญชีสมาชิก" onclick="closeAuthModal()">&times;</button>
             </div>
 
             <div class="auth-tab-group">
@@ -2526,51 +2555,54 @@
                 <button class="auth-tab-btn" id="tabRegisterBtn" onclick="switchAuthTab('register')">สมัครสมาชิกใหม่</button>
             </div>
 
+            <p id="authStatus" class="membership-status" role="status" aria-live="polite"></p>
             <div class="auth-content active" id="loginContent">
                 <form onsubmit="handleLogin(event)">
                     <div class="form-row">
-                        <label>อีเมล หรือ เบอร์โทรศัพท์ *</label>
-                        <input type="text" id="loginUserKey" placeholder="เช่น yourname@email.com หรือ 0812345678" required>
+                        <label for="loginUserKey">อีเมล *</label>
+                        <input type="email" id="loginUserKey" placeholder="yourname@email.com" autocomplete="username" maxlength="254" required>
                     </div>
                     <div class="form-row">
-                        <label>รหัสผ่าน *</label>
-                        <input type="password" id="loginPassword" placeholder="••••••••" required>
+                        <label for="loginPassword">รหัสผ่าน *</label>
+                        <input type="password" id="loginPassword" placeholder="••••••••" autocomplete="current-password" required>
                     </div>
                     <div class="modal-foot">
-                        <button type="submit" class="btn-save" style="width: 100%;">เข้าสู่ระบบเร้าใจ 🔥</button>
+                        <button type="submit" id="loginSubmit" class="btn-save" style="width: 100%;">เข้าสู่ระบบเร้าใจ 🔥</button>
                     </div>
                 </form>
+                <button type="button" class="btn-nav-action" onclick="switchAuthTab('reset')">ลืมรหัสผ่าน?</button>
+                <p class="membership-note">สมาชิกเดิมที่สมัครเฉพาะในเครื่อง ต้องสมัครและยืนยันอีเมลในระบบใหม่ก่อน</p>
             </div>
 
             <div class="auth-content" id="registerContent">
                 <form onsubmit="handleRegister(event)">
                     <div class="form-row">
-                        <label>ชื่อ-นามสกุล *</label>
-                        <input type="text" id="regName" placeholder="เช่น สมเกียรติ ยิ้มหวาน" required>
+                        <label for="regName">ชื่อ-นามสกุล *</label>
+                        <input type="text" id="regName" placeholder="เช่น สมเกียรติ ยิ้มหวาน" autocomplete="name" maxlength="100" required>
                     </div>
                     <div class="form-grid form-row">
                         <div>
-                            <label>อีเมล *</label>
-                            <input type="email" id="regEmail" placeholder="name@domain.com" required>
+                            <label for="regEmail">อีเมล *</label>
+                            <input type="email" id="regEmail" placeholder="name@domain.com" autocomplete="email" maxlength="254" required>
                         </div>
                         <div>
-                            <label>เบอร์โทรศัพท์ *</label>
-                            <input type="tel" id="regPhone" placeholder="08XXXXXXXX" required>
+                            <label for="regPhone">เบอร์โทรศัพท์ *</label>
+                            <input type="tel" id="regPhone" placeholder="08XXXXXXXX" autocomplete="tel" maxlength="30" required>
                         </div>
                     </div>
                     <div class="form-row">
-                        <label>รหัสผ่าน *</label>
-                        <input type="password" id="regPassword" placeholder="ตั้งรหัสผ่าน 6 ตัวอักษรขึ้นไป" minlength="6" required>
+                        <label for="regPassword">รหัสผ่าน *</label>
+                        <input type="password" id="regPassword" placeholder="ตั้งรหัสผ่าน 8–128 ตัวอักษร" autocomplete="new-password" minlength="8" maxlength="128" required>
                     </div>
                     
                     <div class="form-row">
-                        <label>รหัสผู้แนะนำ / Referral Code (ถ้ามี)</label>
-                        <input type="text" id="regReferrerCode" placeholder="กรอกโค้ดที่ได้จากเพื่อนเพื่อรับสิทธิพิเศษ" style="border-color: var(--flame-orange);">
+                        <label for="regReferrerCode">รหัสผู้แนะนำ / Referral Code (ถ้ามี)</label>
+                        <input type="text" id="regReferrerCode" maxlength="20" placeholder="กรอกโค้ดที่ได้จากเพื่อนเพื่อรับสิทธิพิเศษ" style="border-color: var(--flame-orange);">
                     </div>
 
                     <div class="form-row">
-                        <label>ที่อยู่เริ่มต้นสำหรับการจัดส่ง (กรอกทีหลังได้)</label>
-                        <textarea id="regAddress" rows="2" placeholder="บ้านเลขที่ ถนน แขวง/ตำบล เขต/อำเภอ จังหวัด..."></textarea>
+                        <label for="regAddress">ที่อยู่เริ่มต้นสำหรับการจัดส่ง (กรอกทีหลังได้)</label>
+                        <textarea id="regAddress" rows="2" maxlength="1000" autocomplete="street-address" placeholder="บ้านเลขที่ ถนน แขวง/ตำบล เขต/อำเภอ จังหวัด..."></textarea>
                     </div>
 
                     <div class="consent-checkbox-wrap">
@@ -2586,10 +2618,45 @@
                     </div>
 
                     <div class="modal-foot">
-                        <button type="submit" class="btn-save" style="width: 100%;">สมัครสมาชิกและยินยอมเงื่อนไข ✅</button>
+                        <button type="submit" id="registerSubmit" class="btn-save" style="width: 100%;">สมัครสมาชิกและยืนยันอีเมล ✅</button>
                     </div>
                 </form>
             </div>
+            <div class="auth-content" id="resetContent">
+                <form onsubmit="handlePasswordReset(event)">
+                    <div class="form-row"><label for="resetEmail">อีเมลที่สมัครสมาชิก *</label><input type="email" id="resetEmail" autocomplete="email" required maxlength="254"></div>
+                    <button type="submit" id="resetSubmit" class="btn-save">ส่งลิงก์ตั้งรหัสผ่านใหม่</button>
+                </form>
+            </div>
+            <div class="auth-content" id="passwordContent">
+                <p class="membership-note">ตั้งรหัสผ่านสำหรับคำเชิญหรือการกู้คืนบัญชี</p>
+                <form onsubmit="handleSetPassword(event)">
+                    <div class="form-row"><label for="newMemberPassword">รหัสผ่านใหม่ *</label><input type="password" id="newMemberPassword" autocomplete="new-password" minlength="8" maxlength="128" required></div>
+                    <div class="form-row"><label for="confirmMemberPassword">ยืนยันรหัสผ่านใหม่ *</label><input type="password" id="confirmMemberPassword" autocomplete="new-password" minlength="8" maxlength="128" required></div>
+                    <div class="consent-checkbox-wrap"><input type="checkbox" id="memberTerms" required><label for="memberTerms">ยอมรับข้อกำหนดการใช้บริการและยินยอมให้ร้านจัดเก็บชื่อ โทรศัพท์ ที่อยู่เพื่อบริการตามนโยบายความเป็นส่วนตัว</label></div>
+                    <button type="submit" id="passwordSubmit" class="btn-save">บันทึกรหัสผ่าน</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="membersModal" role="dialog" aria-modal="true" aria-labelledby="membersTitle">
+        <div class="modal-box members-box">
+            <div class="modal-head"><h3 id="membersTitle">👥 สมาชิก MAXMUXSIX</h3><button class="btn-close" aria-label="ปิดจัดการสมาชิก" onclick="closeMembersModal()">&times;</button></div>
+            <p class="membership-note">เพิ่มสมาชิกด้วยคำเชิญทางอีเมล ให้เจ้าของบัญชีตั้งรหัสผ่านเอง การลบเป็นการลบบัญชีส่วนกลางและไม่สามารถเรียกคืนได้</p>
+            <form id="inviteMemberForm" onsubmit="handleInviteMember(event)">
+                <div class="form-grid form-row">
+                    <div><label for="inviteName">ชื่อ *</label><input id="inviteName" maxlength="100" required autocomplete="off"></div>
+                    <div><label for="inviteEmail">อีเมล *</label><input id="inviteEmail" type="email" maxlength="254" required autocomplete="off"></div>
+                </div>
+                <div class="form-row"><label for="invitePhone">โทรศัพท์ (ถ้ามี)</label><input id="invitePhone" type="tel" maxlength="30" autocomplete="off"></div>
+                <button id="inviteSubmit" type="submit" class="btn-save">+ เพิ่มผู้ใช้และส่งคำเชิญ</button>
+            </form>
+            <p id="membersStatus" class="membership-status" role="status" aria-live="polite"></p>
+            <div class="members-table-wrap" tabindex="0" aria-label="ตารางสมาชิก เลื่อนด้านข้างได้">
+                <table class="members-table"><thead><tr><th scope="col">ชื่อ / อีเมล</th><th scope="col">สถานะ</th><th scope="col">จัดการ</th></tr></thead><tbody id="membersBody"></tbody></table>
+            </div>
+            <div class="members-pagination"><button id="membersPrev" class="btn-nav-action" onclick="loadMembers(membersPage - 1)">ก่อนหน้า</button><span id="membersPageLabel">หน้า 1</span><button id="membersNext" class="btn-nav-action" onclick="loadMembers(membersPage + 1)">ถัดไป</button></div>
         </div>
     </div>
 
@@ -3778,6 +3845,9 @@
         </button>
     </nav>
 
+    <script src="auth-config.js"></script>
+    <script src="assets/vendor/supabase.js"></script>
+    <script src="assets/js/cloud-auth.js"></script>
     <script>
         const defaultMaxmuxsixData = [
             {
@@ -3891,8 +3961,14 @@
 
         let cart = JSON.parse(localStorage.getItem('maxmuxsix_cart')) || [];
         let orders = JSON.parse(localStorage.getItem('maxmuxsix_orders')) || [];
-        let users = JSON.parse(localStorage.getItem('maxmuxsix_users')) || [];
-        let currentUser = JSON.parse(localStorage.getItem('maxmuxsix_active_user')) || null;
+        // Identity comes only from Auth.getUser + RLS profile, never legacy local accounts.
+        let currentUser = null;
+        let membership = null;
+        let authBusy = false;
+        let membershipFocus = null;
+        let membersPage = 1;
+        let membersBusy = false;
+        let membersRequestVersion = 0;
         let sentEmails = JSON.parse(localStorage.getItem('maxmuxsix_sent_emails')) || [];
         const DEFAULT_GAS_URL = 'https://script.google.com/macros/s/AKfycbz-wK7x3pHtmdtcoxjIjNImAqNJcBXFDb0yYGnaQ5QzIK5vDhxLVIaJ6XzlVAcjsQQp/exec';
         let emailSettings = JSON.parse(localStorage.getItem('maxmuxsix_email_settings')) || {
@@ -3915,9 +3991,11 @@
         // ==========================================
         // 🔒 โหมดผู้ดูแลร้าน (Admin Mode Control)
         // ==========================================
-        let isAdminMode = sessionStorage.getItem('maxmuxsix_admin_mode') === 'true';
+        let isAdminMode = false;
 
         function renderAdminControls() {
+            document.getElementById('btnManageMembers').style.display = isAdminMode ? 'inline-flex' : 'none';
+            document.getElementById('btnMobileManageMembers').style.display = isAdminMode ? 'flex' : 'none';
             const btnAdd = document.getElementById('btnHeaderAddProduct');
             if (btnAdd) {
                 btnAdd.style.display = isAdminMode ? 'inline-flex' : 'none';
@@ -3929,11 +4007,11 @@
             const link = document.getElementById('adminToggleLink');
             if (link) {
                 if (isAdminMode) {
-                    link.innerHTML = '🔓 ออกจากโหมดผู้ดูแลร้าน (Admin Active)';
+                    link.innerHTML = '👥 จัดการสมาชิก (ผู้ดูแลร้าน)';
                     link.style.color = '#34D399';
                     link.style.borderColor = '#10B981';
                 } else {
-                    link.innerHTML = '🔒 โหมดผู้ดูแลร้าน';
+                    link.innerHTML = '🔒 เข้าสู่ระบบผู้ดูแลร้าน';
                     link.style.color = '#6B8076';
                     link.style.borderColor = '#1A3D2C';
                 }
@@ -3944,27 +4022,15 @@
             }
         }
 
-        function promptAdminMode(e) {
+        async function promptAdminMode(e) {
             if (e) e.preventDefault();
-            if (isAdminMode) {
-                if (confirm('คุณต้องการออกจากโหมดผู้ดูแลร้านหรือไม่?')) {
-                    isAdminMode = false;
-                    sessionStorage.removeItem('maxmuxsix_admin_mode');
-                    renderAdminControls();
-                    showEmailToast('🔒 ออกจากโหมดผู้ดูแลร้านแล้ว');
-                }
-            } else {
-                const pin = prompt('กรุณาระบุรหัส PIN ผู้ดูแลร้าน (ค่าเริ่มต้น: 1234):');
-                if (pin === null) return;
-                const expectedPin = localStorage.getItem('maxmuxsix_admin_pin') || '1234';
-                if (pin.trim() === expectedPin) {
-                    isAdminMode = true;
-                    sessionStorage.setItem('maxmuxsix_admin_mode', 'true');
-                    renderAdminControls();
-                    showEmailToast('🔓 ยินดีต้อนรับสู่โหมดผู้ดูแลร้าน');
-                } else {
-                    alert('❌ รหัส PIN ไม่ถูกต้อง');
-                }
+            if (!currentUser) { openAuthModal('login'); setAuthStatus('เข้าสู่ระบบด้วยบัญชีผู้ดูแลร้านก่อน ไม่ใช้ PIN เดิม'); return; }
+            try {
+                const verified = await membership.refresh();
+                if (!verified.isAdmin) throw new Error('บัญชีนี้ไม่มีสิทธิ์ผู้ดูแลร้าน');
+                await openMembersModal();
+            } catch (error) {
+                showMembershipToast(error.message);
             }
         }
 
@@ -3977,8 +4043,6 @@
                 localStorage.setItem('maxmuxsix_data', JSON.stringify(currentProducts));
                 localStorage.setItem('maxmuxsix_cart', JSON.stringify(cart));
                 localStorage.setItem('maxmuxsix_orders', JSON.stringify(orders));
-                localStorage.setItem('maxmuxsix_users', JSON.stringify(users));
-                localStorage.setItem('maxmuxsix_active_user', JSON.stringify(currentUser));
                 localStorage.setItem('maxmuxsix_sent_emails', JSON.stringify(sentEmails));
                 document.getElementById('productCounter').textContent = `${currentProducts.length} รายการ`;
                 updateCartCounter();
@@ -4105,12 +4169,18 @@
         }
 
         function openAuthModal(tab = 'login') {
+            if (!document.getElementById('authModal').classList.contains('active')) membershipFocus = document.activeElement;
             switchAuthTab(tab);
             document.getElementById('authModal').classList.add('active');
+            if (!membership || !membership.configured) setAuthStatus('ระบบสมาชิกยังไม่เปิดใช้งาน กรุณาติดต่อร้าน หรือลองอีกครั้งภายหลัง');
+            const focusId = { login: 'loginUserKey', register: 'regName', reset: 'resetEmail', password: 'newMemberPassword' }[tab];
+            document.getElementById(focusId || 'loginUserKey').focus();
         }
 
         function closeAuthModal() {
             document.getElementById('authModal').classList.remove('active');
+            ['loginPassword', 'regPassword', 'newMemberPassword', 'confirmMemberPassword'].forEach(id => { document.getElementById(id).value = ''; });
+            if (membershipFocus && membershipFocus.focus) membershipFocus.focus();
         }
 
         function openSubscribeModal() {
@@ -4128,22 +4198,42 @@
         }
 
         function switchAuthTab(tab) {
-            const loginBtn = document.getElementById('tabLoginBtn');
-            const regBtn = document.getElementById('tabRegisterBtn');
-            const loginContent = document.getElementById('loginContent');
-            const regContent = document.getElementById('registerContent');
-
-            if (tab === 'login') {
-                loginBtn.classList.add('active');
-                regBtn.classList.remove('active');
-                loginContent.classList.add('active');
-                regContent.classList.remove('active');
-            } else {
-                regBtn.classList.add('active');
-                loginBtn.classList.remove('active');
-                regContent.classList.add('active');
-                loginContent.classList.remove('active');
+            for (const mode of ['login', 'register', 'reset', 'password']) {
+                document.getElementById(mode + 'Content').classList[mode === tab ? 'add' : 'remove']('active');
             }
+            document.getElementById('tabLoginBtn').classList[tab === 'login' ? 'add' : 'remove']('active');
+            document.getElementById('tabRegisterBtn').classList[tab === 'register' ? 'add' : 'remove']('active');
+            setAuthStatus('');
+        }
+
+        function setAuthStatus(message) {
+            document.getElementById('authStatus').textContent = message;
+        }
+
+        function showMembershipToast(message) {
+            const area = document.getElementById('emailToastArea');
+            if (toastTimeout) clearTimeout(toastTimeout);
+            area.innerHTML = '';
+            const toast = document.createElement('div');
+            toast.className = 'email-toast'; toast.setAttribute('role', 'status');
+            const text = document.createElement('span'); text.className = 'email-toast-body'; text.textContent = message;
+            const close = document.createElement('button'); close.type = 'button'; close.className = 'email-toast-close'; close.textContent = '×'; close.setAttribute('aria-label', 'ปิดข้อความสมาชิก'); close.onclick = closeEmailToast;
+            toast.appendChild(text); toast.appendChild(close); area.appendChild(toast);
+            toastTimeout = setTimeout(closeEmailToast, 5000);
+        }
+
+        async function runAuthAction(buttonId, action) {
+            if (authBusy) return;
+            authBusy = true;
+            const button = document.getElementById(buttonId);
+            button.disabled = true;
+            button.setAttribute('aria-busy', 'true');
+            setAuthStatus('กำลังติดต่อระบบสมาชิก…');
+            try {
+                if (!membership) throw new Error('ระบบสมาชิกยังไม่เปิดใช้งาน กรุณาติดต่อร้าน');
+                await action();
+            } catch (error) { setAuthStatus(error.message || 'ทำรายการไม่สำเร็จ กรุณาลองใหม่'); }
+            finally { authBusy = false; button.disabled = false; button.removeAttribute('aria-busy'); }
         }
 
         // ==========================================
@@ -4151,100 +4241,22 @@
         // ==========================================
         async function handleRegister(e) {
             e.preventDefault();
-
-            // 🤖 Honeypot check — บอทจะกรอก field นี้, คนจริงจะไม่กรอก
             const honeypot = document.getElementById('regWebsite');
             if (honeypot && honeypot.value.trim() !== '') {
-                logSecurityEvent('bot_detected', 'register honeypot triggered');
-                showEmailToast('⚠️ ตรวจพบกิจกรรมผิดปกติ กรุณาลองใหม่อีกครั้ง');
+                setAuthStatus('ตรวจพบกิจกรรมผิดปกติ กรุณาลองใหม่');
                 return;
             }
-
-            // 🛡️ Rate Limit check
-            const rl = checkRateLimit('register');
-            if (!rl.allowed) {
-                logSecurityEvent('register_blocked', rl.message);
-                showEmailToast(rl.message);
-                return;
-            }
-
-            const name     = document.getElementById('regName').value.trim();
-            const email    = document.getElementById('regEmail').value.trim().toLowerCase();
-            const phone    = document.getElementById('regPhone').value.trim();
-            const password = document.getElementById('regPassword').value;
-            const address  = document.getElementById('regAddress').value.trim();
-            const consentGiven = document.getElementById('regConsentCheckbox').checked;
-            const referrerCodeInput = document.getElementById('regReferrerCode').value.trim().toUpperCase();
-
-            if (!consentGiven) {
-                alert('กรุณายินยอมรับข้อกำหนดและนโยบายคุ้มครองข้อมูลส่วนบุคคล (PDPA)');
-                return;
-            }
-
-            // ตรวจสอบความยาวรหัสผ่าน
-            if (password.length < 6) {
-                showEmailToast('⚠️ รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร');
-                return;
-            }
-
-            const exists = users.find(u => u.email === email || u.phone === phone);
-            if (exists) {
-                alert('อีเมลหรือเบอร์โทรศัพท์นี้ถูกใช้งานในระบบแล้ว กรุณาเข้าสู่ระบบ');
-                switchAuthTab('login');
-                return;
-            }
-
-            // บันทึก attempt
-            recordRateLimitAttempt('register');
-
-            // ตรวจสอบรหัสผู้แนะนำ
-            if (referrerCodeInput) {
-                const referrerUser = users.find(u => u.referralCode === referrerCodeInput);
-                if (referrerUser) {
-                    referrerUser.referredCount = (referrerUser.referredCount || 0) + 1;
-                } else {
-                    alert('⚠️ โค้ดผู้แนะนำไม่ถูกต้อง (แต่ระบบจะทำการสมัครสมาชิกให้ตามปกติ)');
-                }
-            }
-
-            // 🔐 Hash รหัสผ่านด้วย SHA-256 ก่อนเก็บ
-            const hashedPassword = await hashPassword(password);
-
-            const myNewReferralCode = 'MAX' + Math.floor(1000 + Math.random() * 9000);
-
-            const newUser = {
-                id: 'USR-' + Date.now(),
-                name: sanitizeHtml(name),
-                email,
-                phone,
-                password: hashedPassword,   // เก็บแบบ hash เท่านั้น
-                address: sanitizeHtml(address),
-                referralCode: myNewReferralCode,
-                referredCount: 0,
-                registeredDate: new Date().toISOString(),
-                consentPDPA: true
-            };
-
-            users.push(newUser);
-            currentUser = newUser;
-            syncStorage();
-            closeAuthModal();
-
-            // ส่งอีเมลต้อนรับสมาชิกใหม่อัตโนมัติ พร้อมโค้ดส่วนลด 10%
-            sendWelcomeEmail(newUser);
+            await runAuthAction('registerSubmit', async () => {
+                const result = await membership.register({ name: document.getElementById('regName').value, email: document.getElementById('regEmail').value, phone: document.getElementById('regPhone').value, password: document.getElementById('regPassword').value, address: document.getElementById('regAddress').value, consent: document.getElementById('regConsentCheckbox').checked, referrerCode: document.getElementById('regReferrerCode').value });
+                document.getElementById('regPassword').value = '';
+                if (result.pendingConfirmation) setAuthStatus('หากสมัครได้ ระบบจะส่งลิงก์ยืนยันอีเมลให้ กรุณาตรวจกล่องจดหมายและสแปม แล้วกลับมาเข้าสู่ระบบ');
+                else { closeAuthModal(); showMembershipToast('สมัครสมาชิกสำเร็จ'); }
+            });
         }
 
         function openReferralModal() {
             if (!currentUser) return;
             
-            if (!currentUser.referralCode) {
-                currentUser.referralCode = 'MAX' + Math.floor(1000 + Math.random() * 9000);
-                currentUser.referredCount = 0;
-                const idx = users.findIndex(u => u.id === currentUser.id);
-                if (idx > -1) users[idx] = currentUser;
-                syncStorage();
-            }
-
             document.getElementById('myReferralCodeDisplay').textContent = currentUser.referralCode;
             document.getElementById('myReferredCountDisplay').textContent = currentUser.referredCount || 0;
             document.getElementById('referralModal').classList.add('active');
@@ -4265,52 +4277,139 @@
 
         async function handleLogin(e) {
             e.preventDefault();
-            const userKey  = document.getElementById('loginUserKey').value.trim().toLowerCase();
-            const password = document.getElementById('loginPassword').value;
+            await runAuthAction('loginSubmit', async () => {
+                const verified = await membership.login(document.getElementById('loginUserKey').value, document.getElementById('loginPassword').value);
+                document.getElementById('loginPassword').value = '';
+                if (verified.user && !verified.user.consentPDPA) openAuthModal('password');
+                else { closeAuthModal(); showMembershipToast('เข้าสู่ระบบสำเร็จ'); }
+            });
+        }
 
-            // 🛡️ Brute-force protection
-            const rl = checkRateLimit('login_fail');
-            if (!rl.allowed) {
-                logSecurityEvent('login_blocked', `user tried: ${userKey}`);
-                showEmailToast(rl.message);
-                return;
+        async function handleLogout() {
+            if (!confirm('คุณต้องการออกจากระบบบนเครื่องนี้หรือไม่?')) return;
+            try { await membership.logout(); showMembershipToast('ออกจากระบบบนเครื่องนี้แล้ว'); }
+            catch (error) { showMembershipToast(error.message); }
+        }
+
+        async function handlePasswordReset(e) {
+            e.preventDefault();
+            await runAuthAction('resetSubmit', async () => {
+                await membership.resetPassword(document.getElementById('resetEmail').value);
+                setAuthStatus('หากมีบัญชีอีเมลนี้ ระบบจะส่งลิงก์ตั้งรหัสผ่านใหม่ กรุณาตรวจกล่องจดหมายและสแปม');
+            });
+        }
+
+        async function handleSetPassword(e) {
+            e.preventDefault();
+            await runAuthAction('passwordSubmit', async () => {
+                const password = document.getElementById('newMemberPassword').value;
+                if (password !== document.getElementById('confirmMemberPassword').value) throw new Error('รหัสผ่านทั้งสองช่องไม่ตรงกัน');
+                await membership.setPassword(password, document.getElementById('memberTerms').checked);
+                closeAuthModal(); showMembershipToast('บันทึกรหัสผ่านสำเร็จ');
+            });
+        }
+
+        function applyMembershipState(state) {
+            currentUser = state.user;
+            isAdminMode = state.isAdmin === true;
+            renderAuthUI(); renderAdminControls();
+            if (!isAdminMode) {
+                membersRequestVersion++;
+                document.getElementById('membersBody').innerHTML = '';
+                closeMembersModal();
             }
+            if (currentUser && !currentUser.consentPDPA) openAuthModal('password');
+        }
 
-            // หาผู้ใช้ตาม email หรือ phone
-            const candidate = users.find(u => u.email === userKey || u.phone === userKey);
+        async function openMembersModal() {
+            if (!currentUser || !isAdminMode) { showMembershipToast('กรุณาเข้าสู่ระบบด้วยบัญชีผู้ดูแลร้าน'); return; }
+            membershipFocus = document.activeElement;
+            document.getElementById('membersModal').classList.add('active');
+            document.getElementById('inviteName').focus();
+            await loadMembers(1);
+        }
 
-            let loginOk = false;
-            if (candidate) {
-                if (isHashed(candidate.password)) {
-                    // รหัสผ่าน hash แล้ว — เปรียบเทียบกับ hash ของที่กรอก
-                    const inputHash = await hashPassword(password);
-                    loginOk = (inputHash === candidate.password);
-                } else {
-                    // รหัสผ่าน plaintext เก่า — เปรียบเทียบตรง แล้ว migrate ทันที
-                    loginOk = (candidate.password === password);
-                    if (loginOk) await migratePasswordIfNeeded(candidate, password);
+        function closeMembersModal() {
+            const modal = document.getElementById('membersModal');
+            if (!modal.classList.contains('active')) return;
+            modal.classList.remove('active');
+            membersRequestVersion++;
+            setMembersBusy(false);
+            document.getElementById('membersBody').innerHTML = '';
+            ['inviteName', 'inviteEmail', 'invitePhone'].forEach(id => { document.getElementById(id).value = ''; });
+            if (membershipFocus && membershipFocus.focus) membershipFocus.focus();
+        }
+
+        function setMembersBusy(busy) {
+            membersBusy = busy;
+            for (const id of ['inviteSubmit', 'membersPrev', 'membersNext']) document.getElementById(id).disabled = busy;
+            document.getElementById('membersModal').setAttribute('aria-busy', String(busy));
+        }
+
+        async function loadMembers(page = 1, message = '') {
+            if (membersBusy || page < 1 || !isAdminMode) return;
+            const version = ++membersRequestVersion;
+            setMembersBusy(true);
+            document.getElementById('membersStatus').textContent = 'กำลังโหลดสมาชิก…';
+            document.getElementById('membersBody').innerHTML = '';
+            try {
+                const data = await membership.admin('list', { page });
+                if (version !== membersRequestVersion || !isAdminMode) return;
+                membersPage = page;
+                const body = document.getElementById('membersBody');
+                for (const user of data.users) {
+                    const row = document.createElement('tr');
+                    const account = document.createElement('td');
+                    account.textContent = (user.name || 'สมาชิก') + ' / ' + user.email;
+                    const status = document.createElement('td');
+                    status.textContent = user.isAdmin ? 'ผู้ดูแลร้าน' : user.confirmed ? 'ยืนยันอีเมลแล้ว' : 'รอยืนยันอีเมล';
+                    const action = document.createElement('td');
+                    const button = document.createElement('button');
+                    button.className = 'btn-nav-action'; button.textContent = 'ลบ'; button.type = 'button';
+                    button.disabled = user.isAdmin || user.id === currentUser.id;
+                    button.onclick = () => handleDeleteMember(user.id, user.email);
+                    action.appendChild(button); row.appendChild(account); row.appendChild(status); row.appendChild(action); body.appendChild(row);
                 }
-            }
-
-            if (loginOk) {
-                currentUser = candidate;
-                syncStorage();
-                clearRateLimitBlock('login_fail');
-                logSecurityEvent('login_ok', candidate.email);
-                showEmailToast(`🔥 ยินดีต้อนรับกลับ คุณ ${candidate.name}!`);
-                closeAuthModal();
-            } else {
-                recordRateLimitAttempt('login_fail');
-                logSecurityEvent('login_fail', `tried: ${userKey}`);
-                alert('❌ ข้อมูลเข้าสู่ระบบไม่ถูกต้อง กรุณาตรวจสอบอีเมล เบอร์โทร หรือรหัสผ่าน');
+                document.getElementById('membersPageLabel').textContent = 'หน้า ' + page;
+                document.getElementById('membersStatus').textContent = message || (data.users.length ? 'แสดงสมาชิก ' + data.users.length + ' คนในหน้านี้' : 'ไม่พบสมาชิกในหน้านี้');
+                setMembersBusy(false);
+                document.getElementById('membersPrev').disabled = page <= 1;
+                document.getElementById('membersNext').disabled = !data.hasNext;
+            } catch (error) {
+                if (version === membersRequestVersion) document.getElementById('membersStatus').textContent = error.message;
+            } finally {
+                if (version === membersRequestVersion && membersBusy) setMembersBusy(false);
             }
         }
 
-        function handleLogout() {
-            if (confirm('คุณต้องการออกจากระบบหรือไม่?')) {
-                currentUser = null;
-                syncStorage();
-            }
+        async function handleInviteMember(e) {
+            e.preventDefault();
+            if (membersBusy) return;
+            const version = ++membersRequestVersion;
+            setMembersBusy(true);
+            document.getElementById('membersStatus').textContent = 'กำลังส่งคำเชิญ…';
+            try {
+                await membership.admin('invite', { email: document.getElementById('inviteEmail').value, name: document.getElementById('inviteName').value, phone: document.getElementById('invitePhone').value });
+                if (version !== membersRequestVersion || !isAdminMode) return;
+                ['inviteName', 'inviteEmail', 'invitePhone'].forEach(id => { document.getElementById(id).value = ''; });
+                setMembersBusy(false);
+                await loadMembers(1, 'ส่งคำเชิญแล้ว ให้ผู้ใช้เปิดอีเมลเพื่อตั้งรหัสผ่าน');
+            } catch (error) { if (version === membersRequestVersion) document.getElementById('membersStatus').textContent = error.message; }
+            finally { if (version === membersRequestVersion && membersBusy) setMembersBusy(false); }
+        }
+
+        async function handleDeleteMember(id, email) {
+            if (membersBusy || !confirm('ลบบัญชี ' + email + ' ออกจากระบบส่วนกลางอย่างถาวรหรือไม่? ไม่สามารถย้อนกลับได้')) return;
+            const version = ++membersRequestVersion;
+            setMembersBusy(true);
+            document.getElementById('membersStatus').textContent = 'กำลังลบบัญชี…';
+            try {
+                await membership.admin('delete', { id });
+                if (version !== membersRequestVersion || !isAdminMode) return;
+                setMembersBusy(false);
+                await loadMembers(membersPage, 'ลบบัญชีแล้ว');
+            } catch (error) { if (version === membersRequestVersion) document.getElementById('membersStatus').textContent = error.message; }
+            finally { if (version === membersRequestVersion && membersBusy) setMembersBusy(false); }
         }
 
         // ==========================================
@@ -4762,7 +4861,7 @@
                 appliedDiscountRate = 0.10;
                 msg.style.color = '#10B981';
                 msg.textContent = '🎉 โค้ดต้อนรับสมาชิกใหม่สำเร็จ! ได้รับส่วนลด 10%';
-            } else if (/^MAX\d{4}$/.test(code)) {
+            } else if (/^MAX(?:\d{4}|[A-F0-9]{8})$/.test(code)) {
                 appliedDiscountRate = 0.10;
                 msg.style.color = '#10B981';
                 msg.textContent = `🤝 ใช้โค้ดแนะนำเพื่อน (${code}) สำเร็จ! ได้รับส่วนลด 10%`;
@@ -5114,12 +5213,10 @@
         }
 
         function resetToDefault() {
-            if (confirm('คุณต้องการรีเซ็ตข้อมูลกลับเป็นค่าเริ่มต้นของ MAXMUXSIX หรือไม่?')) {
+            if (confirm('รีเซ็ตสินค้า ตะกร้า คำสั่งซื้อและกล่องอีเมลเฉพาะเครื่องนี้หรือไม่? ไม่ลบบัญชีสมาชิกส่วนกลาง')) {
                 currentProducts = [...defaultMaxmuxsixData];
                 cart = [];
                 orders = [];
-                users = [];
-                currentUser = null;
                 sentEmails = [];
                 syncStorage();
                 applyFilters();
@@ -6622,7 +6719,8 @@ function testRun() {
             return sanitizeHtml(isLocal || isHttps || isUploaded ? image : 'max_1.jpg');
         }
 
-        // --- 2. SHA-256 Password Hashing (Web Crypto API) ---
+        // Legacy hash utilities retained for regression compatibility only.
+        // Membership never calls these or trusts locally stored password hashes.
         async function hashPassword(password) {
             const encoder = new TextEncoder();
             // เพิ่ม site-specific salt เพื่อป้องกัน rainbow table
@@ -6711,17 +6809,6 @@ function testRun() {
             localStorage.setItem(AUDIT_LOG_KEY, JSON.stringify(log.slice(0, MAX_LOG_ENTRIES)));
         }
 
-        // --- 5. Password Migration (plaintext -> hashed) on login ---
-        // จะถูกเรียกใน handleLogin() หลังตรวจสอบ password สำเร็จ
-        async function migratePasswordIfNeeded(user, rawPassword) {
-            if (!isHashed(user.password)) {
-                user.password = await hashPassword(rawPassword);
-                const idx = users.findIndex(u => u.id === user.id);
-                if (idx !== -1) users[idx].password = user.password;
-                syncStorage();
-            }
-        }
-
         // ==========================================
         // เริ่มต้นการทำงาน (Initial Boot)
         // ==========================================
@@ -6732,6 +6819,28 @@ function testRun() {
         renderAuthUI();
         populateLineProductSelect();
         handleUrlParametersOnLoad();
+
+        try {
+            membership = window.MaxmuxsixMembership.createMembership({
+                config: window.MAXMUXSIX_AUTH_CONFIG || {},
+                createClient: window.MaxmuxsixSupabase && window.MaxmuxsixSupabase.createClient,
+                onChange: applyMembershipState,
+                onRecovery: () => openAuthModal('password')
+            });
+            membership.start().catch(error => { setAuthStatus(error.message); showMembershipToast(error.message); });
+        } catch (error) { setAuthStatus('ตั้งค่าระบบสมาชิกไม่สำเร็จ กรุณาติดต่อร้าน'); console.error('Membership configuration invalid'); }
+
+        if (document.addEventListener) document.addEventListener('keydown', event => {
+            const modal = ['authModal', 'membersModal'].map(id => document.getElementById(id)).find(el => el.classList.contains('active'));
+            if (!modal) return;
+            if (event.key === 'Escape') { event.preventDefault(); modal.id === 'authModal' ? closeAuthModal() : closeMembersModal(); }
+            if (event.key === 'Tab') {
+                const items = Array.from(modal.querySelectorAll('button:not([disabled]),input:not([disabled]),textarea:not([disabled]),[tabindex="0"]')).filter(el => el.getClientRects().length);
+                const first = items[0], last = items[items.length - 1];
+                if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
+                else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
+            }
+        });
 
         // ตรวจสอบว่าเปิดมาด้วย #admin หรือไม่
         if (window.location.hash === '#admin') {

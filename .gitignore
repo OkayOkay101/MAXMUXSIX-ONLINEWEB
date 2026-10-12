@@ -50,3 +50,6 @@ npm-debug.log*
 _agents/
 _agent/
 
+# Agent execution scratch ledgers (not application data)
+.superpowers/
+

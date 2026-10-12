@@ -133,35 +133,26 @@ describe('02. Security & Authentication (Hash, RateLimit, AuditLog, Admin)', () 
         });
     });
 
-    describe('Admin Mode PIN Security', () => {
+    describe('Legacy Admin PIN is disabled', () => {
         it('should start in non-admin mode by default', () => {
             const adminModeInSession = store.session['maxmuxsix_admin_mode'] === 'true';
             assert.strictEqual(adminModeInSession, false);
         });
 
-        it('should reject incorrect Admin PIN', () => {
-            let alertMsg = '';
-            app.alert = (msg) => { alertMsg = msg; };
-            app.prompt = () => 'wrong_pin';
-
-            app.promptAdminMode();
-            assert.notStrictEqual(store.session['maxmuxsix_admin_mode'], 'true');
-            assert.ok(alertMsg.includes('ไม่ถูกต้อง'));
+        it('requires member login without prompting for a PIN', async () => {
+            let prompted = false;
+            app.prompt = () => { prompted = true; return '1234'; };
+            await app.promptAdminMode();
+            assert.equal(prompted, false);
+            assert.equal(app.isAdminMode, false);
         });
 
-        it('should grant admin mode when correct PIN (1234) is entered', () => {
-            app.prompt = () => '1234';
-
-            app.promptAdminMode();
-            assert.strictEqual(store.session['maxmuxsix_admin_mode'], 'true');
-        });
-
-        it('should support custom PIN stored in localStorage', () => {
+        it('rejects legacy default and custom PINs as admin credentials', async () => {
             store.local['maxmuxsix_admin_pin'] = '9876';
-
-            app.prompt = () => '9876';
-            app.promptAdminMode();
-            assert.strictEqual(store.session['maxmuxsix_admin_mode'], 'true');
+            app.prompt = () => 'wrong_pin';
+            await app.promptAdminMode();
+            assert.notStrictEqual(store.session['maxmuxsix_admin_mode'], 'true');
+            assert.equal(app.isAdminMode, false);
         });
     });
 });

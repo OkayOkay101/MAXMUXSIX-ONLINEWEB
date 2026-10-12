@@ -5,7 +5,8 @@
   "private": true,
   "scripts": {
     "test": "node --test tests/unit/*.test.js",
-    "test:verbose": "node --test --test-reporter=spec tests/unit/*.test.js"
+    "test:verbose": "node --test --test-reporter=spec tests/unit/*.test.js",
+    "build:auth": "esbuild assets/js/supabase-entry.js --bundle --minify --format=iife --global-name=MaxmuxsixSupabase --outfile=assets/vendor/supabase.js --legal-comments=linked"
   },
   "keywords": [
     "ecommerce",
@@ -14,5 +15,7 @@
     "responsive"
   ],
   "author": "MAXMUXSIX Team",
-  "license": "UNLICENSED"
+  "license": "UNLICENSED",
+  "dependencies": { "@supabase/supabase-js": "2.117.3" },
+  "devDependencies": { "esbuild": "0.28.2", "@electric-sql/pglite": "0.5.8" }
 }
