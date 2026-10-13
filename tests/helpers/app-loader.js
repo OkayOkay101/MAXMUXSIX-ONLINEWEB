@@ -45,6 +45,7 @@ function createAppInstance(options = {}) {
                     this._textContent = String(val);
                 },
                 style: {},
+                dataset: {},
                 _attributes: {},
                 _classes: new Set(),
                 classList: {

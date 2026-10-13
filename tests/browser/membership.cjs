@@ -16,6 +16,7 @@ const users = new Map([
 const calls = [];
 const tokens = new Map();
 let failList = false;
+let failUpdate = false;
 function identity(member) {
     return { id: member.id, aud: 'authenticated', role: 'authenticated', email: member.email, phone: '', email_confirmed_at: member.confirmed ? '2026-10-12T00:00:00Z' : null, confirmed_at: '2026-10-12T00:00:00Z', created_at: '2026-10-12T00:00:00Z', updated_at: '2026-10-12T00:00:00Z', app_metadata: { provider: 'email', providers: ['email'] }, user_metadata: { name: member.name }, identities: [] };
 }
@@ -50,7 +51,7 @@ async function configure(context, configured = true) {
         if (url.pathname === '/auth/v1/logout') return send(204, null);
         if (!member) return send(401, { message: 'Invalid user' });
         if (url.pathname === '/auth/v1/user') return send(200, identity(member));
-        if (url.pathname === '/rest/v1/profiles') return send(200, { id: member.id, name: member.name, phone: '0812345678', address: 'กรุงเทพ', referral_code: 'MAXABCD1234', consent_at: member.consent ? '2026-10-12' : null, created_at: '2026-10-12' });
+        if (url.pathname === '/rest/v1/profiles') return send(200, { id: member.id, name: member.name, phone: member.phone ?? '0812345678', address: member.address ?? 'กรุงเทพ', referral_code: 'MAXABCD1234', consent_at: member.consent ? '2026-10-12' : null, created_at: '2026-10-12' });
         if (url.pathname === '/rest/v1/rpc/is_member_admin') return send(200, member.admin);
         if (url.pathname === '/rest/v1/rpc/member_referral_count') return send(200, 0);
         if (url.pathname === '/rest/v1/rpc/accept_member_terms') { member.consent = true; return send(204, null); }
@@ -58,7 +59,14 @@ async function configure(context, configured = true) {
             if (!member.admin) return send(403, { error: 'ผู้ดูแลเท่านั้น' });
             if (body.action === 'list') {
                 if (failList) return send(500, { error: 'Unavailable' });
-                return send(200, { users: Array.from(users.values()).map(u => ({ id: u.id, email: u.email, name: u.name, confirmed: u.confirmed, isAdmin: u.admin })), hasNext: false, page: 1 });
+                return send(200, { users: Array.from(users.values()).map(u => ({ id: u.id, email: u.email, name: u.name, phone: u.phone ?? '0812345678', address: u.address ?? 'กรุงเทพ', confirmed: u.confirmed, isAdmin: u.admin })), hasNext: false, page: 1 });
+            }
+            if (body.action === 'update') {
+                if (failUpdate) return send(500, { error: 'Unavailable' });
+                const target = users.get(body.id);
+                if (!target) return send(404, { error: 'Not found' });
+                Object.assign(target, { name: body.name, phone: body.phone, address: body.address });
+                return send(200, { ok: true });
             }
             if (body.action === 'invite') { const id = '44444444-4444-4444-8444-444444444444'; users.set(id, { id, name: body.name, email: body.email, admin: false, confirmed: false, consent: false }); return send(200, { ok: true }); }
             if (body.action === 'delete') { users.delete(body.id); return send(200, { ok: true }); }
@@ -96,14 +104,40 @@ async function login(page, email) {
         await page.waitForFunction(() => document.getElementById('membersBody').children.length === 2);
         assert.equal(await page.locator('#membersBody img').count(), 0);
         assert.ok((await page.locator('#membersBody').innerText()).includes('<img src=x onerror=alert(1)>'));
-        assert.equal(await page.locator('#membersBody button').first().isDisabled(), true);
+        assert.equal(await page.locator('#membersBody').getByRole('button', { name: 'ลบ', exact: true }).first().isDisabled(), true);
+        // Update form retains input after provider failure, then renders saved values inertly.
+        await page.locator('#membersBody tr').nth(1).getByRole('button', { name: 'แก้ไข', exact: true }).click({ timeout: 3000 });
+        assert.equal(await page.locator('#editMemberName').inputValue(), '<img src=x onerror=alert(1)>');
+        assert.equal(await page.locator('#editMemberAddress').inputValue(), 'กรุงเทพ');
+        const updatedName = 'สมาชิกอัปเดต <svg onload=alert(1)>';
+        await page.locator('#editMemberName').fill(updatedName);
+        await page.locator('#editMemberPhone').fill('0899999999');
+        await page.locator('#editMemberAddress').fill('เชียงใหม่');
+        failUpdate = true;
+        await page.locator('#editMemberSubmit').click();
+        await page.waitForFunction(() => !membersBusy && document.getElementById('membersStatus').textContent.includes('ไม่สำเร็จ'));
+        assert.equal(await page.locator('#editMemberName').inputValue(), updatedName);
+        assert.equal(await page.locator('#editMemberSubmit').isDisabled(), false);
+        failUpdate = false;
+        await page.locator('#editMemberSubmit').click();
+        await page.waitForFunction(() => !membersBusy && document.getElementById('membersStatus').textContent.includes('บันทึกข้อมูล'));
+        assert.equal(await page.locator('#editMemberForm').isVisible(), false);
+        assert.ok((await page.locator('#membersBody').innerText()).includes(updatedName));
+        assert.equal(await page.locator('#membersBody svg').count(), 0);
+        assert.equal(users.get(buyerId).address, 'เชียงใหม่');
+        await page.locator('#membersBody tr').nth(1).getByRole('button', { name: 'แก้ไข', exact: true }).click();
+        assert.equal(await page.locator('#editMemberPhone').inputValue(), '0899999999');
+        assert.equal(await page.locator('#editMemberAddress').inputValue(), 'เชียงใหม่');
+        await page.locator('#editMemberCancel').click();
+        assert.equal(await page.evaluate(() => document.activeElement.textContent), 'แก้ไข');
+        assert.equal(await page.locator('#membersBody').getByRole('button', { name: 'ลบ', exact: true }).first().isDisabled(), true);
         const contrasts = await page.evaluate(() => {
             const luminance = color => {
                 const c = color.match(/[\d.]+/g).slice(0, 3).map(Number).map(n => { n /= 255; return n <= 0.04045 ? n/12.92 : ((n+0.055)/1.055)**2.4; });
                 return c[0]*0.2126 + c[1]*0.7152 + c[2]*0.0722;
             };
             const background = luminance(getComputedStyle(document.querySelector('.members-box')).backgroundColor);
-            return ['#membersTitle', '#membersStatus', '#membersBody td', '#inviteMemberForm label'].map(selector => {
+            return ['#membersTitle', '#membersStatus', '#membersBody td', '#inviteMemberForm label', '#editMemberForm label', '#editMemberAccount'].map(selector => {
                 const foreground = luminance(getComputedStyle(document.querySelector(selector)).color);
                 return (Math.max(foreground, background)+0.05)/(Math.min(foreground, background)+0.05);
             });
@@ -112,9 +146,12 @@ async function login(page, email) {
         await page.locator('#inviteName').fill('ทดสอบคำเชิญ'); await page.locator('#inviteEmail').fill('invite@example.com');
         await page.locator('#inviteSubmit').click();
         await page.waitForFunction(() => document.getElementById('membersBody').children.length === 3);
+        await page.locator('#membersBody tr').last().getByRole('button', { name: 'แก้ไข', exact: true }).click();
         page.once('dialog', dialog => dialog.accept());
         await page.locator('#membersBody button').last().click();
         await page.waitForFunction(() => document.getElementById('membersBody').children.length === 2);
+        assert.equal(await page.locator('#editMemberForm').isVisible(), false);
+        assert.equal(await page.locator('#editMemberAddress').inputValue(), '');
         // Keyboard wraps within modal and Escape restores its opening control.
         await page.locator('#membersNext').evaluate(el => { el.disabled = false; el.focus(); });
         await page.keyboard.press('Tab');
@@ -127,7 +164,8 @@ async function login(page, email) {
         assert.equal(await page.locator('#inviteSubmit').isDisabled(), false);
         failList = false; await page.evaluate(() => loadMembers(1));
         await page.waitForFunction(() => document.getElementById('membersBody').children.length === 2);
-        await page.screenshot({ path: path.resolve(__dirname, '../../tmp/membership-desktop.png'), animations: 'disabled' });
+        await page.locator('#membersBody tr').nth(1).getByRole('button', { name: 'แก้ไข', exact: true }).click();
+        await page.screenshot({ path: path.resolve(__dirname, '../../tmp/admin-crud-desktop.png'), animations: 'disabled' });
         await page.evaluate(() => closeMembersModal());
         // Two isolated browser contexts authenticate against the same simulated provider.
         const mobile = await browser.newContext({ viewport: { width: 390, height: 844 }, isMobile: true });
@@ -144,7 +182,11 @@ async function login(page, email) {
             const range = document.createRange(); range.selectNodeContents(button);
             return range.getClientRects().length;
         }), 1, 'Thai delete label stays on one line on mobile');
-        await phone.screenshot({ path: path.resolve(__dirname, '../../tmp/membership-mobile.png'), animations: 'disabled' });
+        await phone.locator('#membersBody tr').nth(1).getByRole('button', { name: 'แก้ไข', exact: true }).click();
+        assert.equal(await phone.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true);
+        await phone.locator('#editMemberSubmit').scrollIntoViewIfNeeded();
+        assert.equal(await phone.locator('#editMemberSubmit').isVisible(), true);
+        await phone.screenshot({ path: path.resolve(__dirname, '../../tmp/admin-crud-mobile.png'), animations: 'disabled' });
         await phone.evaluate(() => closeMembersModal());
         phone.once('dialog', d => d.accept()); await phone.evaluate(() => handleLogout());
         await phone.waitForFunction(() => currentUser === null);
@@ -177,6 +219,6 @@ async function login(page, email) {
         assert.ok(await empty.locator('.card').count() > 0);
         assert.equal(await empty.evaluate(() => localStorage.getItem('maxmuxsix_users')), null);
         assert.deepEqual(errors, []);
-        console.log(JSON.stringify({ result: 'PASS', widths: [1440, 390], minContentContrast: Math.min(...contrasts).toFixed(2), checks: ['signup confirmation', 'real SDK login', 'admin list/invite/delete', 'inert names', 'keyboard focus', 'retryable provider error', 'isolated contexts', 'logout isolation', 'non-admin denial', 'invite and recovery URL password flows', 'unconfigured storefront'], provider: 'HTTP fixture only; no live Supabase or email', requests: calls.length }));
+        console.log(JSON.stringify({ result: 'PASS', widths: [1440, 390], minContentContrast: Math.min(...contrasts).toFixed(2), checks: ['signup confirmation', 'real SDK login', 'admin CRUD', 'update failure preserves edits', 'inert names', 'keyboard focus', 'retryable provider error', 'isolated contexts', 'logout isolation', 'non-admin denial', 'invite and recovery URL password flows', 'unconfigured storefront'], provider: 'HTTP fixture only; no live Supabase or email', requests: calls.length }));
     } finally { await browser.close(); }
 })().catch(error => { console.error(error); process.exitCode = 1; });

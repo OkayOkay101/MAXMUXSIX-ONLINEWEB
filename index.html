@@ -2157,6 +2157,11 @@
         .members-table td:nth-child(2) { min-width: 110px; }
         .members-table th:last-child, .members-table td:last-child { min-width: 88px; white-space: nowrap; }
         .members-table .btn-nav-action { white-space: nowrap; padding: 8px 12px; min-height: 44px; }
+        .member-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+        .member-edit-panel { margin: 20px 0; padding: 16px; border: 1px solid var(--flame-yellow); border-radius: 8px; background: var(--bg-card); }
+        .member-edit-panel h4 { color: var(--flame-yellow); margin: 0 0 8px; }
+        .member-edit-panel textarea { width: 100%; box-sizing: border-box; resize: vertical; min-height: 80px; padding: 12px; border: 1px solid var(--green-border); border-radius: 8px; background: var(--bg-wood); color: var(--cream-light); font: inherit; }
+        .member-edit-actions { display: flex; flex-wrap: wrap; gap: 12px; }
         .members-pagination { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 16px; }
         #authModal button:disabled, #membersModal button:disabled { opacity: 0.55; cursor: wait; transform: none; }
         #authModal :focus-visible, #membersModal :focus-visible { outline: 3px solid var(--flame-yellow); outline-offset: 3px; }
@@ -2653,6 +2658,17 @@
                 <button id="inviteSubmit" type="submit" class="btn-save">+ เพิ่มผู้ใช้และส่งคำเชิญ</button>
             </form>
             <p id="membersStatus" class="membership-status" role="status" aria-live="polite"></p>
+            <form id="editMemberForm" class="member-edit-panel" hidden onsubmit="handleUpdateMember(event)">
+                <h4>แก้ไขข้อมูลสมาชิก</h4>
+                <p id="editMemberAccount" class="membership-note"></p>
+                <div class="form-grid form-row">
+                    <div><label for="editMemberName">ชื่อ *</label><input id="editMemberName" maxlength="100" required autocomplete="off"></div>
+                    <div><label for="editMemberPhone">โทรศัพท์</label><input id="editMemberPhone" type="tel" maxlength="30" autocomplete="off"></div>
+                </div>
+                <div class="form-row"><label for="editMemberAddress">ที่อยู่</label><textarea id="editMemberAddress" maxlength="1000" rows="3" autocomplete="off"></textarea></div>
+                <p class="membership-note">แก้ไขเฉพาะข้อมูลติดต่อ ไม่เปลี่ยนอีเมล รหัสผ่าน หรือสิทธิ์ของบัญชี</p>
+                <div class="member-edit-actions"><button id="editMemberSubmit" type="submit" class="btn-save">บันทึกข้อมูล</button><button id="editMemberCancel" type="button" class="btn-nav-action" onclick="if (!membersBusy) resetMemberEditor()">ยกเลิก</button></div>
+            </form>
             <div class="members-table-wrap" tabindex="0" aria-label="ตารางสมาชิก เลื่อนด้านข้างได้">
                 <table class="members-table"><thead><tr><th scope="col">ชื่อ / อีเมล</th><th scope="col">สถานะ</th><th scope="col">จัดการ</th></tr></thead><tbody id="membersBody"></tbody></table>
             </div>
@@ -3969,6 +3985,8 @@
         let membersPage = 1;
         let membersBusy = false;
         let membersRequestVersion = 0;
+        let membersEditingId = null;
+        let memberEditorFocus = null;
         let sentEmails = JSON.parse(localStorage.getItem('maxmuxsix_sent_emails')) || [];
         const DEFAULT_GAS_URL = 'https://script.google.com/macros/s/AKfycbz-wK7x3pHtmdtcoxjIjNImAqNJcBXFDb0yYGnaQ5QzIK5vDhxLVIaJ6XzlVAcjsQQp/exec';
         let emailSettings = JSON.parse(localStorage.getItem('maxmuxsix_email_settings')) || {
@@ -4335,6 +4353,7 @@
             modal.classList.remove('active');
             membersRequestVersion++;
             setMembersBusy(false);
+            resetMemberEditor(false);
             document.getElementById('membersBody').innerHTML = '';
             ['inviteName', 'inviteEmail', 'invitePhone'].forEach(id => { document.getElementById(id).value = ''; });
             if (membershipFocus && membershipFocus.focus) membershipFocus.focus();
@@ -4342,7 +4361,9 @@
 
         function setMembersBusy(busy) {
             membersBusy = busy;
-            for (const id of ['inviteSubmit', 'membersPrev', 'membersNext']) document.getElementById(id).disabled = busy;
+            for (const id of ['inviteSubmit', 'membersPrev', 'membersNext', 'editMemberSubmit', 'editMemberCancel',
+                'inviteName', 'inviteEmail', 'invitePhone', 'editMemberName', 'editMemberPhone', 'editMemberAddress']) document.getElementById(id).disabled = busy;
+            document.querySelectorAll('#membersBody button').forEach(button => { button.disabled = busy || button.dataset.protected === 'true'; });
             document.getElementById('membersModal').setAttribute('aria-busy', String(busy));
         }
 
@@ -4364,11 +4385,17 @@
                     const status = document.createElement('td');
                     status.textContent = user.isAdmin ? 'ผู้ดูแลร้าน' : user.confirmed ? 'ยืนยันอีเมลแล้ว' : 'รอยืนยันอีเมล';
                     const action = document.createElement('td');
+                    const actions = document.createElement('div'); actions.className = 'member-actions';
+                    const edit = document.createElement('button');
+                    edit.className = 'btn-nav-action'; edit.textContent = 'แก้ไข'; edit.type = 'button';
+                    edit.onclick = () => openMemberEditor(user, edit);
                     const button = document.createElement('button');
                     button.className = 'btn-nav-action'; button.textContent = 'ลบ'; button.type = 'button';
                     button.disabled = user.isAdmin || user.id === currentUser.id;
+                    button.dataset.protected = String(button.disabled);
                     button.onclick = () => handleDeleteMember(user.id, user.email);
-                    action.appendChild(button); row.appendChild(account); row.appendChild(status); row.appendChild(action); body.appendChild(row);
+                    actions.appendChild(edit); actions.appendChild(button); action.appendChild(actions);
+                    row.appendChild(account); row.appendChild(status); row.appendChild(action); body.appendChild(row);
                 }
                 document.getElementById('membersPageLabel').textContent = 'หน้า ' + page;
                 document.getElementById('membersStatus').textContent = message || (data.users.length ? 'แสดงสมาชิก ' + data.users.length + ' คนในหน้านี้' : 'ไม่พบสมาชิกในหน้านี้');
@@ -4398,6 +4425,53 @@
             finally { if (version === membersRequestVersion && membersBusy) setMembersBusy(false); }
         }
 
+        function openMemberEditor(user, button) {
+            if (membersBusy || !isAdminMode || !currentUser) return;
+            membersEditingId = user.id;
+            memberEditorFocus = button;
+            document.getElementById('editMemberAccount').textContent = user.email;
+            document.getElementById('editMemberName').value = user.name || '';
+            document.getElementById('editMemberPhone').value = user.phone || '';
+            document.getElementById('editMemberAddress').value = user.address || '';
+            document.getElementById('editMemberForm').hidden = false;
+            document.getElementById('membersStatus').textContent = '';
+            document.getElementById('editMemberName').focus();
+        }
+
+        function resetMemberEditor(restoreFocus = true) {
+            membersEditingId = null;
+            document.getElementById('editMemberForm').hidden = true;
+            document.getElementById('editMemberAccount').textContent = '';
+            ['editMemberName', 'editMemberPhone', 'editMemberAddress'].forEach(id => { document.getElementById(id).value = ''; });
+            if (restoreFocus && memberEditorFocus && memberEditorFocus.isConnected) memberEditorFocus.focus();
+            memberEditorFocus = null;
+        }
+
+        async function handleUpdateMember(e) {
+            e.preventDefault();
+            if (membersBusy || !membersEditingId || !isAdminMode || !currentUser) return;
+            const id = membersEditingId;
+            const fields = { id, name: document.getElementById('editMemberName').value,
+                phone: document.getElementById('editMemberPhone').value, address: document.getElementById('editMemberAddress').value };
+            const version = ++membersRequestVersion;
+            setMembersBusy(true);
+            document.getElementById('membersStatus').textContent = 'กำลังบันทึกข้อมูลสมาชิก…';
+            try {
+                await membership.admin('update', fields);
+                if (version !== membersRequestVersion || !isAdminMode) return;
+                if (id === currentUser.id) await membership.refresh();
+                if (version !== membersRequestVersion || !isAdminMode) return;
+                resetMemberEditor(false);
+                setMembersBusy(false);
+                await loadMembers(membersPage, 'บันทึกข้อมูลสมาชิกแล้ว');
+                if (document.getElementById('membersModal').classList.contains('active')) document.getElementById('inviteName').focus();
+            } catch (error) {
+                if (version === membersRequestVersion) document.getElementById('membersStatus').textContent = error.message;
+            } finally {
+                if (version === membersRequestVersion && membersBusy) setMembersBusy(false);
+            }
+        }
+
         async function handleDeleteMember(id, email) {
             if (membersBusy || !confirm('ลบบัญชี ' + email + ' ออกจากระบบส่วนกลางอย่างถาวรหรือไม่? ไม่สามารถย้อนกลับได้')) return;
             const version = ++membersRequestVersion;
@@ -4406,6 +4480,7 @@
             try {
                 await membership.admin('delete', { id });
                 if (version !== membersRequestVersion || !isAdminMode) return;
+                if (membersEditingId === id) resetMemberEditor(false);
                 setMembersBusy(false);
                 await loadMembers(membersPage, 'ลบบัญชีแล้ว');
             } catch (error) { if (version === membersRequestVersion) document.getElementById('membersStatus').textContent = error.message; }

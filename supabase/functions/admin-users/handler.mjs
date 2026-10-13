@@ -30,7 +30,7 @@ export function createHandler({ backend, siteUrl }) {
                 const [profiles, admins] = ids.length ? await Promise.all([backend.getProfiles(ids), backend.adminIds(ids)]) : [[], []];
                 return response(200, { page, hasNext: Boolean(result.nextPage), users: result.users.map(user => {
                     const profile = profiles.find(p => p.id === user.id);
-                    return { id: user.id, email: user.email || '', name: profile?.name || '', phone: profile?.phone || '', createdAt: user.created_at, confirmed: Boolean(user.email_confirmed_at), isAdmin: admins.includes(user.id) };
+                    return { id: user.id, email: user.email || '', name: profile?.name || '', phone: profile?.phone || '', address: profile?.address || '', createdAt: user.created_at, confirmed: Boolean(user.email_confirmed_at), isAdmin: admins.includes(user.id) };
                 }) });
             }
             if (input.action === 'invite') {
@@ -39,6 +39,21 @@ export function createHandler({ backend, siteUrl }) {
                 const phone = typeof input.phone === 'string' ? input.phone.trim() : '';
                 if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || email.length > 254 || !name || name.length > 100 || phone.length > 30) return response(400, { error: 'ตรวจสอบชื่อ อีเมล และโทรศัพท์' });
                 await backend.invite({ email, name, phone, redirectTo: siteUrl });
+                return response(200, { ok: true });
+            }
+            if (input.action === 'update') {
+                // Contact data only: never mass-assign Auth credentials, consent or roles.
+                if (!Object.keys(input).every(key => ['action', 'id', 'name', 'phone', 'address'].includes(key)) ||
+                    typeof input.id !== 'string' || !uuid.test(input.id) ||
+                    !['name', 'phone', 'address'].every(key => typeof input[key] === 'string')) {
+                    return response(400, { error: 'ข้อมูลแก้ไขสมาชิกไม่ถูกต้อง' });
+                }
+                const fields = { name: input.name.trim(), phone: input.phone.trim(), address: input.address.trim() };
+                if (!fields.name || fields.name.length > 100 || fields.phone.length > 30 || fields.address.length > 1000) {
+                    return response(400, { error: 'ตรวจสอบชื่อ โทรศัพท์ และที่อยู่' });
+                }
+                if (!(await backend.getProfiles([input.id])).some(profile => profile.id === input.id) ||
+                    !await backend.updateProfile(input.id, fields)) return response(404, { error: 'ไม่พบสมาชิกที่ต้องการแก้ไข' });
                 return response(200, { ok: true });
             }
             if (input.action === 'delete') {
@@ -59,9 +74,12 @@ export function createSupabaseBackend(client) {
     return {
         async getUser(token) { const result = await client.auth.getUser(token); return result.error ? null : result.data.user; },
         async adminIds(ids) { return data(await client.rpc('server_member_admin_ids', { member_ids: ids })); },
-        async getProfiles(ids) { return data(await client.from('profiles').select('id,name,phone,consent_at').in('id', ids)); },
+        async getProfiles(ids) { return data(await client.from('profiles').select('id,name,phone,address,consent_at').in('id', ids)); },
         async listUsers(page, perPage) { return data(await client.auth.admin.listUsers({ page, perPage })); },
         async invite({ email, name, phone, redirectTo }) { return data(await client.auth.admin.inviteUserByEmail(email, { redirectTo, data: { name, phone } })); },
-        async delete(id) { return data(await client.auth.admin.deleteUser(id)); }
+        async delete(id) { return data(await client.auth.admin.deleteUser(id)); },
+        async updateProfile(id, fields) {
+            return Boolean(data(await client.from('profiles').update(fields).eq('id', id).select('id').maybeSingle()));
+        }
     };
 }

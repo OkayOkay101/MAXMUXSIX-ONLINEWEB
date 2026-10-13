@@ -96,3 +96,65 @@ test('successful login reports account status, never claims a welcome email was 
     assert.equal(getElement('emailToastArea').children[0].children[0].textContent, 'เข้าสู่ระบบสำเร็จ');
     assert.equal(app.currentUser.id, 'cloud');
 });
+
+test('closing an editor during an in-flight update clears contact data and ignores its stale result', async () => {
+    let finishUpdate, listCalls = 0;
+    const pending = new Promise(resolve => { finishUpdate = resolve; });
+    const member = { id: 'buyer', name: 'Buyer', email: 'buyer@example.test', phone: '081', address: 'Private address' };
+    const { app, getElement } = createAppInstance({ globals: { MaxmuxsixMembership: { createMembership: () => ({
+        configured: true, start: async () => {}, admin: async action => {
+            if (action === 'update') return pending;
+            listCalls++; return { users: [member], hasNext: false };
+        }
+    }) } } });
+    app.currentUser = { id: 'admin', name: 'Admin' }; app.isAdminMode = true;
+    await app.openMembersModal();
+    app.openMemberEditor(member, null);
+    const saving = app.handleUpdateMember({ preventDefault() {} });
+    assert.equal(getElement('editMemberSubmit').disabled, true);
+    app.closeMembersModal();
+    assert.equal(getElement('editMemberForm').hidden, true);
+    assert.equal(getElement('editMemberAddress').value, '');
+    finishUpdate({ ok: true });
+    await saving;
+    assert.equal(listCalls, 1);
+    assert.equal(getElement('membersBody').children.length, 0);
+    assert.equal(getElement('membersModal').classList.contains('active'), false);
+});
+
+test('loss of admin status closes and clears the editor without submitting profile changes', async () => {
+    let updates = 0;
+    const { app, getElement } = createAppInstance({ globals: { MaxmuxsixMembership: { createMembership: () => ({
+        configured: true, start: async () => {}, admin: async action => {
+            if (action === 'update') updates++;
+            return { users: [], hasNext: false };
+        }
+    }) } } });
+    app.currentUser = { id: 'admin', name: 'Admin', consentPDPA: true }; app.isAdminMode = true;
+    await app.openMembersModal();
+    app.openMemberEditor({ id: 'buyer', name: 'Buyer', email: 'buyer@example.test', address: 'Private address' }, null);
+    app.applyMembershipState({ user: null, isAdmin: false });
+    await app.handleUpdateMember({ preventDefault() {} });
+    assert.equal(updates, 0);
+    assert.equal(getElement('editMemberForm').hidden, true);
+    assert.equal(getElement('editMemberAddress').value, '');
+});
+
+test('deleting the member open in the editor clears their contact data after success', async () => {
+    const member = { id: 'buyer', name: 'Buyer', email: 'buyer@example.test', address: 'Private address' };
+    let users = [member];
+    const { app, getElement } = createAppInstance({ globals: { MaxmuxsixMembership: { createMembership: () => ({
+        configured: true, start: async () => {}, admin: async action => {
+            if (action === 'delete') { users = []; return { ok: true }; }
+            return { users, hasNext: false };
+        }
+    }) } } });
+    app.currentUser = { id: 'admin', name: 'Admin' }; app.isAdminMode = true;
+    await app.openMembersModal();
+    app.openMemberEditor(member, null);
+    await app.handleDeleteMember(member.id, member.email);
+    assert.equal(getElement('membersBody').children.length, 0);
+    assert.equal(getElement('editMemberForm').hidden, true);
+    assert.equal(getElement('editMemberAddress').value, '');
+    assert.equal(getElement('editMemberAccount').textContent, '');
+});

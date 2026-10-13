@@ -7,11 +7,12 @@ async function fixture(overrides = {}) {
     let mutations = 0;
     const backend = {
         getUser: async token => token === 'valid' ? { id: ADMIN, email_confirmed_at: 'now' } : null,
-        getProfiles: async ids => ids.map(id => ({ id, name: '<Buyer>', phone: '081', consent_at: 'now' })),
+        getProfiles: async ids => ids.map(id => ({ id, name: '<Buyer>', phone: '081', address: 'กรุงเทพ', consent_at: 'now' })),
         adminIds: async ids => ids.filter(id => id === ADMIN),
         listUsers: async page => ({ users: [{ id: BUYER, email: 'buyer@example.com', created_at: '2026-10-12', email_confirmed_at: 'now' }], nextPage: null }),
         invite: async () => { mutations++; },
-        delete: async () => { mutations++; }
+        delete: async () => { mutations++; },
+        updateProfile: async () => { mutations++; return true; }
     };
     Object.assign(backend, overrides);
     const { createHandler } = await handlerModule;
@@ -34,6 +35,7 @@ test('authenticated non-admin cannot list or mutate users', async () => {
     const f = await fixture({ adminIds: async () => [] });
     assert.equal((await f.request({ action: 'list', page: 1 })).status, 403);
     assert.equal((await f.request({ action: 'delete', id: BUYER })).status, 403);
+    assert.equal((await f.request({ action: 'update', id: BUYER, name: 'Other', phone: '', address: '' })).status, 403);
     assert.equal(f.mutations(), 0);
 });
 test('deleted or unconsented profile is denied despite valid Auth identity', async () => {
@@ -57,6 +59,7 @@ test('listing returns minimal joined profile data with bounded pagination', asyn
     const data = await response.json();
     assert.equal(data.users[0].name, '<Buyer>');
     assert.equal(data.users[0].email, 'buyer@example.com');
+    assert.equal(data.users[0].address, 'กรุงเทพ');
     assert.equal(data.users[0].password, undefined);
     assert.equal(data.hasNext, false);
     assert.equal((await f.request({ action: 'list', page: -1 })).status, 400);
@@ -89,4 +92,80 @@ test('provider failure hides credentials and internals', async () => {
     const response = await f.request({ action: 'delete', id: BUYER });
     assert.equal(response.status, 500);
     assert.ok(!(await response.text()).includes('secret-service-key'));
+});
+
+test('admin updates only normalized profile fields, not Auth credentials or roles', async () => {
+    let update;
+    const f = await fixture({ updateProfile: async (id, fields) => { update = { id, fields }; return true; } });
+    const response = await f.request({ action: 'update', id: BUYER, name: ' ผู้ซื้อใหม่ ', phone: ' 0812345678 ', address: ' กรุงเทพ ' });
+    assert.equal(response.status, 200);
+    assert.deepEqual(await response.json(), { ok: true });
+    assert.deepEqual(update, { id: BUYER, fields: { name: 'ผู้ซื้อใหม่', phone: '0812345678', address: 'กรุงเทพ' } });
+});
+
+test('admin can edit their non-security contact fields without changing admin membership', async () => {
+    const f = await fixture();
+    assert.equal((await f.request({ action: 'update', id: ADMIN, name: 'Owner', phone: '', address: '' })).status, 200);
+    assert.equal(f.mutations(), 1);
+});
+
+test('profile update validation prevents oversized, missing, typed or privileged fields', async () => {
+    const input = { action: 'update', id: BUYER, name: 'Buyer', phone: '', address: '' };
+    for (const patch of [
+        { id: 'bad-id' }, { name: '' }, { name: ' '.repeat(5) }, { name: 'x'.repeat(101) },
+        { phone: 'x'.repeat(31) }, { address: 'x'.repeat(1001) }, { phone: null },
+        { address: 123 }, { name: undefined }, { email: 'other@example.test' },
+        { password: 'fixture-only-password' }, { role: 'admin' }, { consent_at: 'now' }, { referral_code: 'MAXOTHER' }
+    ]) {
+        const f = await fixture();
+        assert.equal((await f.request({ ...input, ...patch })).status, 400);
+        assert.equal(f.mutations(), 0);
+    }
+});
+
+test('profile updates reject missing profiles and deletion races without reporting success', async () => {
+    const input = { action: 'update', id: BUYER, name: 'Buyer', phone: '', address: '' };
+    const missing = await fixture({ getProfiles: async ids => ids.filter(id => id === ADMIN).map(id => ({ id, consent_at: 'now' })) });
+    assert.equal((await missing.request(input)).status, 404);
+    assert.equal(missing.mutations(), 0);
+    const race = await fixture({ updateProfile: async () => false });
+    assert.equal((await race.request(input)).status, 404);
+});
+
+test('forged tokens and unconsented admins cannot update profiles', async () => {
+    const input = { action: 'update', id: BUYER, name: 'Buyer', phone: '', address: '' };
+    const forged = await fixture();
+    assert.equal((await forged.request(input, { Authorization: 'Bearer fake' })).status, 401);
+    assert.equal(forged.mutations(), 0);
+    const unconsented = await fixture({ getProfiles: async ids => ids.map(id => ({ id, consent_at: null })) });
+    assert.equal((await unconsented.request(input)).status, 403);
+    assert.equal(unconsented.mutations(), 0);
+});
+
+test('profile update provider errors do not expose internal details', async () => {
+    const f = await fixture({ updateProfile: async () => { throw new Error('private-provider-credential'); } });
+    const response = await f.request({ action: 'update', id: BUYER, name: 'Buyer', phone: '', address: '' });
+    assert.equal(response.status, 500);
+    assert.equal((await response.text()).includes('private-provider-credential'), false);
+});
+
+test('Supabase profile adapter bounds updates by id and distinguishes no returned row', async () => {
+    const { createSupabaseBackend } = await handlerModule;
+    let table, patch, idFilter, projection, returned = { id: BUYER };
+    const query = {
+        update(value) { patch = value; return this; },
+        eq(key, value) { idFilter = [key, value]; return this; },
+        select(value) { projection = value; return this; },
+        async maybeSingle() { return { data: returned, error: null }; }
+    };
+    const backend = createSupabaseBackend({ from(name) { table = name; return query; } });
+    assert.equal(typeof backend.updateProfile, 'function');
+    const fields = { name: 'Buyer', phone: '081', address: 'กรุงเทพ' };
+    assert.equal(await backend.updateProfile(BUYER, fields), true);
+    assert.equal(table, 'profiles');
+    assert.deepEqual(patch, fields);
+    assert.deepEqual(idFilter, ['id', BUYER]);
+    assert.equal(projection, 'id');
+    returned = null;
+    assert.equal(await backend.updateProfile(BUYER, fields), false);
 });
