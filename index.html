@@ -2166,6 +2166,283 @@
         #authModal button:disabled, #membersModal button:disabled { opacity: 0.55; cursor: wait; transform: none; }
         #authModal :focus-visible, #membersModal :focus-visible { outline: 3px solid var(--flame-yellow); outline-offset: 3px; }
         @media (max-width: 480px) { .members-table th, .members-table td { padding: 8px; } }
+
+        /* --- UX Upgrades: Shopping Steps, Sort, Stock Badges, Quick Toast & Floating Cart --- */
+        .shopping-steps-section {
+            max-width: 1200px;
+            margin: 0.5rem auto 2rem;
+            padding: 0 1.5rem;
+        }
+        .steps-container {
+            background: linear-gradient(145deg, #0D2218, #07150E);
+            border: 2px solid #1E543C;
+            border-radius: 20px;
+            padding: 1.6rem 1.4rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+        }
+        .steps-header {
+            text-align: center;
+            margin-bottom: 1.4rem;
+        }
+        .steps-badge {
+            display: inline-block;
+            background: rgba(232, 93, 4, 0.15);
+            color: var(--flame-orange);
+            border: 1px solid var(--flame-orange);
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+        .steps-title {
+            color: var(--flame-yellow);
+            font-size: 1.45rem;
+            font-weight: 800;
+            margin-top: 8px;
+        }
+        .steps-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.2rem;
+        }
+        .step-card {
+            background: rgba(10, 28, 20, 0.7);
+            border: 1.5px solid #23583F;
+            border-radius: 16px;
+            padding: 1.2rem;
+            position: relative;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            transition: transform 0.25s ease, border-color 0.25s ease;
+        }
+        .step-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--flame-yellow);
+        }
+        .step-num {
+            position: absolute;
+            top: -10px;
+            left: 14px;
+            background: var(--flame-orange);
+            color: #FFF;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            font-size: 0.75rem;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid #0D2218;
+            box-shadow: 0 2px 8px rgba(232, 93, 4, 0.6);
+        }
+        .step-icon {
+            font-size: 2rem;
+            line-height: 1;
+            margin-top: 4px;
+            flex-shrink: 0;
+        }
+        .step-content {
+            flex: 1;
+        }
+        .step-heading {
+            color: var(--cream);
+            font-size: 1.05rem;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+        .step-desc {
+            color: #A3C2B3;
+            font-size: 0.85rem;
+            line-height: 1.4;
+            margin: 0;
+        }
+        @media (max-width: 768px) {
+            .steps-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+            .step-card {
+                padding: 1rem 1rem 1rem 1.2rem;
+            }
+        }
+
+        .sort-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: #0A1C14;
+            border: 2px solid #1E543C;
+            border-radius: 25px;
+            padding: 6px 14px;
+        }
+        .sort-label {
+            color: #8BA89B;
+            font-size: 0.88rem;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+        .select-sort {
+            background: transparent;
+            color: var(--cream);
+            border: none;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            outline: none;
+            padding: 2px 0;
+        }
+        .select-sort option {
+            background: #0A1C14;
+            color: var(--cream);
+        }
+
+        .stock-badge.stock-available {
+            background: rgba(16, 185, 129, 0.25);
+            border: 1px solid #10B981;
+            color: #6EE7B7;
+        }
+        .stock-badge.stock-low {
+            background: rgba(239, 68, 68, 0.25);
+            border: 1px solid #EF4444;
+            color: #FCA5A5;
+            animation: pulseWarning 1.5s infinite alternate;
+        }
+        @keyframes pulseWarning {
+            0% { opacity: 0.85; }
+            100% { opacity: 1; transform: scale(1.02); }
+        }
+
+        .cart-quick-toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            opacity: 0;
+            visibility: hidden;
+            background: rgba(13, 34, 24, 0.96);
+            border: 2px solid var(--flame-orange);
+            color: #FFF;
+            padding: 12px 20px;
+            border-radius: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), 0 0 15px rgba(232, 93, 4, 0.4);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s ease, visibility 0.3s;
+            max-width: 90vw;
+            pointer-events: none;
+        }
+        .cart-quick-toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+        }
+        .btn-toast-viewcart {
+            background: var(--flame-orange);
+            color: #FFF;
+            border: none;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: background 0.2s;
+        }
+        .btn-toast-viewcart:hover {
+            background: var(--flame-red);
+        }
+        @media (max-width: 768px) {
+            .cart-quick-toast {
+                bottom: 84px;
+                font-size: 0.85rem;
+                padding: 10px 16px;
+            }
+        }
+
+        .floating-mobile-cart {
+            display: none;
+            position: fixed;
+            bottom: 78px;
+            right: 16px;
+            background: linear-gradient(135deg, var(--flame-orange), var(--flame-red));
+            color: #FFF;
+            border: 2px solid #FAA307;
+            border-radius: 30px;
+            padding: 8px 16px;
+            box-shadow: 0 8px 25px rgba(232, 93, 4, 0.5);
+            z-index: 140;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+            transform: translateY(100px);
+            opacity: 0;
+            pointer-events: none;
+        }
+        .floating-mobile-cart.visible {
+            transform: translateY(0);
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .floating-mobile-cart:active {
+            transform: scale(0.96);
+        }
+        .float-cart-icon-wrapper {
+            position: relative;
+            font-size: 1.3rem;
+            display: flex;
+            align-items: center;
+        }
+        .float-cart-badge {
+            position: absolute;
+            top: -6px;
+            right: -8px;
+            background: #FFF;
+            color: var(--flame-red);
+            font-size: 0.75rem;
+            font-weight: 800;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid var(--flame-orange);
+        }
+        .float-cart-text {
+            display: flex;
+            flex-direction: column;
+            line-height: 1.2;
+        }
+        .float-cart-label {
+            font-size: 0.72rem;
+            color: #FFF4E5;
+            font-weight: 600;
+        }
+        .float-cart-total {
+            font-size: 0.95rem;
+            font-weight: 800;
+            color: #FFF;
+        }
+        .float-cart-arrow {
+            font-size: 1rem;
+            font-weight: 700;
+        }
+        @media (max-width: 768px) {
+            .floating-mobile-cart {
+                display: flex;
+            }
+        }
     </style>
 </head>
 <body>
@@ -2292,6 +2569,42 @@
         </div>
     </section>
 
+        <!-- 3 ขั้นตอนสั่งซื้อง่ายๆ สำหรับลูกค้า (Shopping Guide Steps) -->
+    <section class="shopping-steps-section" aria-label="ขั้นตอนการสั่งซื้อ">
+        <div class="steps-container">
+            <div class="steps-header">
+                <span class="steps-badge">🛒 สั่งง่ายใน 3 ขั้นตอน</span>
+                <h2 class="steps-title">อร่อยฟินถึงบ้าน ง่ายนิดเดียว</h2>
+            </div>
+            <div class="steps-grid">
+                <div class="step-card">
+                    <div class="step-num">1</div>
+                    <div class="step-icon">🎋</div>
+                    <div class="step-content">
+                        <h3 class="step-heading">1. เลือกเมนูโปรด</h3>
+                        <p class="step-desc">เลือกข้าวหลามสูตรเตาถ่านแท้ ช็อตไฟลุก หรือรสพรีเมียมตามใจชอบ</p>
+                    </div>
+                </div>
+                <div class="step-card">
+                    <div class="step-num">2</div>
+                    <div class="step-icon">🏷️</div>
+                    <div class="step-content">
+                        <h3 class="step-heading">2. ใส่ตะกร้า & โค้ดลด</h3>
+                        <p class="step-desc">ใส่โค้ด <strong>MAX10</strong> หรือ <strong>WELCOME10</strong> รับส่วนลด 10% ทันที</p>
+                    </div>
+                </div>
+                <div class="step-card">
+                    <div class="step-num">3</div>
+                    <div class="step-icon">🚚</div>
+                    <div class="step-content">
+                        <h3 class="step-heading">3. จัดส่งด่วนถึงบ้าน</h3>
+                        <p class="step-desc">เผาสดใหม่เตาถ่านทุกวัน พร้อมแพ็กส่งไว หอมอร่อยถึงหน้าบ้าน</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <div class="controls-wrapper">
         <div class="search-container">
             <input type="text" id="filterKeyword" placeholder="🔍 ค้นหาเมนู เช่น ถั่วดำ, ช็อตมะพร้าว, สังขยา..." oninput="applyFilters()">
@@ -2301,6 +2614,15 @@
             <button class="btn-filter" onclick="selectCategory('สูตรเตาถ่านแท้', this)">สูตรเตาถ่านแท้</button>
             <button class="btn-filter" onclick="selectCategory('เมนูช็อตไฟลุก', this)">เมนูช็อตไฟลุก</button>
             <button class="btn-filter" onclick="selectCategory('รสพรีเมียม', this)">รสพรีเมียม</button>
+        </div>
+        <div class="sort-container">
+            <label for="filterSort" class="sort-label">⚡ เรียงตาม:</label>
+            <select id="filterSort" class="select-sort" onchange="applyFilters()">
+                <option value="default">⭐ เมนูแนะนำ</option>
+                <option value="price-asc">💵 ราคา: ต่ำ → สูง</option>
+                <option value="price-desc">💎 ราคา: สูง → ต่ำ</option>
+                <option value="stock-desc">📦 มีสินค้าพร้อมส่ง</option>
+            </select>
         </div>
     </div>
 
@@ -3837,6 +4159,22 @@
     </template>
 
     <!-- Mobile Bottom Navigation Bar (Dock) -->
+        <!-- Toast แจ้งเตือนเมื่อกดใส่ตะกร้า (Cart Quick Feedback Toast) -->
+    <div id="cartToastNotification" class="cart-quick-toast" role="status" aria-live="polite"></div>
+
+    <!-- Floating Mobile Quick Cart Pill -->
+    <aside id="floatingMobileCart" class="floating-mobile-cart" onclick="openCartModal()" aria-label="เปิดตะกร้าสินค้า">
+        <div class="float-cart-icon-wrapper">
+            <span>🛒</span>
+            <span class="float-cart-badge" id="floatCartBadge">0</span>
+        </div>
+        <div class="float-cart-text">
+            <span class="float-cart-label">ตะกร้าของคุณ</span>
+            <span class="float-cart-total" id="floatCartTotal">0 บาท</span>
+        </div>
+        <div class="float-cart-arrow">→</div>
+    </aside>
+
     <nav class="mobile-bottom-bar" aria-label="Mobile Navigation">
         <button class="mobile-nav-btn active" id="btnBottomNavHome" onclick="scrollToTop()">
             <span class="mobile-nav-icon">🏠</span>
@@ -4077,6 +4415,20 @@
             if (topBadge) topBadge.textContent = count;
             const bottomBadge = document.getElementById('cartCountBottom');
             if (bottomBadge) bottomBadge.textContent = count;
+
+            const floatCart = document.getElementById('floatingMobileCart');
+            const floatBadge = document.getElementById('floatCartBadge');
+            const floatTotal = document.getElementById('floatCartTotal');
+            if (floatCart) {
+                if (count > 0) {
+                    const totalAmt = cart.reduce((sum, item) => sum + ((Number(item.price) || 0) * (Number(item.qty) || 0)), 0);
+                    if (floatBadge) floatBadge.textContent = count;
+                    if (floatTotal) floatTotal.textContent = `${totalAmt.toLocaleString()} บาท`;
+                    floatCart.classList.add('visible');
+                } else {
+                    floatCart.classList.remove('visible');
+                }
+            }
         }
 
         function checkCookieConsent() {
@@ -4500,7 +4852,7 @@
             }
 
             // กรองสินค้าเฉพาะที่มีสต็อก และเป็นเมนูขายดีหรือเรตติ้งดี
-            let recommended = currentProducts.filter(p => p.stock > 0 && (p.tag.includes('ขายดี') || p.tag.includes('ซิกเนเจอร์') || p.rating.includes('5.0') || p.rating.includes('4.9')));
+            let recommended = currentProducts.filter(p => (Number(p.stock) || 0) > 0 && ((p.tag && (p.tag.includes('ขายดี') || p.tag.includes('ซิกเนเจอร์'))) || (p.rating && (p.rating.includes('5.0') || p.rating.includes('4.9')))));
 
             // สุ่มมาแสดง 3 รายการ
             recommended = recommended.sort(() => 0.5 - Math.random()).slice(0, 3);
@@ -4753,6 +5105,9 @@
                 const safeCategory = escapeStoredText(p.category);
                 const safeTag = p.tag ? escapeStoredText(p.tag) : '';
                 const safeRating = sanitizeHtml(p.rating || '4.9 ★★★★★');
+                const isLowStock = stockCount <= 5;
+                const stockBadgeClass = isLowStock ? 'stock-badge stock-low' : 'stock-badge stock-available';
+                const stockIcon = isLowStock ? '⚠️ ใกล้หมด' : '🟢 พร้อมส่ง';
                 const adminButtons = isAdminMode ? `
                     <button class="btn-act edit" title="แก้ไข" onclick="editProduct(${htmlJsArg(p.id)})">✏️</button>
                     <button class="btn-act delete" title="ลบ" onclick="deleteProduct(${htmlJsArg(p.id)})">🗑️</button>
@@ -4762,7 +5117,7 @@
                     <div class="card-img-wrapper">
                         <img src="${safeImageAttribute(p.image)}" alt="${safeName}" loading="lazy" onerror="this.onerror=null; this.src='${fallbackImageBase64}';">
                         ${safeTag ? `<div class="card-ribbon-tag">${safeTag}</div>` : ''}
-                        <div class="stock-badge">คงเหลือ ${safeDisplayNumber(stockCount)} กระบอก</div>
+                        <div class="${stockBadgeClass}">${stockIcon} คงเหลือ ${safeDisplayNumber(stockCount)} กระบอก</div>
                     </div>
                     <div class="card-body">
                         <div class="card-category-rating">
@@ -4785,6 +5140,24 @@
             });
 
             syncStorage();
+        }
+
+                function showCartToast(message) {
+            let toast = document.getElementById('cartToastNotification');
+            if (!toast) {
+                toast = document.createElement('div');
+                toast.id = 'cartToastNotification';
+                toast.className = 'cart-quick-toast';
+                document.body.appendChild(toast);
+            }
+            toast.innerHTML = `<span>${sanitizeHtml(message)}</span> <button type="button" onclick="openCartModal()" class="btn-toast-viewcart">ดูตะกร้า →</button>`;
+            toast.classList.add('show');
+            if (typeof window !== 'undefined') {
+                if (window._cartToastTimer) clearTimeout(window._cartToastTimer);
+                window._cartToastTimer = setTimeout(() => {
+                    if (toast && toast.classList) toast.classList.remove('show');
+                }, 3200);
+            }
         }
 
         function addToCart(productId) {
@@ -4812,6 +5185,7 @@
 
             syncStorage();
             
+            showCartToast(`🛒 เพิ่ม "${product.name}" ลงในตะกร้าแล้ว`);
             const cartBtn = document.querySelector('.header-actions button:nth-child(3)');
             if (cartBtn) {
                 cartBtn.style.transform = 'scale(1.15)';
@@ -5227,8 +5601,10 @@
         }
 
         function applyFilters() {
-            const query = document.getElementById('filterKeyword').value.trim().toLowerCase();
-            let filtered = currentProducts;
+            const query = (document.getElementById('filterKeyword')?.value || '').trim().toLowerCase();
+            const sortElem = document.getElementById('filterSort');
+            const sortMode = (sortElem && sortElem.value) ? sortElem.value : 'default';
+            let filtered = [...currentProducts];
 
             if (activeCategory !== 'all') {
                 filtered = filtered.filter(p => p.category === activeCategory);
@@ -5236,13 +5612,23 @@
 
             if (query) {
                 filtered = filtered.filter(p => 
-                    p.name.toLowerCase().includes(query) || 
-                    p.desc.toLowerCase().includes(query)
+                    (p.name && p.name.toLowerCase().includes(query)) || 
+                    (p.desc && p.desc.toLowerCase().includes(query))
                 );
+            }
+
+            if (sortMode === 'price-asc') {
+                filtered.sort((a, b) => (Number(a.price) || 0) - (Number(b.price) || 0));
+            } else if (sortMode === 'price-desc') {
+                filtered.sort((a, b) => (Number(b.price) || 0) - (Number(a.price) || 0));
+            } else if (sortMode === 'stock-desc') {
+                filtered.sort((a, b) => (Number(b.stock) || 0) - (Number(a.stock) || 0));
             }
             
             // เรียกใช้ระบบอัปเดตหน้าหลักและเมนูแนะนำ
-            renderRecommendedProducts(query, activeCategory);
+            if (typeof renderRecommendedProducts === 'function') {
+                renderRecommendedProducts(query, activeCategory);
+            }
             renderItems(filtered);
         }
 
