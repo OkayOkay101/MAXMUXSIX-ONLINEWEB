@@ -336,6 +336,12 @@
         }
 
         .container { max-width: 1200px; margin: 0 auto; padding: 1rem 1.5rem 4rem; }
+        /* เดสก์ท็อป: แสดงเมนูทั้งหมดก่อน แล้วค่อยเมนูแนะนำ เพื่อให้เห็นสินค้าครบตั้งแต่หน้าแรก */
+        @media (min-width: 1024px) {
+            main.container { display: flex; flex-direction: column; }
+            main.container > #productDisplayGrid { order: -1; }
+            main.container > #recommendedSection { margin-top: 2rem; }
+        }
         
         /* สไตล์เสริมสำหรับระบบแนะนำสินค้าบนหน้าหลัก */
         .recommended-scroll-area {
