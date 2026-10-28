@@ -175,6 +175,9 @@
             margin: 0 4px;
         }
 
+        .products-heading { max-width: 1200px; margin: 1.5rem auto 0.5rem; padding: 0 1.5rem; font-size: 1.6rem; color: #F4F1DE; display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.4rem 0.8rem; }
+        .products-heading span { font-size: 0.95rem; font-weight: 400; color: #8BA89B; }
+        @media (max-width: 600px) { .products-heading { font-size: 1.25rem; padding: 0 1rem; margin-top: 1rem; } }
         .hero { text-align: center; padding: 4rem 1.5rem 2.5rem; position: relative; }
         .trailer-section {
             max-width: 1100px;
@@ -333,6 +336,12 @@
         }
 
         .container { max-width: 1200px; margin: 0 auto; padding: 1rem 1.5rem 4rem; }
+        /* เดสก์ท็อป: แสดงเมนูทั้งหมดก่อน แล้วค่อยเมนูแนะนำ เพื่อให้เห็นสินค้าครบตั้งแต่หน้าแรก */
+        @media (min-width: 1024px) {
+            main.container { display: flex; flex-direction: column; }
+            main.container > #productDisplayGrid { order: -1; }
+            main.container > #recommendedSection { margin-top: 2rem; }
+        }
         
         /* สไตล์เสริมสำหรับระบบแนะนำสินค้าบนหน้าหลัก */
         .recommended-scroll-area {
@@ -2533,6 +2542,49 @@
         </div>
     </div>
 
+    <h1 class="products-heading" id="productsHeading">🎋 เมนูข้าวหลาม MAXMUXSIX <span>เลือกเมนูแล้วกดใส่ตะกร้าได้เลย</span></h1>
+    <div class="controls-wrapper" aria-labelledby="productsHeading">
+        <div class="search-container">
+            <input type="text" id="filterKeyword" placeholder="🔍 ค้นหาเมนู เช่น ถั่วดำ, ช็อตมะพร้าว, สังขยา..." oninput="applyFilters()">
+        </div>
+        <div class="filter-group">
+            <button class="btn-filter active" onclick="selectCategory('all', this)">ทั้งหมด</button>
+            <button class="btn-filter" onclick="selectCategory('สูตรเตาถ่านแท้', this)">สูตรเตาถ่านแท้</button>
+            <button class="btn-filter" onclick="selectCategory('เมนูช็อตไฟลุก', this)">เมนูช็อตไฟลุก</button>
+            <button class="btn-filter" onclick="selectCategory('รสพรีเมียม', this)">รสพรีเมียม</button>
+        </div>
+        <div class="sort-container">
+            <label for="filterSort" class="sort-label">⚡ เรียงตาม:</label>
+            <select id="filterSort" class="select-sort" onchange="applyFilters()">
+                <option value="default">⭐ เมนูแนะนำ</option>
+                <option value="price-asc">💵 ราคา: ต่ำ → สูง</option>
+                <option value="price-desc">💎 ราคา: สูง → ต่ำ</option>
+                <option value="stock-desc">📦 มีสินค้าพร้อมส่ง</option>
+            </select>
+        </div>
+    </div>
+
+    <main class="container">
+        <!-- ระบบแนะนำสินค้าบนหน้าหลัก (Product Recommendations) -->
+        <div id="recommendedSection" style="display: none;"></div>
+
+        <div class="grid" id="productDisplayGrid"></div>
+
+        <div class="storage-bar">
+            <div class="storage-status">
+                📦 สต็อกเมนู: <strong id="productCounter">0 รายการ</strong>
+                <span style="font-size: 0.85rem; color: #8BA89B; margin-left: 8px;">(ระบบ LocalStorage)</span>
+            </div>
+            <div class="storage-btns">
+                <button class="btn-db" onclick="backupToJson()">📥 สำรองข้อมูล (JSON)</button>
+                <button class="btn-db" onclick="document.getElementById('uploadJsonInput').click()">📤 นำเข้าข้อมูล</button>
+                <input type="file" id="uploadJsonInput" style="display: none;" accept=".json" onchange="restoreFromJson(event)">
+                <button class="btn-db reset" onclick="resetToDefault()">🔄 คืนค่าเริ่มต้น</button>
+            </div>
+        </div>
+    </main>
+
+    <!-- ข้อมูลแบรนด์/ตัวอย่าง/ขั้นตอน ย้ายมาไว้หลังรายการสินค้า เพื่อให้ลูกค้าเห็นเมนูทันที -->
     <section class="hero">
         <div class="emblem-badge">
             <div class="emblem-title">MAXMUXSIX</div>
@@ -2605,46 +2657,6 @@
         </div>
     </section>
 
-    <div class="controls-wrapper">
-        <div class="search-container">
-            <input type="text" id="filterKeyword" placeholder="🔍 ค้นหาเมนู เช่น ถั่วดำ, ช็อตมะพร้าว, สังขยา..." oninput="applyFilters()">
-        </div>
-        <div class="filter-group">
-            <button class="btn-filter active" onclick="selectCategory('all', this)">ทั้งหมด</button>
-            <button class="btn-filter" onclick="selectCategory('สูตรเตาถ่านแท้', this)">สูตรเตาถ่านแท้</button>
-            <button class="btn-filter" onclick="selectCategory('เมนูช็อตไฟลุก', this)">เมนูช็อตไฟลุก</button>
-            <button class="btn-filter" onclick="selectCategory('รสพรีเมียม', this)">รสพรีเมียม</button>
-        </div>
-        <div class="sort-container">
-            <label for="filterSort" class="sort-label">⚡ เรียงตาม:</label>
-            <select id="filterSort" class="select-sort" onchange="applyFilters()">
-                <option value="default">⭐ เมนูแนะนำ</option>
-                <option value="price-asc">💵 ราคา: ต่ำ → สูง</option>
-                <option value="price-desc">💎 ราคา: สูง → ต่ำ</option>
-                <option value="stock-desc">📦 มีสินค้าพร้อมส่ง</option>
-            </select>
-        </div>
-    </div>
-
-    <main class="container">
-        <!-- ระบบแนะนำสินค้าบนหน้าหลัก (Product Recommendations) -->
-        <div id="recommendedSection" style="display: none;"></div>
-
-        <div class="grid" id="productDisplayGrid"></div>
-
-        <div class="storage-bar">
-            <div class="storage-status">
-                📦 สต็อกเมนู: <strong id="productCounter">0 รายการ</strong>
-                <span style="font-size: 0.85rem; color: #8BA89B; margin-left: 8px;">(ระบบ LocalStorage)</span>
-            </div>
-            <div class="storage-btns">
-                <button class="btn-db" onclick="backupToJson()">📥 สำรองข้อมูล (JSON)</button>
-                <button class="btn-db" onclick="document.getElementById('uploadJsonInput').click()">📤 นำเข้าข้อมูล</button>
-                <input type="file" id="uploadJsonInput" style="display: none;" accept=".json" onchange="restoreFromJson(event)">
-                <button class="btn-db reset" onclick="resetToDefault()">🔄 คืนค่าเริ่มต้น</button>
-            </div>
-        </div>
-    </main>
 
     <!-- Section: หน้าร้านจริง & ช่องทางการติดต่อ (Storefront & Contact Mockup) -->
     <section id="storeContactSection" class="store-contact-section">
