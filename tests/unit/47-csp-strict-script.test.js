@@ -33,6 +33,11 @@ describe('47. Strict CSP: no inline event handlers, hashed inline script only', 
         }
     });
 
+    it('pins index.html to LF so a Windows checkout keeps the hash valid', () => {
+        const attrs = fs.existsSync(path.join(root, '.gitattributes')) ? fs.readFileSync(path.join(root, '.gitattributes'), 'utf8') : '';
+        assert.match(attrs, /^index\.html\s+text\s+eol=lf\s*$/m);
+    });
+
     it('loads the action dispatcher before the app script and publishes it', () => {
         assert.ok(html.indexOf('<script src="assets/js/actions.js"></script>') > 0);
         assert.ok(html.indexOf('assets/js/actions.js') < html.indexOf('<script>\n'));
