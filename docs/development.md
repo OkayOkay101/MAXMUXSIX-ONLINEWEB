@@ -1,8 +1,11 @@
 # Development
 
+The Thai version is [development_TH.md](development_TH.md).
+
 ## Requirements
 
-- Node.js 22 or later. The Supabase SDK is pinned to `2.117.3` in `package.json`.
+- Node.js 22 or later (required by [cloud-membership-setup.md](cloud-membership-setup.md); `package.json` has no `engines` field).
+- `@supabase/supabase-js` is pinned to `2.117.3` in `package.json`.
 - Google Chrome, only for the browser test in `tests/browser/membership.cjs`.
 
 ## Install
@@ -11,24 +14,32 @@
 npm ci --ignore-scripts
 ```
 
-`--ignore-scripts` skips install scripts. The build does not need them.
+`--ignore-scripts` skips install scripts. The build and test suite do not need them.
 
-## Commands
+## npm scripts
 
-| Command | What it does |
+| Command | What it runs |
 |---|---|
-| `npm test` | Runs `node --test tests/unit/*.test.js` |
-| `npm run test:verbose` | Same tests with the spec reporter |
-| `npm run build:auth` | Bundles `assets/js/supabase-entry.js` into `assets/vendor/supabase.js` with esbuild |
-| `npm run csp:hash` | Runs `scripts/csp-hash.js` to compute the inline script hash for the Content Security Policy |
+| `npm test` | `node --test tests/unit/*.test.js` |
+| `npm run test:verbose` | The same unit tests with the `spec` reporter |
+| `npm run build:auth` | `esbuild` bundles `assets/js/supabase-entry.js` into `assets/vendor/supabase.js` |
+| `npm run csp:hash` | `node scripts/csp-hash.js` (updates inline `<script>` SHA-256 hashes in `index.html`) |
+
+**CSP hash rule:** `index.html` uses a strict `script-src` without `'unsafe-inline'`. Whenever you edit an inline `<script>` in `index.html`, run `npm run csp:hash` before committing; otherwise `tests/unit/47-csp-strict-script.test.js` will fail and browsers will block the script. Note that `.gitattributes` pins `index.html` to LF line endings so hashes stay identical across Windows and Linux.
 
 ## Deployment build
 
-`vercel.json` sets the build command to `node scripts/build-public.js` and the output directory to `public`. The script copies only the files listed in `PUBLIC_FILES` into `public/`. It refuses to run if a listed file is missing, and it refuses to delete the project folder.
+`vercel.json` sets `"framework": null`, `"installCommand": ""`, `"buildCommand": "node scripts/build-public.js"`, and `"outputDirectory": "public"`.
 
-Files that are not listed (tests, docs, Apps Script files, Supabase code) are not published.
+`scripts/build-public.js` copies only the 18 files listed in `PUBLIC_FILES` into `public/`. It fails if any listed file is missing, and refuses to delete the project root or its parent. Files outside `PUBLIC_FILES` (tests, docs, Apps Script files, Supabase code) are not published.
 
-Security headers for the deployed site are set in `vercel.json`: `X-Frame-Options: DENY`, a `frame-ancestors 'none'` CSP, `nosniff`, `no-referrer`, a restricted `Permissions-Policy`, and HSTS.
+`vercel.json` also sets six security headers on `/(.*)`:
+- `X-Frame-Options: DENY`
+- `Content-Security-Policy: frame-ancestors 'none'`
+- `X-Content-Type-Options: nosniff`
+- `Referrer-Policy: no-referrer`
+- `Permissions-Policy: camera=(), microphone=(), geolocation=()`
+- `Strict-Transport-Security: max-age=31536000; includeSubDomains`
 
 ## Browser test for membership
 
@@ -36,27 +47,33 @@ Security headers for the deployed site are set in `vercel.json`: `X-Frame-Option
 PLAYWRIGHT_MODULE=/path/to/playwright node tests/browser/membership.cjs
 ```
 
-The script uses a mocked Supabase provider. It does not send email or delete real accounts. Set `PLAYWRIGHT_MODULE` to the path of an installed Playwright module.
+The script uses a mocked Supabase provider. It does not send email or delete real accounts. `PLAYWRIGHT_MODULE` must point to an installed Playwright module, and the script launches Google Chrome.
+
+## Unit tests
+
+`npm test` runs `tests/unit/*.test.js`. Three database test files (`12-membership-database.test.js`, `35-order-email-database.test.js`, and `41-shop-orders-database.test.js`) run the SQL migrations in an in-memory PostgreSQL (`@electric-sql/pglite`). Other tests load browser scripts and Apps Script files through the helpers in `tests/helpers/`.
+
+`tests/runtime/auth-email-webhook.test.ts` is a TypeScript runtime test. No npm script runs it, so `npm test` does not include it.
 
 ## Supabase
 
-- Migrations are in `supabase/migrations/`. Run each file once, in order, on a new project. Do not run a migration twice.
-- Edge Functions are in `supabase/functions/`. Deploy with the Supabase CLI (see [the membership setup guide](cloud-membership-setup.md)).
-- Unit tests use an in-memory PostgreSQL (PGlite) to run the migrations and RLS checks locally. They do not test a hosted Supabase project.
+- Migrations are in `supabase/migrations/`. Follow the order and the one-time rule in [cloud-membership-setup.md](cloud-membership-setup.md). Do not run a migration twice.
+- Edge Functions are in `supabase/functions/`. Deploy them with the Supabase CLI as described in the membership guide.
+- Unit tests do not hit a live hosted Supabase project.
 
 ## Google Apps Script
 
-Each `.js` file at the root that ends in `_apps_script.js` is pasted into its own Apps Script project. The Apps Script files are not covered by the build.
+Each of these root files is pasted into its own Apps Script project:
 
-- `google_apps_script.js`: order and receipt emails
+- `google_apps_script.js`: order and welcome emails
 - `google_auth_apps_script.js`: auth email relay (deploy in a separate project)
-- `line_bot_smart_apps_script.js` or `line_bot_apps_script.js`: LINE bot. Choose one.
+- `line_bot_smart_apps_script.js` or `line_bot_apps_script.js`: LINE bot (choose one; see [ADR 0001](adr/0001-keep-two-line-bots.md))
 
-Do not put two LINE bot files in one project.
+Do not put both LINE bot files in the same Apps Script project. Apps Script files are not part of the Vercel build.
 
-## Tests folder
+## Test folders
 
-- `tests/unit/`: unit tests, one file per area (cart, catalog filters, auth, order email, LINE, captcha, and others)
-- `tests/helpers/`: loaders that run browser scripts and Apps Script files in Node
-- `tests/browser/`: browser test for membership
-- `tests/runtime/`: runtime test for the auth email webhook
+- `tests/unit/`: unit tests separated by feature/area (sanitizer, security, cart, quiz, catalog, GAS, responsive UI, LINE bot, SEO, cloud auth, PGlite DB, captcha, CSP, etc.)
+- `tests/helpers/`: loaders that execute browser scripts and Apps Script files in Node
+- `tests/browser/`: Playwright browser test for membership
+- `tests/runtime/`: TypeScript runtime test for the auth email webhook (not run by npm scripts)
