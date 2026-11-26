@@ -65,6 +65,18 @@
             min-height: 100vh;
         }
 
+        /* Demo notice: always visible, no close control */
+        .demo-notice {
+            background: #FFE066;
+            color: #3D0000;
+            font-size: 0.9rem;
+            font-weight: 800;
+            line-height: 1.5;
+            text-align: center;
+            padding: 8px 12px;
+            border-bottom: 3px solid #D00000;
+        }
+
         /* Header Navigation */
         header {
             background: #0D2218;
@@ -2459,6 +2471,8 @@
 </head>
 <body>
 
+    <div id="demoBanner" class="demo-notice" role="note">🧪 เว็บตัวอย่าง ไม่มีการขายหรือจัดส่งจริง ห้ามโอนเงิน</div>
+
     <div class="promo-banner">
         🔥 สั่งซื้อวันนี้ ใส่โค้ด <span class="promo-code-tag">MAX10</span> หรือลูกค้าใหม่ใช้ <span class="promo-code-tag">WELCOME10</span> รับส่วนลดทันที 10%!
         <button onclick="openSubscribeModal()" style="background: var(--flame-orange); color: #FFF; border: none; padding: 2px 10px; border-radius: 20px; font-size: 0.8rem; font-weight: 700; cursor: pointer; margin-left: 8px; transition: 0.2s;">
@@ -3153,6 +3167,8 @@
                 <h3>💳 ชำระเงินผ่าน PromptPay QR</h3>
                 <button class="btn-close" onclick="closePaymentModal()">&times;</button>
             </div>
+
+            <div class="demo-notice" role="note" style="border: 2px solid #D00000; border-radius: 10px; margin-bottom: 12px;">🧪 เว็บตัวอย่าง ไม่มีการขายหรือจัดส่งจริง ห้ามโอนเงิน</div>
 
             <div class="qr-section">
                 <div class="pp-logo">พร้อมเพย์ (PromptPay)</div>
