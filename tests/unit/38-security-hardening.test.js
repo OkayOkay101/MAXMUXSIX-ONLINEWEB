@@ -100,3 +100,19 @@ test('the page hides itself when another site frames it', () => {
     assert.equal(run(true), 'none');
     assert.equal(run(false), undefined);
 });
+
+const csp = name => {
+    const policy = read('index.html').match(/http-equiv="Content-Security-Policy" content="([^"]*)"/)[1];
+    const directive = policy.split(';').map(part => part.trim().split(/\s+/)).find(part => part[0] === name);
+    return directive.slice(1);
+};
+
+test('the page may call only the Supabase project it is configured for', () => {
+    const configured = read('auth-config.js').match(/url: '(https:\/\/[a-z0-9-]+\.supabase\.co)'/)[1];
+    assert.deepEqual(csp('connect-src').filter(source => source.includes('supabase')), [configured]);
+    assert.ok(!csp('connect-src').some(source => source.includes('*')));
+});
+
+test('no script may be loaded from the font host', () => {
+    assert.ok(!csp('script-src').some(source => source.includes('fonts.googleapis.com')));
+});

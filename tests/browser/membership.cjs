@@ -6,7 +6,8 @@ const path = require('node:path');
 const { pathToFileURL } = require('node:url');
 
 const site = pathToFileURL(path.resolve(__dirname, '../../index.html')).href;
-const project = 'https://test.supabase.co';
+// The page's CSP allows only this host. Every request to it is answered by the mock route in configure().
+const project = 'https://lxvxffrexegvqzeojztw.supabase.co';
 const adminId = '11111111-1111-4111-8111-111111111111';
 const buyerId = '22222222-2222-4222-8222-222222222222';
 const users = new Map([

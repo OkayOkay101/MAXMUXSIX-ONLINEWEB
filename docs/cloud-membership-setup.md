@@ -40,7 +40,7 @@ window.MAXMUXSIX_AUTH_CONFIG = Object.freeze({
 
 สองค่านี้เป็น public config จึงเห็นได้ใน browser และ commit ได้ สิทธิ์ข้อมูลต้องคุมด้วย RLS ไม่ใช่การซ่อน public key ห้ามใส่ `service_role`, `sb_secret`, database password, access token หรือ SMTP password ลงไฟล์/แชต
 
-รองรับ Supabase hosted URL `https://*.supabase.co` ถ้าใช้ custom domain หรือ self-hosted ต้องปรับ validation และ CSP connect-src ให้ตรง origin ที่ตั้งใจใช้งานก่อน
+รองรับ Supabase hosted URL `https://*.supabase.co` แต่ CSP `connect-src` ใน `index.html` อนุญาตเฉพาะ origin ของโปรเจกต์ที่ตั้งไว้ ถ้าเปลี่ยนโปรเจกต์ต้องแก้ CSP ให้ตรงกันด้วย ส่วน custom domain หรือ self-hosted ต้องปรับ validation และ CSP ก่อน
 
 ## 4. Deploy ฟังก์ชันจัดการผู้ใช้
 
