@@ -4358,6 +4358,20 @@
             web3formsKey: '',
             websiteUrl: 'https://maxmuxsix-demo.vercel.app/'
         };
+        function persistEmailSettings() {
+            if (typeof emailSettings !== 'object' || !emailSettings) return;
+            const { gasToken: _gt, web3formsKey: _wk, ...publicSettings } = emailSettings;
+            try { localStorage.setItem('maxmuxsix_email_settings', JSON.stringify(publicSettings)); } catch (_) {}
+        }
+        // Keep relay secrets in-memory only; scrub any legacy secrets from localStorage on load.
+        if (emailSettings.gasToken || emailSettings.web3formsKey) {
+            emailSettings.gasToken = '';
+            emailSettings.web3formsKey = '';
+            persistEmailSettings();
+        } else {
+            emailSettings.gasToken = '';
+            emailSettings.web3formsKey = '';
+        }
         if (!emailSettings.websiteUrl) {
             emailSettings.websiteUrl = 'https://maxmuxsix-demo.vercel.app/';
         }
@@ -4686,9 +4700,9 @@
 
         function clearSavedEmailSecrets() {
             if (typeof emailSettings === 'object' && emailSettings) {
-                delete emailSettings.gasToken;
-                delete emailSettings.web3formsKey;
-                try { localStorage.setItem('maxmuxsix_email_settings', JSON.stringify(emailSettings)); } catch (_) {}
+                emailSettings.gasToken = '';
+                emailSettings.web3formsKey = '';
+                persistEmailSettings();
             }
         }
 
@@ -6312,11 +6326,11 @@
                 statusMeta.innerHTML = `<span style="color:#FAA307;">⏳ กำลังเชื่อมต่อส่งอีเมลจริง...</span>`;
             }
 
-            // ดึงค่าล่าสุดจาก input เผื่อผู้ใช้เพิ่งวางแล้วกดส่งทันที
+            // ดึงค่าล่าสุดจาก input เผื่อผู้ใช้เพิ่งวางแล้วกดส่งทันที (เก็บใน memory เท่านั้น ไม่บันทึกลง localStorage)
             const keyInput = document.getElementById('settingWeb3FormsKey');
             if (keyInput && keyInput.value.trim()) {
                 emailSettings.web3formsKey = keyInput.value.trim();
-                localStorage.setItem('maxmuxsix_email_settings', JSON.stringify(emailSettings));
+                persistEmailSettings();
             }
 
             let result = { success: false, method: 'none', message: '' };
@@ -6489,7 +6503,7 @@
         function autoSaveWeb3FormsKey(val) {
             const key = val.trim();
             emailSettings.web3formsKey = key;
-            localStorage.setItem('maxmuxsix_email_settings', JSON.stringify(emailSettings));
+            persistEmailSettings();
 
             const badge = document.getElementById('web3formsKeyBadge');
             if (badge) {
@@ -6690,7 +6704,7 @@ function testRun() {
         function autoSaveGasUrl(val) {
             const url = val.trim();
             emailSettings.gasUrl = url;
-            localStorage.setItem('maxmuxsix_email_settings', JSON.stringify(emailSettings));
+            persistEmailSettings();
             const badge = document.getElementById('gasStatusBadge');
             if (badge) {
                 if (url.includes('script.google.com')) {
@@ -6853,7 +6867,7 @@ function testRun() {
                 websiteUrl: emailSettings.websiteUrl || 'https://maxmuxsix-demo.vercel.app/'
             };
 
-            localStorage.setItem('maxmuxsix_email_settings', JSON.stringify(emailSettings));
+            persistEmailSettings();
             if (keyVal) autoSaveWeb3FormsKey(keyVal);
             if (gasVal) autoSaveGasUrl(gasVal);
             updateQuickBarStatus();
@@ -6864,7 +6878,7 @@ function testRun() {
             const keyInput = document.getElementById('settingWeb3FormsKey');
             if (keyInput && keyInput.value.trim()) {
                 emailSettings.web3formsKey = keyInput.value.trim();
-                localStorage.setItem('maxmuxsix_email_settings', JSON.stringify(emailSettings));
+                persistEmailSettings();
             }
 
             const emailInput = document.getElementById('testRecipientEmailInput');
@@ -6881,7 +6895,7 @@ function testRun() {
                 const gasInput = document.getElementById('settingGasUrl');
                 if (gasInput && gasInput.value.trim()) {
                     emailSettings.gasUrl = gasInput.value.trim();
-                    localStorage.setItem('maxmuxsix_email_settings', JSON.stringify(emailSettings));
+                    persistEmailSettings();
                 }
                 if (!emailSettings.gasUrl) {
                     alert('⚠️ กรุณากรอก Web App URL ของ Google Apps Script ในช่องด้านบนก่อนกดส่งครับ\n\nหากยังไม่มี สามารถดูวิธีติดตั้งในหัวข้อ "📖 คลิกเพื่อดูวิธีรับ Web App URL" ได้เลยครับ');

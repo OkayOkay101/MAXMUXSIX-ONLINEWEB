@@ -18,6 +18,6 @@ Deno.serve(createAuthEmailHandler({
         siteUrl: Deno.env.get('SITE_URL'),
         gasUrl: Deno.env.get('AUTH_GAS_URL'),
         relaySecret: Deno.env.get('AUTH_GAS_RELAY_SECRET'),
-        upstreamTimeoutMs: 3500
+        upstreamTimeoutMs: 4500
     }
 }));
