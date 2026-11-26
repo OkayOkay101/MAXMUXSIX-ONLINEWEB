@@ -1,19 +1,13 @@
 /**
  * =========================================================================
- * 🤖 UPGRADED LINE OFFICIAL ACCOUNT CHATBOT & BROADCAST SYSTEM
- * (Google Apps Script - ระบบแชทบอทตอบคำถามอัตโนมัติ + ระบบบรอดแคสต์ผ่านชีต)
+ * 🤖 MAXMUXSIX LINE LOG BOT & BROADCAST SYSTEM (Google Apps Script)
  * =========================================================================
- * 
- * 🌟 ความสามารถหลักของระบบ:
- * 1. 📢 One-Click LINE Broadcast: ยิงบรอดแคสต์หาเพื่อนทุกคน หรือเฉพาะลูกค้าเก่า ผ่านเมนูใน Google Sheets
- * 2. 🧪 Test Before Send: มีระบบทดสอบยิงเข้าไลน์ตัวเองก่อน เพื่อตรวจดูความสวยงามก่อนยิงหาลูกค้าจริง
- * 3. 📊 Quota Checker: ตรวจสอบโควตาข้อความคงเหลือประจำเดือนของ LINE ได้ทันทีในคลิกเดียว
- * 4. 📋 Smart Intent Routing: ตอบคำถามยอดฮิตอัตโนมัติ (เมนู, ราคา, โปรโมชั่น, พิกัด, ค่าส่ง, บัญชี, ติดต่อคน)
- * 5. 📑 Dynamic FAQ from Google Sheets: เพิ่มคำถาม-คำตอบเองในชีตได้ทันที ไม่ต้องแตะโค้ด
- * 6. 🛒 Multi-Turn Conversation (Order Wizard): จำบริบท ถาม-ตอบเป็นลำดับขั้นตอน บันทึกคำสั่งซื้อลงชีต
- * 7. ⚡ Contextual Quick Reply: มีปุ่มนำทางลอยให้ลูกค้ากดได้ทันทีทุกข้อความ
- * 8. 🛡️ Robust Webhook Handler: รองรับปุ่ม Verify, กัน Error 302, มีหน้า doGet เช็คสถานะ 24 ชม.
- * 
+ *
+ * ความสามารถ:
+ * 1. บันทึกข้อความและพิกัดที่ลูกค้าส่งมาลงแท็บ "Chat_History"
+ * 2. ตอบรับสั้น ๆ ข้อความเดียว แล้วให้แอดมินตอบเองในแชต
+ * 3. บรอดแคสต์ผ่านเมนูใน Google Sheet พร้อมทดสอบส่งและตรวจโควตา
+ *
  * -------------------------------------------------------------------------
  * ⚙️ การตั้งค่าก่อนใช้งาน:
  * 0. (ความปลอดภัย) ตั้ง Script Property ชื่อ LINE_WEBHOOK_KEY เป็นรหัสสุ่ม 32 ตัวขึ้นไป
@@ -37,12 +31,14 @@ const CHANNEL_ACCESS_TOKEN = scriptProperty("LINE_CHANNEL_ACCESS_TOKEN");
 // วิธีดู User ID: ดูได้จากแท็บ "Chat_History" เมื่อคุณพิมพ์ทักไลน์บอทเข้ามา จะมี User ID ขึ้นต้นด้วย U...
 const ADMIN_USER_ID = scriptProperty("LINE_ADMIN_USER_ID");
 
-// 🏪 3. ข้อมูลร้านค้า (ปรับเปลี่ยนให้ตรงกับธุรกิจของคุณได้ทันที)
+// 🏪 3. ชื่อร้าน (ใช้ในหน้าตรวจสถานะ)
 const SHOP_CONFIG = {
-  shopName: "MAXMUXSIX ข้าวหลามเตาถ่าน",
-  businessHours: "ทุกวัน 08:00 - 18:00 น.",
-  address: "ร้าน MAXMUXSIX ถนนสายหลัก ตลาดเตาถ่าน"
+  shopName: "MAXMUXSIX ข้าวหลามเตาถ่าน"
 };
+
+// ข้อความตอบกลับของบอต
+const ACK_TEXT = "ได้รับข้อความแล้วครับ ✅ กรุณารอแอดมินตอบกลับในแชตนี้";
+const WELCOME_TEXT = "สวัสดีครับ ยินดีต้อนรับสู่ MAXMUXSIX ข้าวหลามเตาถ่าน 🎋\nพิมพ์ข้อความไว้ในแชตนี้ได้เลยครับ แล้วรอแอดมินตอบกลับ";
 
 // =========================================================================
 // 📢 BROADCAST & GOOGLE SHEETS CUSTOM MENU (ระบบเมนูบรอดแคสต์บน Google Sheet)
@@ -395,7 +391,7 @@ function buildBroadcastMessages(draft) {
     text: draft.text
   };
 
-  // สร้าง Quick Reply ตามที่ระบุไว้ หรือใช้ค่าเริ่มต้น
+  // แนบปุ่ม Quick Reply เฉพาะเมื่อระบุไว้ในชีต
   if (draft.quickReplyItems && draft.quickReplyItems.length > 0) {
     textMsg.quickReply = {
       items: draft.quickReplyItems.map(function(label) {
@@ -409,8 +405,6 @@ function buildBroadcastMessages(draft) {
         };
       })
     };
-  } else {
-    textMsg.quickReply = getMainQuickReply();
   }
 
   messages.push(textMsg);
@@ -626,8 +620,8 @@ function doPost(e) {
 
       // 1. กรณีผู้ใช้แอดไลน์หรือปลดบล็อก (Follow Event) -> ส่งข้อความต้อนรับทันที
       if (event.type === "follow") {
-        sendWelcomeMessage(replyToken);
         logChat(ss, userId, "[FOLLOW: เพิ่มเพื่อนใหม่]", "ส่งข้อความต้อนรับ");
+        sendLineReply(replyToken, [{ type: "text", text: WELCOME_TEXT }]);
         continue;
       }
 
@@ -651,366 +645,13 @@ function doPost(e) {
 }
 
 // =========================================================================
-// 🧠 CORE CONVERSATION ENGINE (ระบบประมวลผลบทสนทนา)
+// 🧠 รับข้อความ: จดลงชีตและตอบรับ
 // =========================================================================
 
 function handleUserMessage(ss, replyToken, userId, text) {
-  const lowerText = text.toLowerCase();
-
-  // 1. ตรวจสอบการยกเลิก / รีเซ็ต
-  if (lowerText === "ยกเลิก" || lowerText === "เริ่มใหม่" || lowerText === "เมนูหลัก" || lowerText === "menu") {
-    clearUserState(ss, userId);
-    sendWelcomeMessage(replyToken, "🔄 กลับสู่เมนูหลักเรียบร้อยแล้วครับ! เลือกหัวข้อที่สนใจได้เลยครับ 👇");
-    logChat(ss, userId, text, "รีเซ็ตสถานะกลับสู่เมนูหลัก");
-    return;
-  }
-
-  // 2. ตรวจสอบขั้นตอนการคุยต่อเนื่อง (Multi-Step Conversation)
-  const state = getUserState(ss, userId);
-  if (state && state.step) {
-    const isStepHandled = handleMultiStepFlow(ss, replyToken, userId, text, state);
-    if (isStepHandled) return;
-  }
-
-  // 3. Smart Intent Matching (จับใจความสำคัญของคำถามยอดฮิต)
-  const intentResult = matchSmartIntents(text);
-  if (intentResult) {
-    sendLineReply(replyToken, intentResult.messages);
-    logChat(ss, userId, text, intentResult.intentName);
-
-    if (intentResult.startFlow === "ORDER_FLOW") {
-      setUserState(ss, userId, "ORDER_STEP_1_SELECT_PRODUCT", {});
-    }
-    return;
-  }
-
-  // 4. Dynamic Sheet FAQ (ดึงคำตอบจากแท็บ FAQ ในชีต)
-  const faqAnswer = searchFaqFromSheet(ss, text);
-  if (faqAnswer) {
-    sendLineReply(replyToken, [
-      {
-        type: "text",
-        text: faqAnswer,
-        quickReply: getGeneralQuickReply()
-      }
-    ]);
-    logChat(ss, userId, text, "[FAQ-SHEET]: " + faqAnswer.substring(0, 30));
-    return;
-  }
-
-  // 5. Fallback Handler เมื่อไม่เข้าใจคำถาม
-  sendFallbackMessage(replyToken, text);
-  logChat(ss, userId, text, "[FALLBACK]: ไม่เข้าใจคำถาม");
-}
-
-function matchSmartIntents(text) {
-  const t = text.toLowerCase();
-
-  // ทักทาย
-  if (/^(สวัสดี|ดีครับ|ดีค่ะ|หวัดดี|hello|hi|เริ่ม|สอบถาม)/.test(t)) {
-    return {
-      intentName: "GREETING",
-      messages: [{
-        type: "text",
-        text: `ยินดีต้อนรับสู่ ${SHOP_CONFIG.shopName} ครับ! 🌾🔥\n\nยินดีให้บริการครับ ลูกค้าสามารถกดเลือกหัวข้อที่ต้องการ หรือพิมพ์สอบถามได้เลยครับ`,
-        quickReply: getMainQuickReply()
-      }]
-    };
-  }
-
-  // สั่งซื้อ
-  if (/(สั่งซื้อ|สั่งของ|ซื้อ|จอง|สั่งข้าวหลาม|order)/.test(t)) {
-    return {
-      intentName: "START_ORDER",
-      startFlow: "ORDER_FLOW",
-      messages: [{
-        type: "text",
-        text: "🛒 เริ่มต้นการสั่งซื้อ/สั่งจองล่วงหน้า\n\nกรุณาเลือกชุดสินค้าที่ต้องการได้เลยครับ 👇",
-        quickReply: {
-          items: [
-            { type: "action", action: { type: "message", label: "ชุดคลาสสิก (3 กระบอก)", text: "ชุดคลาสสิก (3 กระบอก)" } },
-            { type: "action", action: { type: "message", label: "ชุดครอบครัว (5 กระบอก)", text: "ชุดครอบครัว (5 กระบอก)" } },
-            { type: "action", action: { type: "message", label: "ชุดจุใจ (10 กระบอก)", text: "ชุดจุใจ (10 กระบอก)" } },
-            { type: "action", action: { type: "message", label: "❌ ยกเลิก", text: "ยกเลิก" } }
-          ]
-        }
-      }]
-    };
-  }
-
-  // เมนูและราคา
-  if (/(เมนู|ราคา|สินค้า|มีอะไรบ้าง|ขายอะไร|ไส้)/.test(t)) {
-    return {
-      intentName: "SHOW_MENU",
-      messages: [{
-        type: "text",
-        text: `📋 เมนูแนะนำของ ${SHOP_CONFIG.shopName} 🎋\n` +
-              `------------------------------------\n` +
-              `1. ข้าวหลามกะทิสดถั่วดำ - 50.- / กระบอก\n` +
-              `2. ข้าวหลามข้าวเหนียวดำเผือกหอม - 60.- / กระบอก\n` +
-              `3. ข้าวหลามกะทิลาวามะพร้าวอ่อน - 70.- / กระบอก\n` +
-              `4. ข้าวหลามชาเขียวมัทฉะถั่วแดง - 75.- / กระบอก\n\n` +
-              `🔥 เซ็ตสุดคุ้ม:\n` +
-              `• เซ็ตครอบครัว 5 กระบอก เพียง 270.- (ปกติ 300.-)\n` +
-              `• ข้าวหลามย่างเตาถ่านแท้ หอม ละมุน หวานมันกลมกล่อม`,
-        quickReply: {
-          items: [
-            { type: "action", action: { type: "message", label: "🛒 สั่งซื้อเลย", text: "สั่งซื้อ" } },
-            { type: "action", action: { type: "message", label: "💰 ดูโปรโมชั่น", text: "โปรโมชั่น" } },
-            { type: "action", action: { type: "message", label: "🚚 ค่าจัดส่ง", text: "ค่าจัดส่ง" } },
-            { type: "action", action: { type: "message", label: "🏠 เมนูหลัก", text: "เมนูหลัก" } }
-          ]
-        }
-      }]
-    };
-  }
-
-  // โปรโมชั่น
-  if (/(โปร|โปรโมชั่น|ส่วนลด|ลดราคา|แถม|พิเศษ)/.test(t)) {
-    return {
-      intentName: "PROMOTION",
-      messages: [{
-        type: "text",
-        text: `🎉 โปรโมชั่นพิเศษประจำเดือนนี้!\n` +
-              `------------------------------------\n` +
-              `✨ สั่งครบ 10 กระบอก จัดส่งฟรีทั่วประเทศ!\n` +
-              `✨ ลูกค้าสั่งซื้อครั้งแรก รับส่วนลดทันที 20 บาท\n` +
-              `✨ สั่งจองล่วงหน้า 1 วัน แถมฟรี 1 กระบอกเล็ก! 🎋`,
-        quickReply: {
-          items: [
-            { type: "action", action: { type: "message", label: "🛒 สั่งซื้อสินค้า", text: "สั่งซื้อ" } },
-            { type: "action", action: { type: "message", label: "📋 ดูเมนูสินค้า", text: "เมนู" } },
-            { type: "action", action: { type: "message", label: "🏠 เมนูหลัก", text: "เมนูหลัก" } }
-          ]
-        }
-      }]
-    };
-  }
-
-  // การจัดส่ง
-  if (/(ส่ง|ค่าส่ง|รอบส่ง|จัดส่ง|ปลายทาง|ขนส่ง)/.test(t)) {
-    return {
-      intentName: "SHIPPING_INFO",
-      messages: [{
-        type: "text",
-        text: `🚚 ข้อมูลการจัดส่งของทางร้าน\n` +
-              `------------------------------------\n` +
-              `• รอบจัดส่ง: ทุกวันจันทร์ - เสาร์ (ตัดรอบ 10.00 น.)\n` +
-              `• กทม.และปริมณฑล: ได้รับวันถัดไปทันที\n` +
-              `• ต่างจังหวัด: 1-2 วันทำการ (แพ็กสูญญากาศรักษาความสดใหม่)\n` +
-              `• ค่าจัดส่งเริ่มต้น 50 บาท (สั่งครบ 500 บาท ส่งฟรี!)`,
-        quickReply: {
-          items: [
-            { type: "action", action: { type: "message", label: "🛒 สั่งซื้อเลย", text: "สั่งซื้อ" } },
-            { type: "action", action: { type: "message", label: "📍 หน้าร้านอยู่ที่ไหน", text: "หน้าร้าน" } },
-            { type: "action", action: { type: "message", label: "🏠 เมนูหลัก", text: "เมนูหลัก" } }
-          ]
-        }
-      }]
-    };
-  }
-
-  // หน้าร้าน
-  if (/(ร้าน|หน้าร้าน|พิกัด|เปิดกี่โมง|ปิดกี่โมง|ที่อยู่|แผนที่|อยู่ที่ไหน|สาขา)/.test(t)) {
-    return {
-      intentName: "STORE_LOCATION",
-      messages: [{
-        type: "text",
-        text: `📍 ข้อมูลหน้าร้าน ${SHOP_CONFIG.shopName}\n` +
-              `------------------------------------\n` +
-              `🏠 ที่อยู่: ${SHOP_CONFIG.address}\n` +
-              `⏰ เวลาทำการ: ${SHOP_CONFIG.businessHours}\n` +
-              `\n` +
-              `แวะมาชิมร้อนๆ จากเตาถ่านได้ทุกวันเลยครับ มีที่จอดรถสะดวกสบายครับ! 🚗`,
-        quickReply: {
-          items: [
-            { type: "action", action: { type: "location", label: "📌 แชร์พิกัดของคุณ" } },
-            { type: "action", action: { type: "message", label: "📋 เมนูสินค้า", text: "เมนู" } },
-            { type: "action", action: { type: "message", label: "👤 โทรหาหน้าร้าน", text: "ติดต่อแอดมิน" } },
-            { type: "action", action: { type: "message", label: "🏠 เมนูหลัก", text: "เมนูหลัก" } }
-          ]
-        }
-      }]
-    };
-  }
-
-  // การชำระเงิน
-  if (/(โอน|ชำระเงิน|เลขบัญชี|จ่ายเงิน|พร้อมเพย์|ธนาคาร|คิวอาร์|qr)/.test(t)) {
-    return {
-      intentName: "PAYMENT_INFO",
-      messages: [{
-        type: "text",
-        text: `💳 ช่องทางการชำระเงิน\n` +
-              `------------------------------------\n` +
-              `⏳ รอแอดมินแจ้งช่องทางชำระเงินในแชทนี้นะครับ\n` +
-              `⚠️ กรุณาอย่าเพิ่งโอนเงินจนกว่าแอดมินจะแจ้งครับ`,
-        quickReply: {
-          items: [
-            { type: "action", action: { type: "message", label: "🛒 สั่งซื้อสินค้า", text: "สั่งซื้อ" } },
-            { type: "action", action: { type: "message", label: "👤 ติดต่อแอดมิน", text: "ติดต่อแอดมิน" } },
-            { type: "action", action: { type: "message", label: "🏠 เมนูหลัก", text: "เมนูหลัก" } }
-          ]
-        }
-      }]
-    };
-  }
-
-  // ติดต่อคน / แอดมิน
-  if (/(แอดมิน|คน|คุยกับคน|ติดต่อ|โทร|เจ้าหน้าที่|พนักงาน)/.test(t)) {
-    return {
-      intentName: "CONTACT_ADMIN",
-      messages: [{
-        type: "text",
-        text: `👤 ติดต่อทีมงาน / แอดมิน\n` +
-              `------------------------------------\n` +
-              `💬 กรุณาพิมพ์ข้อความทิ้งไว้ในแชทนี้ แล้วรอแอดมินเข้ามาตอบครับ\n\n` +
-              `⏰ เวลาทำการ: ${SHOP_CONFIG.businessHours}`,
-        quickReply: {
-          items: [
-            { type: "action", action: { type: "message", label: "📋 ดูเมนูสินค้า", text: "เมนู" } },
-            { type: "action", action: { type: "message", label: "🏠 เมนูหลัก", text: "เมนูหลัก" } }
-          ]
-        }
-      }]
-    };
-  }
-
-  return null;
-}
-
-// Flow การสั่งซื้อต่อเนื่อง
-function handleMultiStepFlow(ss, replyToken, userId, text, state) {
-  const step = state.step;
-  const data = state.data || {};
-
-  if (step === "ORDER_STEP_1_SELECT_PRODUCT") {
-    data.product = text;
-    setUserState(ss, userId, "ORDER_STEP_2_QUANTITY", data);
-
-    sendLineReply(replyToken, [{
-      type: "text",
-      text: `รับทราบครับ: คุณเลือก "${text}" 🎋\n\nต้องการรับจำนวนกี่ชุดดีครับ? สามารถกดเลือกหรือพิมพ์ระบุได้เลยครับ`,
-      quickReply: {
-        items: [
-          { type: "action", action: { type: "message", label: "1 ชุด", text: "1 ชุด" } },
-          { type: "action", action: { type: "message", label: "2 ชุด", text: "2 ชุด" } },
-          { type: "action", action: { type: "message", label: "3 ชุด", text: "3 ชุด" } },
-          { type: "action", action: { type: "message", label: "5 ชุด (ส่งฟรี)", text: "5 ชุด" } },
-          { type: "action", action: { type: "message", label: "❌ ยกเลิก", text: "ยกเลิก" } }
-        ]
-      }
-    }]);
-    return true;
-  }
-
-  if (step === "ORDER_STEP_2_QUANTITY") {
-    data.quantity = text;
-    setUserState(ss, userId, "ORDER_STEP_3_CONTACT_INFO", data);
-
-    sendLineReply(replyToken, [{
-      type: "text",
-      text: `บันทึกจำนวน "${text}" แล้วครับ ✅\n\nรบกวนแจ้ง "ชื่อผู้รับ + เบอร์โทร + ที่อยู่จัดส่ง" (หรือกดปุ่มแชร์พิกัด) ได้เลยครับ 👇`,
-      quickReply: {
-        items: [
-          { type: "action", action: { type: "location", label: "📍 แชร์พิกัดที่อยู่" } },
-          { type: "action", action: { type: "message", label: "รับเองที่หน้าร้าน", text: "รับเองที่หน้าร้าน" } },
-          { type: "action", action: { type: "message", label: "❌ ยกเลิก", text: "ยกเลิก" } }
-        ]
-      }
-    }]);
-    return true;
-  }
-
-  if (step === "ORDER_STEP_3_CONTACT_INFO") {
-    data.customerInfo = text;
-    saveOrderToSheet(ss, userId, data);
-    clearUserState(ss, userId);
-
-    sendLineReply(replyToken, [{
-      type: "text",
-      text: `🎉 บันทึกคำสั่งซื้อเรียบร้อยแล้วครับ!\n` +
-            `------------------------------------\n` +
-            `📦 สินค้า: ${data.product}\n` +
-            `🔢 จำนวน: ${data.quantity}\n` +
-            `📍 ข้อมูลจัดส่ง: ${data.customerInfo}\n` +
-            `------------------------------------\n` +
-            `💳 ชำระเงิน: รอแอดมินแจ้งช่องทางในแชทนี้ (กรุณาอย่าเพิ่งโอนเงิน)\n` +
-            `เจ้าหน้าที่จะเร่งเตรียมสินค้าและแจ้งเลขพัสดุให้ทราบครับ ขอบพระคุณมากครับ! 🙏✨`,
-      quickReply: getMainQuickReply()
-    }]);
-    return true;
-  }
-
-  return false;
-}
-
-// ค้นหาในชีต FAQ
-function searchFaqFromSheet(ss, userText) {
-  try {
-    const faqSheet = ss.getSheetByName("FAQ");
-    if (!faqSheet) return null;
-    const data = faqSheet.getDataRange().getValues();
-    if (data.length <= 1) return null;
-
-    const cleanInput = userText.toLowerCase().trim();
-    for (let i = 1; i < data.length; i++) {
-      const keyword = String(data[i][0] || "").toLowerCase().trim();
-      const answer = String(data[i][1] || "").trim();
-      if (!keyword || !answer) continue;
-
-      if (cleanInput.indexOf(keyword) !== -1 || keyword.indexOf(cleanInput) !== -1) {
-        return answer;
-      }
-    }
-  } catch (err) {}
-  return null;
-}
-
-// เทมเพลต Quick Reply
-function getMainQuickReply() {
-  return {
-    items: [
-      { type: "action", action: { type: "message", label: "📋 ดูเมนูและราคา", text: "เมนู" } },
-      { type: "action", action: { type: "message", label: "🛒 สั่งซื้อสินค้า", text: "สั่งซื้อ" } },
-      { type: "action", action: { type: "message", label: "💰 โปรโมชั่น", text: "โปรโมชั่น" } },
-      { type: "action", action: { type: "message", label: "🚚 ข้อมูลจัดส่ง", text: "ค่าจัดส่ง" } },
-      { type: "action", action: { type: "message", label: "📍 หน้าร้าน/เวลา", text: "หน้าร้าน" } },
-      { type: "action", action: { type: "message", label: "💳 เลขบัญชี", text: "เลขบัญชี" } },
-      { type: "action", action: { type: "message", label: "👤 ติดต่อแอดมิน", text: "ติดต่อแอดมิน" } }
-    ]
-  };
-}
-
-function getGeneralQuickReply() {
-  return {
-    items: [
-      { type: "action", action: { type: "message", label: "🛒 สั่งซื้อเลย", text: "สั่งซื้อ" } },
-      { type: "action", action: { type: "message", label: "📋 ดูเมนูสินค้า", text: "เมนู" } },
-      { type: "action", action: { type: "message", label: "👤 ติดต่อเจ้าหน้าที่", text: "ติดต่อแอดมิน" } },
-      { type: "action", action: { type: "message", label: "🏠 เมนูหลัก", text: "เมนูหลัก" } }
-    ]
-  };
-}
-
-function sendWelcomeMessage(replyToken, customText) {
-  const welcomeText = customText || 
-    `ยินดีต้อนรับสู่ ${SHOP_CONFIG.shopName} ข้าวหลามเตาถ่านสูตรโบราณหอมกรุ่น 🎋🔥\n\n` +
-    `เราพร้อมให้บริการแล้วครับ สามารถเลือกหัวข้อที่คุณต้องการจากเมนูด้านล่างนี้ได้ทันทีเลยครับ 👇`;
-
-  sendLineReply(replyToken, [{
-    type: "text",
-    text: welcomeText,
-    quickReply: getMainQuickReply()
-  }]);
-}
-
-function sendFallbackMessage(replyToken, originalText) {
-  sendLineReply(replyToken, [{
-    type: "text",
-    text: `ขออภัยครับ บอทยังไม่เข้าใจคำถาม "${originalText}" 🙏\n\n` +
-          `ลูกค้าสามารถเลือกหัวข้อที่ต้องการทราบจากปุ่มด้านล่างนี้ หรือกด "ติดต่อแอดมิน" เพื่อให้เจ้าหน้าที่เข้ามาตอบได้เลยครับ 👇`,
-    quickReply: getMainQuickReply()
-  }]);
+  // จดก่อนตอบ: ถึง LINE จะปฏิเสธการตอบ ข้อความก็ยังอยู่ในชีต
+  logChat(ss, userId, text, "ตอบรับข้อความ");
+  sendLineReply(replyToken, [{ type: "text", text: ACK_TEXT }]);
 }
 
 function sendLineReply(replyToken, messages) {
@@ -1036,34 +677,11 @@ function sendLineReply(replyToken, messages) {
 // =========================================================================
 
 function initDatabaseSheets(ss) {
-  let faqSheet = ss.getSheetByName("FAQ");
-  if (!faqSheet) {
-    faqSheet = ss.insertSheet("FAQ");
-    faqSheet.appendRow(["คีย์เวิร์ดคำถาม (Keyword)", "คำตอบที่ต้องการให้บอทพูด (Bot Answer)"]);
-    faqSheet.appendRow(["เก็บได้กี่วัน", "ข้าวหลามอยู่นอกตู้เย็นได้ 3 วัน และในตู้เย็นได้ 7 วันครับ นำมาอุ่นไมโครเวฟ 1 นาทีก็อร่อยเหมือนเดิมครับ 🎋"]);
-    faqSheet.appendRow(["มีไส้อะไรบ้าง", "มีไส้ถั่วดำกะทิสด, ข้าวเหนียวดำเผือกหอม, ลาวามะพร้าวอ่อน และชาเขียวมัทฉะถั่วแดงครับ"]);
-    faqSheet.setFrozenRows(1);
-  }
-
-  let orderSheet = ss.getSheetByName("Orders");
-  if (!orderSheet) {
-    orderSheet = ss.insertSheet("Orders");
-    orderSheet.appendRow(["วันที่-เวลา", "LINE User ID", "สินค้าที่สั่ง", "จำนวน", "ข้อมูลจัดส่ง/เบอร์โทร", "สถานะ"]);
-    orderSheet.setFrozenRows(1);
-  }
-
   let chatSheet = ss.getSheetByName("Chat_History");
   if (!chatSheet) {
     chatSheet = ss.insertSheet("Chat_History");
     chatSheet.appendRow(["วันที่-เวลา", "LINE User ID", "ข้อความลูกค้า", "การตอบกลับของระบบ"]);
     chatSheet.setFrozenRows(1);
-  }
-
-  let stateSheet = ss.getSheetByName("User_State");
-  if (!stateSheet) {
-    stateSheet = ss.insertSheet("User_State");
-    stateSheet.appendRow(["LINE User ID", "Current Step", "Payload Data (JSON)", "อัปเดตล่าสุด"]);
-    stateSheet.setFrozenRows(1);
   }
 
   let broadcastSheet = ss.getSheetByName("Broadcast");
@@ -1072,70 +690,12 @@ function initDatabaseSheets(ss) {
   }
 }
 
-function getUserState(ss, userId) {
-  try {
-    const sheet = ss.getSheetByName("User_State");
-    if (!sheet) return null;
-    const data = sheet.getDataRange().getValues();
-    for (let i = 1; i < data.length; i++) {
-      if (data[i][0] === userId) {
-        let payload = {};
-        try { payload = JSON.parse(data[i][2] || "{}"); } catch (e) {}
-        return { step: data[i][1], data: payload, rowIndex: i + 1 };
-      }
-    }
-  } catch (err) {}
-  return null;
-}
-
-function setUserState(ss, userId, step, dataObj) {
-  try {
-    const sheet = ss.getSheetByName("User_State");
-    if (!sheet) return;
-    const existing = getUserState(ss, userId);
-    const jsonStr = JSON.stringify(dataObj || {});
-    const now = new Date();
-    if (existing && existing.rowIndex) {
-      sheet.getRange(existing.rowIndex, 2, 1, 3).setValues([[step, jsonStr, now]]);
-    } else {
-      sheet.appendRow([userId, step, jsonStr, now].map(safeCell));
-    }
-  } catch (err) {}
-}
-
-function clearUserState(ss, userId) {
-  try {
-    const sheet = ss.getSheetByName("User_State");
-    if (!sheet) return;
-    const data = sheet.getDataRange().getValues();
-    for (let i = 1; i < data.length; i++) {
-      if (data[i][0] === userId) {
-        sheet.deleteRow(i + 1);
-        break;
-      }
-    }
-  } catch (err) {}
-}
-
-function saveOrderToSheet(ss, userId, data) {
-  try {
-    const sheet = ss.getSheetByName("Orders");
-    if (!sheet) return;
-    sheet.appendRow([
-      new Date(),
-      userId,
-      data.product || "-",
-      data.quantity || "-",
-      data.customerInfo || "-",
-      "รอดำเนินการ / ตรวจสลิป"
-    ].map(safeCell));
-  } catch (err) {}
-}
-
 function logChat(ss, userId, userMessage, botReply) {
   try {
     const sheet = ss.getSheetByName("Chat_History");
-    if (!sheet) return;
+    if (!sheet) throw new Error("sheet not found");
     sheet.appendRow([new Date(), userId, userMessage, botReply].map(safeCell));
-  } catch (err) {}
+  } catch (err) {
+    console.error("Chat_History write failed: " + err.message);
+  }
 }

