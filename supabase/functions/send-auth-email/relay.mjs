@@ -3,7 +3,7 @@ import { AuthEmailValidationError, buildAuthMessages } from './messages.mjs';
 const encoder = new TextEncoder();
 const REQUEST_LIMIT = 32 * 1024;
 const RESPONSE_LIMIT = 16 * 1024;
-const MAX_DEADLINE_MS = 3500;
+const MAX_DEADLINE_MS = 4500;
 const EVENT_ID = /^[A-Za-z0-9_-]{1,128}$/;
 const VALIDATION_CODES = new Set([
     'INVALID_AUTH_PAYLOAD', 'INVALID_AUTH_CONFIG', 'INVALID_AUTH_URL', 'UNSUPPORTED_AUTH_ACTION'
