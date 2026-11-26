@@ -3594,6 +3594,7 @@
     </style>
 </head>
 <body style="margin:0; padding:0; background-color:#0A0704;">
+<div style="background-color:#FFD60A; color:#1A0F00; font-size:13px; font-weight:800; text-align:center; padding:10px;">🧪 เว็บตัวอย่าง ไม่มีการขายหรือจัดส่งจริง ห้ามโอนเงิน</div>
 
     <div style="display:none; max-height:0; overflow:hidden; mso-hide:all;">
         ยินดีต้อนรับสู่ครอบครัวข้าวหลามเผาเตาถ่าน MAXMUXSIX รับส่วนลด 10% สำหรับออเดอร์แรกของคุณ 🔥🎋
@@ -3920,6 +3921,7 @@
 </style>
 </head>
 <body style="margin:0; padding:0; background-color:#0A0704;">
+<div style="background-color:#FFD60A; color:#1A0F00; font-size:13px; font-weight:800; text-align:center; padding:10px;">🧪 เว็บตัวอย่าง ไม่มีการขายหรือจัดส่งจริง ห้ามโอนเงิน</div>
 
     <div style="display:none; max-height:0; overflow:hidden; mso-hide:all;">
         ยืนยันคำสั่งซื้อ #{{ORDER_ID}} สำเร็จเรียบร้อย! ยอดชำระ {{GRAND_TOTAL}} บาท กำลังจัดเตรียมเผาเตาถ่าน 🔥🎋
@@ -6320,6 +6322,7 @@
                     };
                 } else {
                     try {
+                        const DEMO_NOTICE = 'เว็บตัวอย่าง ไม่มีการขายหรือจัดส่งจริง ห้ามโอนเงิน';
                         const GITHUB_ASSET_BASE = 'https://raw.githubusercontent.com/OkayOkay101/MAXMUXSIX-ONLINEWEB/main/';
                         let cloudHtml = (emailRecord.htmlContent || '')
                             .replace(/src=["'](max_\d+\.jpg)["']/gi, `src="${GITHUB_ASSET_BASE}$1"`)
@@ -6327,9 +6330,9 @@
                             .replace(/\{\{WEBSITE_URL\}\}/g, targetSiteUrl)
                             .replace(/href=["']index\.html/gi, `href="${targetSiteUrl}`);
 
-                        const txtContent = emailRecord.orderId 
+                        const txtContent = DEMO_NOTICE + '\n\n' + (emailRecord.orderId 
                             ? `สวัสดีคุณ ${emailRecord.toName} คำสั่งซื้อ #${emailRecord.orderId} ยอดชำระ ${emailRecord.total || 0} บาท กำลังจัดเตรียมเผาเตาถ่านไฟแรง ขอบคุณสำหรับการสั่งซื้อกับ MAXMUXSIX\n\nติดตามสถานะคำสั่งซื้อและดูใบเสร็จ: ${targetSiteUrl}?orderId=${emailRecord.orderId}\nเข้าสู่เว็บไซต์หลัก: ${targetSiteUrl}`
-                            : `สวัสดีคุณ ${emailRecord.toName} ยินดีต้อนรับสู่ MAXMUXSIX โค้ดลด 10% คือ ${emailRecord.promoCode}\n\nคลิกสั่งซื้อพร้อมรับส่วนลดทันที: ${targetSiteUrl}?promo=WELCOME10\nเข้าสู่เว็บไซต์หลัก: ${targetSiteUrl}`;
+                            : `สวัสดีคุณ ${emailRecord.toName} ยินดีต้อนรับสู่ MAXMUXSIX โค้ดลด 10% คือ ${emailRecord.promoCode}\n\nคลิกสั่งซื้อพร้อมรับส่วนลดทันที: ${targetSiteUrl}?promo=WELCOME10\nเข้าสู่เว็บไซต์หลัก: ${targetSiteUrl}`);
 
                         const resp = await fetch(gasUrl, {
                             method: 'POST',
@@ -6410,7 +6413,7 @@
                         formData.append('name', emailRecord.toName || 'ลูกค้า MAXMUXSIX');
                         formData.append('email', emailRecord.to);
                         formData.append('subject', emailRecord.subject);
-                        formData.append('message', msgText);
+                        formData.append('message', DEMO_NOTICE + '\n\n' + msgText);
 
                         const resp = await fetch('https://api.web3forms.com/submit', {
                             method: 'POST',

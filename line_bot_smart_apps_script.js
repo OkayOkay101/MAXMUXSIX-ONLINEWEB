@@ -977,7 +977,7 @@ const ORDER_STEPS = {
   ORDER_STEP_3_CONTACT_INFO: {
     // เบอร์โทร 9-10 หลักขึ้นต้นด้วย 0, พิกัดจากปุ่มแชร์ หรือรับเอง
     accepts: text => text === "รับเองที่หน้าร้าน" || text.indexOf("พิกัด: ") === 0 ||
-      /(^|\D)0([ -]?\d){8,9}(?!\d)/.test(text),
+      /(^|[^\d-])0([ -]?\d){8,9}(?!-?\d)/.test(text),
     prompt: "🧪 เว็บตัวอย่าง: กรุณาใช้ข้อมูลสมมติ ส่งชื่อผู้รับ เบอร์โทร และที่อยู่ หรือแชร์พิกัด 👇",
     buttons: [
       { type: "location", label: "📍 แชร์พิกัดที่อยู่" },
@@ -998,7 +998,10 @@ function isStateExpired(state) {
 
 // ข้อความที่ไม่ใช่คำตอบของขั้น: ตอบคำถามที่รู้จัก แล้วถามขั้นเดิมอีกครั้งโดยไม่แตะสถานะ
 function handleOffStepMessage(ss, replyToken, userId, text, step) {
-  const intentResult = matchSmartIntents(text);
+  let intentResult = text.indexOf("พิกัด: ") === 0 ? null : matchSmartIntents(text);
+  if (intentResult && intentResult.startFlow === "ORDER_FLOW") {
+    if (!/^(สั่งซื้อ|สั่งซื้อสินค้า|สั่งของ|สั่งข้าวหลาม|order)$/i.test(text)) intentResult = null;
+  }
   if (intentResult && intentResult.startFlow === "ORDER_FLOW") {
     sendLineReply(replyToken, intentResult.messages);
     setUserState(ss, userId, "ORDER_STEP_1_SELECT_PRODUCT", {});

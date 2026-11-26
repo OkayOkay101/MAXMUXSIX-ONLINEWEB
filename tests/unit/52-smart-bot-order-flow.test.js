@@ -170,3 +170,28 @@ test('a state 29 minutes old is still active and a valid answer refreshes it', (
     assert.equal(bot.step(), STEP2);
     assert.ok(new Date(bot.updatedAt()).getTime() > before.getTime());
 });
+
+for (const text of ['ถ้าซื้อ 10 กระบอกส่งฟรีไหม', 'ต้องจองล่วงหน้ากี่วัน', 'พิกัด: ซอยจองถนอม']) {
+    test(`"${text}" at step 2 does not wipe the order`, () => {
+        const bot = createBot({ step: STEP2, data: { product: 'จุใจ' } });
+        bot.say(text);
+        assert.equal(bot.step(), STEP2);
+        assert.deepEqual(bot.data(), { product: 'จุใจ' });
+    });
+}
+
+for (const text of ['ทดสอบ 080-000-0000-000', 'ทดสอบ 12-0123456789']) {
+    test(`step 3 does not read a phone number inside "${text}"`, () => {
+        const bot = createBot({ step: STEP3 });
+        bot.say(text);
+        assert.equal(bot.rows.Orders.length, 0);
+    });
+}
+
+for (const text of ['บ้านเลขที่ 99 0800000000', '0800000000 99/1 ถนนทดสอบ']) {
+    test(`step 3 still accepts a phone next to a house number: "${text}"`, () => {
+        const bot = createBot({ step: STEP3 });
+        bot.say(text);
+        assert.equal(bot.rows.Orders.length, 1);
+    });
+}
