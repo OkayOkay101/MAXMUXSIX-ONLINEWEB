@@ -81,7 +81,8 @@ test('rejected signature exposes numeric relay timing only and never starts upst
     assert.equal(calls.length, 0);
 });
 
-test('timeout timing cannot turn an expired upstream request into success', async () => {
+test('timeout timing cannot turn an expired upstream request into success', async t => {
+    controlTimers(t);
     let time = Date.now();
     const { handler } = await setup({ now: () => time,
         config: { ...config, upstreamTimeoutMs: 25 },
@@ -91,6 +92,10 @@ test('timeout timing cannot turn an expired upstream request into success', asyn
     assert.equal(result.headers.get('server-timing'), 'relay;dur=26, upstream;dur=26');
     await failure(result, 504);
 });
+// A 25 ms budget must not race the speed of the machine: the relay's deadline timer
+// fires only when the test ticks it. `settle` uses setImmediate, which stays real.
+const controlTimers = t => t.mock.timers.enable({ apis: ['setTimeout'] });
+const settle = () => new Promise(resolve => setImmediate(resolve));
 async function setup(options = {}) {
     const { createAuthEmailHandler } = await import('../../supabase/functions/send-auth-email/relay.mjs');
     const calls = [];
@@ -431,40 +436,65 @@ test('third redirect is rejected without a fourth request', async () => {
     assert.equal(calls, 3);
 });
 
-test('fetch resolving only after abort never produces success or retry', async () => {
+test('fetch resolving only after abort never produces success or retry', async t => {
+    controlTimers(t);
     let calls = 0;
     let signal;
-    const { handler } = await setup({ config: { ...config, upstreamTimeoutMs: 25 }, fetchImpl: async (_, options) => {
+    let reached;
+    const waiting = new Promise(resolve => { reached = resolve; });
+    const frozen = Date.now();
+    const { handler } = await setup({ now: () => frozen, config: { ...config, upstreamTimeoutMs: 25 }, fetchImpl: async (_, options) => {
         calls++; signal = options.signal;
-        await new Promise(resolve => signal.addEventListener('abort', resolve, { once: true }));
+        const aborted = new Promise(resolve => signal.addEventListener('abort', resolve, { once: true }));
+        reached();
+        await aborted;
         return success();
     } });
-    await failure(await handler(request()), 504);
+    const pending = handler(request());
+    await waiting;
+    t.mock.timers.tick(24);
+    assert.equal(signal.aborted, false);
+    t.mock.timers.tick(1);
+    await failure(await pending, 504);
     assert.equal(signal.aborted, true);
     assert.equal(calls, 1);
 });
-test('noncooperative response stream is bounded by the same absolute deadline', async () => {
+test('noncooperative response stream is bounded by the same absolute deadline', async t => {
+    controlTimers(t);
     let canceled = false;
-    const { handler } = await setup({ config: { ...config, upstreamTimeoutMs: 25 }, fetchImpl: async () =>
-        new Response(new ReadableStream({ pull: () => new Promise(() => {}), cancel() { canceled = true; } })) });
-    await failure(await handler(request()), 504);
+    let reached;
+    const reading = new Promise(resolve => { reached = resolve; });
+    const frozen = Date.now();
+    const { handler } = await setup({ now: () => frozen, config: { ...config, upstreamTimeoutMs: 25 }, fetchImpl: async () =>
+        new Response(new ReadableStream({ pull: () => { reached(); return new Promise(() => {}); }, cancel() { canceled = true; } })) });
+    const pending = handler(request());
+    await reading;
+    await settle();
+    t.mock.timers.tick(25);
+    await failure(await pending, 504);
     assert.equal(canceled, true);
 });
-test('noncooperative request read expires without starting upstream', async () => {
+test('noncooperative request read expires without starting upstream', async t => {
+    controlTimers(t);
     const { handler, calls } = await setup({ config: { ...config, upstreamTimeoutMs: 25 } });
     const req = { method: 'POST', headers: request().headers,
         body: new ReadableStream({ pull: () => new Promise(() => {}) }) };
-    await failure(await handler(req), 504);
+    const pending = handler(req);
+    await settle();
+    t.mock.timers.tick(25);
+    await failure(await pending, 504);
     assert.equal(calls.length, 0);
 });
-test('elapsed budget during verification prevents fetch even before timer gets a turn', async () => {
+test('elapsed budget during verification prevents fetch even before timer gets a turn', async t => {
+    controlTimers(t);
     let time = Date.now();
     const { handler, calls } = await setup({ now: () => time, config: { ...config, upstreamTimeoutMs: 25 },
         verify: raw => { time += 26; return JSON.parse(raw); } });
     await failure(await handler(request()), 504);
     assert.equal(calls.length, 0);
 });
-test('redirect and response parsing share one deadline and signal', async () => {
+test('redirect and response parsing share one deadline and signal', async t => {
+    controlTimers(t);
     let time = Date.now();
     let signal;
     let calls = 0;
