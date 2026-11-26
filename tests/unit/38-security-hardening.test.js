@@ -6,7 +6,7 @@ const vm = require('node:vm');
 const read = file => fs.readFileSync(path.join(__dirname, '..', '..', file), 'utf8');
 
 const PROJECT = 'https://lxvxffrexegvqzeojztw.supabase.co';
-const SITE = 'https://okayokay101.github.io/MAXMUXSIX-ONLINEWEB/';
+const SITE = 'https://maxmuxsix-demo.vercel.app/';
 const lure = 'บัญชีถูกระงับ ยืนยันที่ https://evil.example';
 
 test('auth mail never carries a name chosen by whoever signed up', async () => {

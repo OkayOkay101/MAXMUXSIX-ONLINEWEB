@@ -1,5 +1,5 @@
 const PROJECT_URL = 'https://lxvxffrexegvqzeojztw.supabase.co';
-const SITE_URL = 'https://okayokay101.github.io/MAXMUXSIX-ONLINEWEB/';
+const SITE_URL = 'https://maxmuxsix-demo.vercel.app/';
 const WARNING = 'อย่าแชร์ลิงก์หรือรหัสนี้กับผู้อื่น หากคุณไม่ได้ส่งคำขอนี้ โปรดละเว้นอีเมลนี้';
 
 export class AuthEmailValidationError extends Error {

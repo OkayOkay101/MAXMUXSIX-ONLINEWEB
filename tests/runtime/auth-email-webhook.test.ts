@@ -4,7 +4,7 @@ import { createAuthEmailHandler } from '../../supabase/functions/send-auth-email
 // Isolated runtime verification: no network, real mail or private environment.
 const webhook = new Webhook(btoa('fixture-runtime-key-32-bytes-long!'));
 const eventId = 'runtime_fixture';
-const siteUrl = 'https://okayokay101.github.io/MAXMUXSIX-ONLINEWEB/';
+const siteUrl = 'https://maxmuxsix-demo.vercel.app/';
 const projectUrl = 'https://lxvxffrexegvqzeojztw.supabase.co';
 const raw = JSON.stringify({ user: { email: 'runtime@example.test' }, email_data: {
     email_action_type: 'signup', token: '12345678', token_hash: 'runtime-fixture-hash',

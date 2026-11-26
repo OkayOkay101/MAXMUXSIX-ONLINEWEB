@@ -6,7 +6,7 @@ const { createAuthGasInstance } = require('../helpers/auth-gas-loader');
 
 const config = {
     projectUrl: 'https://lxvxffrexegvqzeojztw.supabase.co',
-    siteUrl: 'https://okayokay101.github.io/MAXMUXSIX-ONLINEWEB/',
+    siteUrl: 'https://maxmuxsix-demo.vercel.app/',
     gasUrl: 'https://script.google.com/macros/s/fixture_deployment/exec',
     relaySecret: 'fixture-UTF8-秘密-not-base64', upstreamTimeoutMs: 3500
 };

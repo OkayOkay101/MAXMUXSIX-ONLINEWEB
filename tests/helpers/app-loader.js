@@ -139,7 +139,7 @@ function createAppInstance(options = {}) {
         location: {
             search: '',
             hash: '',
-            href: 'https://okayokay101.github.io/MAXMUXSIX-ONLINEWEB/'
+            href: 'https://maxmuxsix-demo.vercel.app/'
         },
         navigator: {
             userAgent: 'NodeTestRunner/1.0 (Windows NT 10.0; Win64; x64)'
@@ -149,7 +149,7 @@ function createAppInstance(options = {}) {
             location: {
                 search: '',
                 hash: '',
-                href: 'https://okayokay101.github.io/MAXMUXSIX-ONLINEWEB/'
+                href: 'https://maxmuxsix-demo.vercel.app/'
             }
         },
         alert: () => {},

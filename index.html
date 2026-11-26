@@ -3864,7 +3864,7 @@
                         คุณได้รับอีเมลนี้เพราะสมัครรับข่าวสารจากเว็บไซต์ของเรา
                     </div>
                     <div style="margin-top:10px; font-family: 'Segoe UI', Tahoma, Arial, sans-serif; font-size:11px;">
-                        <a href="{{WEBSITE_URL}}" style="color:#FAA307; text-decoration:underline; margin-right:12px;">https://okayokay101.github.io/MAXMUXSIX-ONLINEWEB/</a>
+                        <a href="{{WEBSITE_URL}}" style="color:#FAA307; text-decoration:underline; margin-right:12px;">https://maxmuxsix-demo.vercel.app/</a>
                         <a href="{{unsubscribe_link}}" style="color:#5C7568; text-decoration:underline;">ยกเลิกการรับข่าวสาร</a>
                     </div>
                 </td>
@@ -4352,10 +4352,10 @@
             gasUrl: DEFAULT_GAS_URL,
             gasToken: '',
             web3formsKey: '',
-            websiteUrl: 'https://okayokay101.github.io/MAXMUXSIX-ONLINEWEB/'
+            websiteUrl: 'https://maxmuxsix-demo.vercel.app/'
         };
         if (!emailSettings.websiteUrl) {
-            emailSettings.websiteUrl = 'https://okayokay101.github.io/MAXMUXSIX-ONLINEWEB/';
+            emailSettings.websiteUrl = 'https://maxmuxsix-demo.vercel.app/';
         }
         if (emailSettings.gasUrl === undefined || !emailSettings.gasUrl) {
             emailSettings.gasUrl = DEFAULT_GAS_URL;
@@ -5725,7 +5725,7 @@
             // แทนที่ตัวแปรไดนามิกในเนื้อหาอีเมล (พร้อม sanitize ป้องกัน XSS)
             const userName = escapeStoredText(user.name || 'สมาชิกร้าน MAXMUXSIX');
             const userRefCode = sanitizeHtml(user.referralCode || 'MAX1000');
-            const websiteUrl = (window.emailSettings && window.emailSettings.websiteUrl) || 'https://okayokay101.github.io/MAXMUXSIX-ONLINEWEB/';
+            const websiteUrl = (window.emailSettings && window.emailSettings.websiteUrl) || 'https://maxmuxsix-demo.vercel.app/';
             
             html = html.replace(/{{USER_NAME}}/g, userName);
             html = html.replace(/{{REFERRAL_CODE}}/g, userRefCode);
@@ -5969,7 +5969,7 @@
                 });
             }
 
-            const websiteUrl = (window.emailSettings && window.emailSettings.websiteUrl) || 'https://okayokay101.github.io/MAXMUXSIX-ONLINEWEB/';
+            const websiteUrl = (window.emailSettings && window.emailSettings.websiteUrl) || 'https://maxmuxsix-demo.vercel.app/';
             html = html.replace(/{{WEBSITE_URL}}/g, websiteUrl);
             html = html.replace(/{{ORDER_ID}}/g, sanitizeHtml(order.id || ''));
             html = html.replace(/{{ORDER_DATE}}/g, sanitizeHtml(order.date || new Date().toLocaleString('th-TH')));
@@ -6309,7 +6309,7 @@
             }
 
             // 1. ส่งผ่าน Google Apps Script (Cloud 24 ชม. ไม่ต้องรันเซิร์ฟเวอร์บนเครื่อง)
-            const targetSiteUrl = (emailSettings && emailSettings.websiteUrl) || 'https://okayokay101.github.io/MAXMUXSIX-ONLINEWEB/';
+            const targetSiteUrl = (emailSettings && emailSettings.websiteUrl) || 'https://maxmuxsix-demo.vercel.app/';
             if (emailSettings.provider === 'gas') {
                 const gasUrl = (emailSettings.gasUrl || '').trim();
                 if (!gasUrl) {
@@ -6824,7 +6824,7 @@ function testRun() {
                 gasUrl: gasVal,
                 gasToken: tokenVal,
                 web3formsKey: keyVal,
-                websiteUrl: emailSettings.websiteUrl || 'https://okayokay101.github.io/MAXMUXSIX-ONLINEWEB/'
+                websiteUrl: emailSettings.websiteUrl || 'https://maxmuxsix-demo.vercel.app/'
             };
 
             localStorage.setItem('maxmuxsix_email_settings', JSON.stringify(emailSettings));

@@ -31,7 +31,7 @@ function googleUrl(value, deployment = false) {
 
 function validConfig(config, maxTimeoutMs = MAX_DEADLINE_MS) {
     return config?.projectUrl === 'https://lxvxffrexegvqzeojztw.supabase.co' &&
-        config.siteUrl === 'https://okayokay101.github.io/MAXMUXSIX-ONLINEWEB/' &&
+        config.siteUrl === 'https://maxmuxsix-demo.vercel.app/' &&
         typeof config.relaySecret === 'string' && config.relaySecret.length > 0 &&
         googleUrl(config.gasUrl, true) && Number.isSafeInteger(config.upstreamTimeoutMs) &&
         config.upstreamTimeoutMs > 0 && config.upstreamTimeoutMs <= maxTimeoutMs;
