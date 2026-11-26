@@ -377,8 +377,8 @@ function getLineQuotaDetails() {
 function buildBroadcastMessages(draft) {
   const messages = [];
 
-  // 1. ถ้ามีรูปภาพ ให้สร้าง Image Message
-  if (draft.imageUrl && /^https?:\/\//i.test(draft.imageUrl)) {
+  // 1. ถ้ามีรูปภาพ ให้สร้าง Image Message (ต้องเป็น https:// ตามข้อกำหนด LINE)
+  if (draft.imageUrl && /^https:\/\//i.test(draft.imageUrl)) {
     messages.push({
       type: "image",
       originalContentUrl: draft.imageUrl,
@@ -607,6 +607,8 @@ function isTrustedWebhook(e) {
  * ฟังก์ชันรับ Webhook POST Event จาก LINE Messaging API
  */
 function doPost(e) {
+  let lock = null;
+  let lockAcquired = false;
   try {
     if (!isTrustedWebhook(e)) {
       return ContentService.createTextOutput("OK");
@@ -614,6 +616,14 @@ function doPost(e) {
 
     if (!e || !e.postData || !e.postData.contents) {
       return ContentService.createTextOutput("OK");
+    }
+
+    if (typeof LockService !== "undefined" && LockService.getScriptLock) {
+      lock = LockService.getScriptLock();
+      lockAcquired = lock.tryLock(10000);
+      if (!lockAcquired) {
+        return ContentService.createTextOutput("OK");
+      }
     }
 
     const body = JSON.parse(e.postData.contents);
@@ -653,6 +663,10 @@ function doPost(e) {
     }
   } catch (err) {
     console.error("Critical Webhook Error: " + err.toString());
+  } finally {
+    if (lock && lockAcquired) {
+      try { lock.releaseLock(); } catch (_) {}
+    }
   }
 
   return ContentService.createTextOutput("OK");

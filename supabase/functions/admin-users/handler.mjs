@@ -69,7 +69,7 @@ export function createHandler({ backend, siteUrl }) {
                 const email = typeof input.email === 'string' ? input.email.trim().toLowerCase() : '';
                 const name = typeof input.name === 'string' ? input.name.trim() : '';
                 const phone = typeof input.phone === 'string' ? input.phone.trim() : '';
-                if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || email.length > 254 || !name || name.length > 100 || phone.length > 30) return response(400, { error: 'ตรวจสอบชื่อ อีเมล และโทรศัพท์' });
+                if (!/^[\x21-\x7e]+$/.test(email) || !/^[^\s@,;<>()[\]\\]+@[^\s@,;<>()[\]\\]+\.[^\s@,;<>()[\]\\]+$/.test(email) || email.length > 254 || !name || name.length > 100 || phone.length > 30) return response(400, { error: 'ตรวจสอบชื่อ อีเมล และโทรศัพท์' });
                 await backend.invite({ email, name, phone, redirectTo: siteUrl });
                 return response(200, { ok: true });
             }
