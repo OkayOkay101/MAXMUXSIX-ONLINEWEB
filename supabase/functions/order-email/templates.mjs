@@ -3,6 +3,8 @@
 export const escapeHtml = value => String(value).replace(/[&<>"']/g, c =>
     ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
 
+export const DEMO_NOTICE = 'เว็บตัวอย่าง ไม่มีการขายหรือจัดส่งจริง ห้ามโอนเงิน';
+
 const FONT = "font-family:'Segoe UI',Tahoma,Arial,sans-serif;";
 const table = (attrs, rows) => `<table role="presentation" cellpadding="0" cellspacing="0" ${attrs}>${rows}</table>`;
 
@@ -14,7 +16,8 @@ function page(title, preview, rows) {
         `<body style="margin:0;padding:0;background-color:#0A0704;${FONT}">` +
         `<div style="display:none;max-height:0;overflow:hidden">${preview}</div>` +
         '<center style="width:100%;background-color:#0A0704">' +
-        table('width="100%" style="max-width:600px;margin:0 auto;background-color:#0D0906;border:1px solid #1E543C;border-radius:12px;overflow:hidden"', rows) +
+        table('width="100%" style="max-width:600px;margin:0 auto;background-color:#0D0906;border:1px solid #1E543C;border-radius:12px;overflow:hidden"',
+            `<tr><td align="center" style="background-color:#FFD60A;color:#1A0F00;font-size:13px;font-weight:800;padding:10px">🧪 ${DEMO_NOTICE}</td></tr>` + rows) +
         '</center></body></html>';
 }
 
