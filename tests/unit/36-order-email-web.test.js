@@ -22,6 +22,20 @@ test('customer mail goes through the server function, never straight to the Apps
     assert.equal(f.fetched(), 0);
 });
 
+test('order mail ignores saved admin relay settings and still goes through the server function', async () => {
+    for (const emailSettings of [
+        { provider: 'gas', gasUrl: 'https://script.google.com/macros/s/x/exec', gasToken: 't' },
+        { provider: 'web3forms', web3formsKey: 'k'.repeat(36) }
+    ]) {
+        const f = setup({ success: true, message: 'sent' });
+        f.instance.state.emailSettings = emailSettings;
+        f.instance.state.orders = [order];
+        await f.app.dispatchRealEmail({ id: 'ORD-EML-1', orderId: order.id, to: order.email, htmlContent: '<b>x</b>' });
+        assert.deepEqual([f.calls.length, f.fetched()], [1, 0], emailSettings.provider);
+        assert.equal(f.calls[0][0], 'order');
+    }
+});
+
 test('the notification shows the real result instead of claiming success early', async () => {
     const f = setup({ success: false, message: 'ยังส่งไม่ได้' });
     f.instance.state.orders = [order];

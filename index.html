@@ -6274,8 +6274,9 @@
 
             let result = { success: false, method: 'none', message: '' };
 
-            // ไม่มีรหัสแอดมิน (ลูกค้าทั่วไป): ให้เซิร์ฟเวอร์สร้างและส่งอีเมลเข้าอีเมลสมาชิกที่ยืนยันแล้ว
-            if (emailSettings.provider === 'gas' && !emailSettings.gasToken) {
+            // คำสั่งซื้อต้องผ่านเซิร์ฟเวอร์เสมอ (คิดราคาและบันทึกคำสั่งซื้อ) แม้เบราว์เซอร์จะมีค่าตั้งของแอดมินค้างอยู่
+            // เมลอื่นที่ไม่มีรหัสแอดมิน (ลูกค้าทั่วไป): ให้เซิร์ฟเวอร์สร้างและส่งเข้าอีเมลสมาชิกที่ยืนยันแล้ว
+            if (emailRecord.orderId || (emailSettings.provider === 'gas' && !emailSettings.gasToken)) {
                 const order = emailRecord.orderId ? orders.find(o => o.id === emailRecord.orderId) : null;
                 result = typeof membership !== 'undefined' && membership
                     ? await membership.sendMail(emailRecord.orderId ? 'order' : 'welcome', emailRecord.to, order)
