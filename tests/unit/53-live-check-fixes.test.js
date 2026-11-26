@@ -19,6 +19,14 @@ test('on phones the cart toast sits above the floating cart button', () => {
     assert.ok(Number(phone.match(/bottom:\s*(\d+)px/)[1]) >= 140);
 });
 
+test('the cart toast stays under the cookie banner so the PDPA text is never covered', () => {
+    const [base] = rules(html);
+    const toastZ = Number(base.match(/z-index:\s*(\d+)/)[1]);
+    const bannerZ = Number(html.match(/\.consent-banner\s*\{[^}]*z-index:\s*(\d+)/)[1]);
+    assert.ok(toastZ < bannerZ, `toast z-index ${toastZ} must be below banner ${bannerZ}`);
+    assert.ok(toastZ > 200, 'toast must stay above the .modal overlay (200)');
+});
+
 test('the meta tags carry no directive that browsers ignore and log as errors', () => {
     const csp = html.match(/<meta http-equiv="Content-Security-Policy" content="([^"]*)"/)[1];
     assert.doesNotMatch(csp, /frame-ancestors/);

@@ -2352,7 +2352,8 @@
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), 0 0 15px rgba(232, 93, 4, 0.4);
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
-            z-index: 9999;
+            /* Below the cookie banner (300) so the PDPA text is never covered; above .modal (200) and the floating cart (140). */
+            z-index: 299;
             display: flex;
             align-items: center;
             gap: 14px;
