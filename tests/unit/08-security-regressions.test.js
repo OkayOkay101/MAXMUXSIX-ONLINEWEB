@@ -1,6 +1,6 @@
 const { describe, it } = require('node:test');
 const assert = require('node:assert/strict');
-const vm = require('node:vm');
+const { runActions } = require('../../assets/js/actions.js');
 const { createAppInstance } = require('../helpers/app-loader');
 
 describe('08. Untrusted data stays inert in rendered UI', () => {
@@ -13,14 +13,14 @@ describe('08. Untrusted data stays inert in rendered UI', () => {
         }]);
         const html = getElement('productDisplayGrid').innerHTML;
         assert.doesNotMatch(html, /src="x" onload="alert\(1\)/);
-        const handler = html.match(/class="btn-order" onclick="([^"]+)"/)[1]
+        const handler = html.match(/class="btn-order" data-on-click="([^"]+)"/)[1]
             .replace(/&quot;/g, '"').replace(/&#x27;/g, "'")
             .replace(/&#x2F;/g, '/').replace(/&amp;/g, '&');
         let receivedId;
-        vm.runInNewContext(handler, {
+        assert.ok(runActions(handler, {}, {}, {
             addToCart: id => { receivedId = id; },
             alert: () => { throw new Error('injected code ran'); }
-        });
+        }));
         assert.strictEqual(receivedId, `max_1');alert(1);//`);
     });
 
@@ -70,15 +70,15 @@ describe('08. Untrusted data stays inert in rendered UI', () => {
         const html = getElement('orderHistoryContainer').innerHTML;
         assert.doesNotMatch(html, /<svg onload=alert\(1\)>/);
         assert.doesNotMatch(html, /<img src=x onerror=alert\(1\)>/);
-        const handler = html.match(/onclick="([^"]+)"/)[1]
+        const handler = html.match(/data-on-click="([^"]+)"/)[1]
             .replace(/&quot;/g, '"').replace(/&#x27;/g, "'")
             .replace(/&#x2F;/g, '/').replace(/&amp;/g, '&');
         let receivedOrderId;
-        vm.runInNewContext(handler, {
+        assert.ok(runActions(handler, {}, {}, {
             closeOrderHistoryModal: () => {},
             openOrderReceiptModal: id => { receivedOrderId = id; },
             alert: () => { throw new Error('injected code ran'); }
-        });
+        }));
         assert.strictEqual(receivedOrderId, `MAX-1');alert(1);//`);
     });
 

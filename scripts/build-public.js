@@ -5,7 +5,7 @@ const path = require('node:path');
 const PUBLIC_FILES = [
     'index.html', 'auth-config.js', 'store_front.jpg',
     ...Array.from({ length: 8 }, (_, i) => `max_${i + 1}.jpg`),
-    'assets/js/captcha.js', 'assets/js/cloud-auth.js', 'assets/js/frame-guard.js',
+    'assets/js/actions.js', 'assets/js/captcha.js', 'assets/js/cloud-auth.js', 'assets/js/frame-guard.js',
     'assets/vendor/supabase.js', 'assets/vendor/THIRD-PARTY-NOTICES.txt',
     'assets/video/khaolam-battle-impact-30s.mp4', 'assets/video/khaolam-battle-impact-poster.jpg'
 ];

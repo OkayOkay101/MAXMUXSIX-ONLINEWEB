@@ -11,7 +11,7 @@
     <!-- Security Headers -->
     <meta http-equiv="Content-Security-Policy" content="
         default-src 'self';
-        script-src 'self' 'unsafe-inline' https://challenges.cloudflare.com;
+        script-src 'self' 'sha256-HQx0zTmzown/evcw+5nYom/KyF/uDpC7xIJSLruKVSE=' https://challenges.cloudflare.com;
         frame-src https://challenges.cloudflare.com;
         style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.gstatic.com;
         font-src 'self' https://fonts.gstatic.com;
@@ -19,6 +19,7 @@
         connect-src 'self' https://script.google.com https://script.googleusercontent.com https://api.web3forms.com https://lxvxffrexegvqzeojztw.supabase.co;
         form-action 'self';
         base-uri 'self';
+        object-src 'none';
     ">
     <!-- กันการซ้อนกรอบ: ใช้ header ใน vercel.json และสคริปต์นี้สำหรับโฮสต์ที่ตั้ง header ไม่ได้ (meta tag ใช้กันไม่ได้) -->
     <script src="assets/js/frame-guard.js"></script>
@@ -2476,7 +2477,7 @@
 
     <div class="promo-banner">
         🔥 สั่งซื้อวันนี้ ใส่โค้ด <span class="promo-code-tag">MAX10</span> หรือลูกค้าใหม่ใช้ <span class="promo-code-tag">WELCOME10</span> รับส่วนลดทันที 10%!
-        <button onclick="openSubscribeModal()" style="background: var(--flame-orange); color: #FFF; border: none; padding: 2px 10px; border-radius: 20px; font-size: 0.8rem; font-weight: 700; cursor: pointer; margin-left: 8px; transition: 0.2s;">
+        <button data-on-click="openSubscribeModal()" style="background: var(--flame-orange); color: #FFF; border: none; padding: 2px 10px; border-radius: 20px; font-size: 0.8rem; font-weight: 700; cursor: pointer; margin-left: 8px; transition: 0.2s;">
             🎁 คลิกรับโค้ดเข้าอีเมล
         </button>
     </div>
@@ -2489,30 +2490,30 @@
             </div>
         </a>
         <div class="header-actions">
-            <button class="btn-nav-action" style="background: linear-gradient(135deg, #E85D04, #D00000); color: #FFF; border-color: #FAA307; font-weight: 700;" onclick="openSubscribeModal()">
+            <button class="btn-nav-action" style="background: linear-gradient(135deg, #E85D04, #D00000); color: #FFF; border-color: #FAA307; font-weight: 700;" data-on-click="openSubscribeModal()">
                 🎁 รับส่วนลด 10%
             </button>
 
-            <button class="btn-nav-action" onclick="scrollToStoreContact()">
+            <button class="btn-nav-action" data-on-click="scrollToStoreContact()">
                 📍 หน้าร้าน & ติดต่อ
             </button>
 
             <div id="authNavArea">
-                <button class="btn-nav-action" onclick="openAuthModal('login')">
+                <button class="btn-nav-action" data-on-click="openAuthModal('login')">
                     👤 เข้าสู่ระบบ / สมัครสมาชิก
                 </button>
             </div>
 
-            <button class="btn-nav-action" onclick="openOrderHistoryModal()">
+            <button class="btn-nav-action" data-on-click="openOrderHistoryModal()">
                 📦 คำสั่งซื้อ
             </button>
-            <button class="btn-nav-action btn-header-cart" onclick="openCartModal()">
+            <button class="btn-nav-action btn-header-cart" data-on-click="openCartModal()">
                 🛒 ตะกร้า
                 <span class="cart-badge" id="cartCount">0</span>
             </button>
-            <button class="btn-nav-action" id="btnManageMembers" style="display:none;" onclick="openMembersModal()">👥 จัดการสมาชิก</button>
-            <button class="btn-add-main" id="btnHeaderAddProduct" style="display: none;" onclick="openCrudModal()">+ เพิ่มเมนู</button>
-            <button class="btn-mobile-menu-toggle" id="btnMobileMenuToggle" onclick="toggleMobileMenu()" aria-label="เปิดเมนู">
+            <button class="btn-nav-action" id="btnManageMembers" style="display:none;" data-on-click="openMembersModal()">👥 จัดการสมาชิก</button>
+            <button class="btn-add-main" id="btnHeaderAddProduct" style="display: none;" data-on-click="openCrudModal()">+ เพิ่มเมนู</button>
+            <button class="btn-mobile-menu-toggle" id="btnMobileMenuToggle" data-on-click="toggleMobileMenu()" aria-label="เปิดเมนู">
                 ☰
             </button>
         </div>
@@ -2523,36 +2524,36 @@
         <div class="mobile-menu-content">
             <div id="mobileAuthArea"></div>
             <div class="mobile-menu-links">
-                <button class="mobile-menu-item promo-item" onclick="closeMobileMenu(); openSubscribeModal();">
+                <button class="mobile-menu-item promo-item" data-on-click="closeMobileMenu(); openSubscribeModal();">
                     <span>🎁 รับโค้ดส่วนลด 10% (ลูกค้าใหม่)</span>
                     <span>→</span>
                 </button>
-                <button class="mobile-menu-item" onclick="closeMobileMenu(); scrollToStoreContact();">
+                <button class="mobile-menu-item" data-on-click="closeMobileMenu(); scrollToStoreContact();">
                     <span>📍 หน้าร้านจริง & ติดต่อเรา</span>
                     <span>→</span>
                 </button>
-                <button class="mobile-menu-item" onclick="closeMobileMenu(); openOrderHistoryModal();">
+                <button class="mobile-menu-item" data-on-click="closeMobileMenu(); openOrderHistoryModal();">
                     <span>📦 ประวัติคำสั่งซื้อของฉัน</span>
                     <span>→</span>
                 </button>
-                <button class="mobile-menu-item" onclick="closeMobileMenu(); openEmailInboxModal();">
+                <button class="mobile-menu-item" data-on-click="closeMobileMenu(); openEmailInboxModal();">
                     <span>📧 กล่องข้อความ & ใบเสร็จอีเมล</span>
                     <span>→</span>
                 </button>
-                <button class="mobile-menu-item" onclick="closeMobileMenu(); openQuizModal();">
+                <button class="mobile-menu-item" data-on-click="closeMobileMenu(); openQuizModal();">
                     <span>🎯 ค้นหาข้าวหลามสไตล์คุณ (แบบทดสอบ)</span>
                     <span>→</span>
                 </button>
-                <button class="mobile-menu-item" onclick="closeMobileMenu(); openReferralModal();">
+                <button class="mobile-menu-item" data-on-click="closeMobileMenu(); openReferralModal();">
                     <span>🤝 ชวนเพื่อนรับค่าคอม</span>
                     <span>→</span>
                 </button>
-                <button class="mobile-menu-item admin-item" id="btnMobileManageMembers" style="display:none;" onclick="closeMobileMenu(); openMembersModal();">👥 จัดการสมาชิก</button>
-                <button class="mobile-menu-item admin-item" id="btnMobileAddProduct" style="display:none;" onclick="closeMobileMenu(); openCrudModal();">
+                <button class="mobile-menu-item admin-item" id="btnMobileManageMembers" style="display:none;" data-on-click="closeMobileMenu(); openMembersModal();">👥 จัดการสมาชิก</button>
+                <button class="mobile-menu-item admin-item" id="btnMobileAddProduct" style="display:none;" data-on-click="closeMobileMenu(); openCrudModal();">
                     <span>➕ เพิ่มเมนูใหม่ (Admin)</span>
                     <span>→</span>
                 </button>
-                <button class="mobile-menu-item admin-item" onclick="closeMobileMenu(); promptAdminMode(event);">
+                <button class="mobile-menu-item admin-item" data-on-click="closeMobileMenu(); promptAdminMode(event);">
                     <span>🔒 จัดการโหมดผู้ดูแลร้าน (Admin Mode)</span>
                     <span>→</span>
                 </button>
@@ -2563,17 +2564,17 @@
     <h1 class="products-heading" id="productsHeading">🎋 เมนูข้าวหลาม MAXMUXSIX <span>เลือกเมนูแล้วกดใส่ตะกร้าได้เลย</span></h1>
     <div class="controls-wrapper" aria-labelledby="productsHeading">
         <div class="search-container">
-            <input type="text" id="filterKeyword" placeholder="🔍 ค้นหาเมนู เช่น ถั่วดำ, ช็อตมะพร้าว, สังขยา..." oninput="applyFilters()">
+            <input type="text" id="filterKeyword" placeholder="🔍 ค้นหาเมนู เช่น ถั่วดำ, ช็อตมะพร้าว, สังขยา..." data-on-input="applyFilters()">
         </div>
         <div class="filter-group">
-            <button class="btn-filter active" onclick="selectCategory('all', this)">ทั้งหมด</button>
-            <button class="btn-filter" onclick="selectCategory('สูตรเตาถ่านแท้', this)">สูตรเตาถ่านแท้</button>
-            <button class="btn-filter" onclick="selectCategory('เมนูช็อตไฟลุก', this)">เมนูช็อตไฟลุก</button>
-            <button class="btn-filter" onclick="selectCategory('รสพรีเมียม', this)">รสพรีเมียม</button>
+            <button class="btn-filter active" data-on-click="selectCategory('all', this)">ทั้งหมด</button>
+            <button class="btn-filter" data-on-click="selectCategory('สูตรเตาถ่านแท้', this)">สูตรเตาถ่านแท้</button>
+            <button class="btn-filter" data-on-click="selectCategory('เมนูช็อตไฟลุก', this)">เมนูช็อตไฟลุก</button>
+            <button class="btn-filter" data-on-click="selectCategory('รสพรีเมียม', this)">รสพรีเมียม</button>
         </div>
         <div class="sort-container">
             <label for="filterSort" class="sort-label">⚡ เรียงตาม:</label>
-            <select id="filterSort" class="select-sort" onchange="applyFilters()">
+            <select id="filterSort" class="select-sort" data-on-change="applyFilters()">
                 <option value="default">⭐ เมนูแนะนำ</option>
                 <option value="price-asc">💵 ราคา: ต่ำ → สูง</option>
                 <option value="price-desc">💎 ราคา: สูง → ต่ำ</option>
@@ -2594,10 +2595,10 @@
                 <span style="font-size: 0.85rem; color: #8BA89B; margin-left: 8px;">(ระบบ LocalStorage)</span>
             </div>
             <div class="storage-btns">
-                <button class="btn-db" onclick="backupToJson()">📥 สำรองข้อมูล (JSON)</button>
-                <button class="btn-db" onclick="document.getElementById('uploadJsonInput').click()">📤 นำเข้าข้อมูล</button>
-                <input type="file" id="uploadJsonInput" style="display: none;" accept=".json" onchange="restoreFromJson(event)">
-                <button class="btn-db reset" onclick="resetToDefault()">🔄 คืนค่าเริ่มต้น</button>
+                <button class="btn-db" data-on-click="backupToJson()">📥 สำรองข้อมูล (JSON)</button>
+                <button class="btn-db" data-on-click="openJsonUpload()">📤 นำเข้าข้อมูล</button>
+                <input type="file" id="uploadJsonInput" style="display: none;" accept=".json" data-on-change="restoreFromJson(event)">
+                <button class="btn-db reset" data-on-click="resetToDefault()">🔄 คืนค่าเริ่มต้น</button>
             </div>
         </div>
     </main>
@@ -2613,7 +2614,7 @@
         <p style="color: #C0D8CC; max-width: 620px; margin: 1.2rem auto 0; font-size: 1.15rem; font-weight: 400;">
             ต้นตำรับข้าวหลามเผาเตาถ่านไฟแรง ข้าวเหนียวเขี้ยวงูนุ่มหนึบ กะทิคั้นสดแท้ สั่งง่าย จัดส่งด่วนถึงหน้าบ้าน
         </p>
-        <button class="btn-add-main" style="margin-top: 1.6rem; font-size: 1.05rem; padding: 13px 30px; box-shadow: 0 8px 25px rgba(232, 93, 4, 0.4);" onclick="openQuizModal()">
+        <button class="btn-add-main" style="margin-top: 1.6rem; font-size: 1.05rem; padding: 13px 30px; box-shadow: 0 8px 25px rgba(232, 93, 4, 0.4);" data-on-click="openQuizModal()">
             🎯 ค้นหาข้าวหลามสไตล์คุณ (ทำแบบทดสอบ 30 วิ)
         </button>
     </section>
@@ -2693,7 +2694,7 @@
                 <!-- คอลัมน์ที่ 1: บรรยากาศหน้าร้านจริง และข้อมูลสาขา -->
                 <div class="store-info-card">
                     <div class="store-img-box">
-                        <img src="store_front.jpg" alt="หน้าร้านข้าวหลาม MAXMUXSIX เตาถ่านแท้ หนองมน" onerror="this.onerror=null; this.src='max_1.jpg';" class="store-feature-img">
+                        <img src="store_front.jpg" alt="หน้าร้านข้าวหลาม MAXMUXSIX เตาถ่านแท้ หนองมน" data-fallback="max_1.jpg" class="store-feature-img">
                         <div class="store-status-pill">
                             <span class="pulse-dot"></span> เปิดบริการทุกวัน 06:00 - 18:00 น.
                         </div>
@@ -2750,7 +2751,7 @@
                             <a href="https://line.me/R/ti/p/@052edqsq" target="_blank" rel="noopener noreferrer" class="btn-line-add">
                                 💬 แอด LINE: @052edqsq
                             </a>
-                            <button type="button" class="btn-line-qr" onclick="openLineQrModal()">
+                            <button type="button" class="btn-line-qr" data-on-click="openLineQrModal()">
                                 📱 สแกน QR Code
                             </button>
                         </div>
@@ -2782,7 +2783,7 @@
                                 เปิดใน Google Maps ↗
                             </a>
                         </div>
-                        <div class="map-canvas-mockup" onclick="window.open('https://maps.google.com/?q=13.2798,100.9328', '_blank')">
+                        <div class="map-canvas-mockup" data-on-click="openStoreMap()">
                             <div class="map-grid-lines"></div>
                             <div class="map-pin-pulse">
                                 <div class="pin-marker">🎋</div>
@@ -2802,10 +2803,10 @@
                         </div>
                         <p class="builder-desc">เลือกเมนูข้าวหลามที่ต้องการ เพื่อสร้าง URL สำหรับนำไปใส่ในปุ่ม LINE Rich Menu หรือ Broadcast ให้ลูกค้ากดแล้วเลือกเมนูนั้นทันที</p>
                         <div class="builder-controls">
-                            <select id="lineProductSelect" class="builder-select" onchange="updateGeneratedLineLink()">
+                            <select id="lineProductSelect" class="builder-select" data-on-change="updateGeneratedLineLink()">
                                 <!-- สร้างโดย JavaScript -->
                             </select>
-                            <button type="button" class="btn-copy-generated" onclick="copyCurrentGeneratedLineLink()">
+                            <button type="button" class="btn-copy-generated" data-on-click="copyCurrentGeneratedLineLink()">
                                 📋 คัดลอกลิงก์
                             </button>
                         </div>
@@ -2825,7 +2826,7 @@
                 เพียงกรอกอีเมลของคุณ ระบบจะจัดส่งโค้ดส่วนลด <strong style="color:var(--flame-yellow);">WELCOME10</strong> และข้อเสนอพิเศษ ข้าวหลามเผาเตาถ่านไฟแรง ส่งตรงถึง Gmail ของคุณทันที <span style="color:#A7F3D0;">(ไม่ต้องสมัครสมาชิก ไม่ต้องล็อกอิน)</span>
             </p>
             
-            <form class="subscribe-form" onsubmit="handleQuickSubscribe(event, 'section')">
+            <form class="subscribe-form" data-on-submit="handleQuickSubscribe(event, 'section')">
                 <div class="subscribe-input-group">
                     <input type="text" id="subscribeNameInput" class="subscribe-input-name" placeholder="ชื่อของคุณ (ระบุหรือไม่ก็ได้)">
                     <input type="email" id="subscribeEmailInput" class="subscribe-input-email" required placeholder="อีเมลของคุณ เช่น yourname@gmail.com">
@@ -2845,7 +2846,7 @@
         จัดทำโดย: <strong style="color: var(--flame-yellow); font-size: 1.05rem;">นายธณาเทพ พรมที</strong> | 
         รหัสนักศึกษา: <strong style="color: var(--flame-yellow); font-size: 1.05rem;">66040233114</strong>
         <div style="margin-top: 14px; font-size: 0.82rem;">
-            <a href="#admin" id="adminToggleLink" onclick="promptAdminMode(event)" style="color: #6B8076; text-decoration: none; border: 1px solid #1A3D2C; padding: 4px 12px; border-radius: 20px; transition: all 0.2s;">
+            <a href="#admin" id="adminToggleLink" data-on-click="promptAdminMode(event)" style="color: #6B8076; text-decoration: none; border: 1px solid #1A3D2C; padding: 4px 12px; border-radius: 20px; transition: all 0.2s;">
                 🔒 โหมดผู้ดูแลร้าน
             </a>
         </div>
@@ -2856,8 +2857,8 @@
             🍪 <strong>นโยบายความเป็นส่วนตัวและคุกกี้ (PDPA):</strong> เว็บไซต์ MAXMUXSIX ใช้คุกกี้และพื้นที่จัดเก็บข้อมูลบนอุปกรณ์เพื่อบันทึกรายการสินค้าในตะกร้า บัญชีสมาชิก และมอบประสบการณ์สั่งซื้อข้าวหลามที่รวดเร็วเร้าใจที่สุดสำหรับคุณ
         </div>
         <div class="consent-actions">
-            <button class="btn-consent-accept" onclick="acceptCookieConsent()">ยอมรับทั้งหมด</button>
-            <button class="btn-consent-decline" onclick="dismissCookieConsent()">จำเป็นเท่านั้น</button>
+            <button class="btn-consent-accept" data-on-click="acceptCookieConsent()">ยอมรับทั้งหมด</button>
+            <button class="btn-consent-decline" data-on-click="dismissCookieConsent()">จำเป็นเท่านั้น</button>
         </div>
     </div>
 
@@ -2866,7 +2867,7 @@
         <div class="modal-box" style="max-width: 400px; text-align: center;">
             <div class="modal-head">
                 <h3 id="lineQrModalTitle">💬 LINE Official Account</h3>
-                <button class="btn-close" onclick="closeLineQrModal()">&times;</button>
+                <button class="btn-close" data-on-click="closeLineQrModal()">&times;</button>
             </div>
             <div style="padding: 24px 16px;">
                 <div style="background: #FFF; padding: 16px; border-radius: 12px; display: inline-block; box-shadow: 0 4px 16px rgba(0,0,0,0.4);">
@@ -2888,17 +2889,17 @@
         <div class="modal-box">
             <div class="modal-head">
                 <h3 id="authModalTitle">บัญชีสมาชิก MAXMUXSIX</h3>
-                <button class="btn-close" aria-label="ปิดบัญชีสมาชิก" onclick="closeAuthModal()">&times;</button>
+                <button class="btn-close" aria-label="ปิดบัญชีสมาชิก" data-on-click="closeAuthModal()">&times;</button>
             </div>
 
             <div class="auth-tab-group">
-                <button class="auth-tab-btn active" id="tabLoginBtn" onclick="switchAuthTab('login')">เข้าสู่ระบบ</button>
-                <button class="auth-tab-btn" id="tabRegisterBtn" onclick="switchAuthTab('register')">สมัครสมาชิกใหม่</button>
+                <button class="auth-tab-btn active" id="tabLoginBtn" data-on-click="switchAuthTab('login')">เข้าสู่ระบบ</button>
+                <button class="auth-tab-btn" id="tabRegisterBtn" data-on-click="switchAuthTab('register')">สมัครสมาชิกใหม่</button>
             </div>
 
             <p id="authStatus" class="membership-status" role="status" aria-live="polite"></p>
             <div class="auth-content active" id="loginContent">
-                <form onsubmit="handleLogin(event)">
+                <form data-on-submit="handleLogin(event)">
                     <div class="form-row">
                         <label for="loginUserKey">อีเมล *</label>
                         <input type="email" id="loginUserKey" placeholder="yourname@email.com" autocomplete="username" maxlength="254" required>
@@ -2912,12 +2913,12 @@
                         <button type="submit" id="loginSubmit" class="btn-save" style="width: 100%;">เข้าสู่ระบบเร้าใจ 🔥</button>
                     </div>
                 </form>
-                <button type="button" class="btn-nav-action" onclick="switchAuthTab('reset')">ลืมรหัสผ่าน?</button>
+                <button type="button" class="btn-nav-action" data-on-click="switchAuthTab('reset')">ลืมรหัสผ่าน?</button>
                 <p class="membership-note">สมาชิกเดิมที่สมัครเฉพาะในเครื่อง ต้องสมัครและยืนยันอีเมลในระบบใหม่ก่อน</p>
             </div>
 
             <div class="auth-content" id="registerContent">
-                <form onsubmit="handleRegister(event)">
+                <form data-on-submit="handleRegister(event)">
                     <div class="form-row">
                         <label for="regName">ชื่อ-นามสกุล *</label>
                         <input type="text" id="regName" placeholder="เช่น สมเกียรติ ยิ้มหวาน" autocomplete="name" maxlength="100" required>
@@ -2966,7 +2967,7 @@
                 </form>
             </div>
             <div class="auth-content" id="resetContent">
-                <form onsubmit="handlePasswordReset(event)">
+                <form data-on-submit="handlePasswordReset(event)">
                     <div class="form-row"><label for="resetEmail">อีเมลที่สมัครสมาชิก *</label><input type="email" id="resetEmail" autocomplete="email" required maxlength="254"></div>
                     <div class="form-row" id="captcha-reset"></div>
                     <button type="submit" id="resetSubmit" class="btn-save">ส่งลิงก์ตั้งรหัสผ่านใหม่</button>
@@ -2974,7 +2975,7 @@
             </div>
             <div class="auth-content" id="passwordContent">
                 <p class="membership-note">ตั้งรหัสผ่านสำหรับคำเชิญหรือการกู้คืนบัญชี</p>
-                <form onsubmit="handleSetPassword(event)">
+                <form data-on-submit="handleSetPassword(event)">
                     <div class="form-row"><label for="newMemberPassword">รหัสผ่านใหม่ *</label><input type="password" id="newMemberPassword" autocomplete="new-password" minlength="8" maxlength="128" required></div>
                     <div class="form-row"><label for="confirmMemberPassword">ยืนยันรหัสผ่านใหม่ *</label><input type="password" id="confirmMemberPassword" autocomplete="new-password" minlength="8" maxlength="128" required></div>
                     <div class="consent-checkbox-wrap"><input type="checkbox" id="memberTerms" required><label for="memberTerms">ยอมรับข้อกำหนดการใช้บริการและยินยอมให้ร้านจัดเก็บชื่อ โทรศัพท์ ที่อยู่เพื่อบริการตามนโยบายความเป็นส่วนตัว</label></div>
@@ -2986,9 +2987,9 @@
 
     <div class="modal" id="membersModal" role="dialog" aria-modal="true" aria-labelledby="membersTitle">
         <div class="modal-box members-box">
-            <div class="modal-head"><h3 id="membersTitle">👥 สมาชิก MAXMUXSIX</h3><button class="btn-close" aria-label="ปิดจัดการสมาชิก" onclick="closeMembersModal()">&times;</button></div>
+            <div class="modal-head"><h3 id="membersTitle">👥 สมาชิก MAXMUXSIX</h3><button class="btn-close" aria-label="ปิดจัดการสมาชิก" data-on-click="closeMembersModal()">&times;</button></div>
             <p class="membership-note">เพิ่มสมาชิกด้วยคำเชิญทางอีเมล ให้เจ้าของบัญชีตั้งรหัสผ่านเอง การลบเป็นการลบบัญชีส่วนกลางและไม่สามารถเรียกคืนได้</p>
-            <form id="inviteMemberForm" onsubmit="handleInviteMember(event)">
+            <form id="inviteMemberForm" data-on-submit="handleInviteMember(event)">
                 <div class="form-grid form-row">
                     <div><label for="inviteName">ชื่อ *</label><input id="inviteName" maxlength="100" required autocomplete="off"></div>
                     <div><label for="inviteEmail">อีเมล *</label><input id="inviteEmail" type="email" maxlength="254" required autocomplete="off"></div>
@@ -2997,7 +2998,7 @@
                 <button id="inviteSubmit" type="submit" class="btn-save">+ เพิ่มผู้ใช้และส่งคำเชิญ</button>
             </form>
             <p id="membersStatus" class="membership-status" role="status" aria-live="polite"></p>
-            <form id="editMemberForm" class="member-edit-panel" hidden onsubmit="handleUpdateMember(event)">
+            <form id="editMemberForm" class="member-edit-panel" hidden data-on-submit="handleUpdateMember(event)">
                 <h4>แก้ไขข้อมูลสมาชิก</h4>
                 <p id="editMemberAccount" class="membership-note"></p>
                 <div class="form-grid form-row">
@@ -3006,12 +3007,12 @@
                 </div>
                 <div class="form-row"><label for="editMemberAddress">ที่อยู่</label><textarea id="editMemberAddress" maxlength="1000" rows="3" autocomplete="off"></textarea></div>
                 <p class="membership-note">แก้ไขเฉพาะข้อมูลติดต่อ ไม่เปลี่ยนอีเมล รหัสผ่าน หรือสิทธิ์ของบัญชี</p>
-                <div class="member-edit-actions"><button id="editMemberSubmit" type="submit" class="btn-save">บันทึกข้อมูล</button><button id="editMemberCancel" type="button" class="btn-nav-action" onclick="if (!membersBusy) resetMemberEditor()">ยกเลิก</button></div>
+                <div class="member-edit-actions"><button id="editMemberSubmit" type="submit" class="btn-save">บันทึกข้อมูล</button><button id="editMemberCancel" type="button" class="btn-nav-action" data-on-click="cancelMemberEdit()">ยกเลิก</button></div>
             </form>
             <div class="members-table-wrap" tabindex="0" aria-label="ตารางสมาชิก เลื่อนด้านข้างได้">
                 <table class="members-table"><thead><tr><th scope="col">ชื่อ / อีเมล</th><th scope="col">สถานะ</th><th scope="col">จัดการ</th></tr></thead><tbody id="membersBody"></tbody></table>
             </div>
-            <div class="members-pagination"><button id="membersPrev" class="btn-nav-action" onclick="loadMembers(membersPage - 1)">ก่อนหน้า</button><span id="membersPageLabel">หน้า 1</span><button id="membersNext" class="btn-nav-action" onclick="loadMembers(membersPage + 1)">ถัดไป</button></div>
+            <div class="members-pagination"><button id="membersPrev" class="btn-nav-action" data-on-click="loadMembersPrevPage()">ก่อนหน้า</button><span id="membersPageLabel">หน้า 1</span><button id="membersNext" class="btn-nav-action" data-on-click="loadMembersNextPage()">ถัดไป</button></div>
         </div>
     </div>
 
@@ -3020,13 +3021,13 @@
         <div class="modal-box" style="max-width: 450px; text-align: center;">
             <div class="modal-head">
                 <h3>🤝 ระบบแนะนำเพื่อน (Affiliate)</h3>
-                <button class="btn-close" onclick="closeReferralModal()">&times;</button>
+                <button class="btn-close" data-on-click="closeReferralModal()">&times;</button>
             </div>
             <p style="color: #C0D8CC;">ชวนเพื่อนมาเป็นครอบครัว MAXMUXSIX<br>รับสิทธิพิเศษและส่วนลดในอนาคต!</p>
             <div style="background: #07150E; border: 2px dashed var(--flame-yellow); padding: 1.5rem; border-radius: 16px; margin: 1.5rem 0;">
                 <div style="font-size: 0.9rem; color: #8BA89B; margin-bottom: 5px;">โค้ดแนะนำของคุณ</div>
                 <div id="myReferralCodeDisplay" style="font-size: 2.5rem; font-weight: 800; color: var(--flame-yellow); letter-spacing: 2px;">-</div>
-                <button onclick="copyReferralCode()" style="margin-top: 10px; background: var(--cream); color: #000; border: none; padding: 6px 16px; border-radius: 20px; font-weight: 700; cursor: pointer; transition: 0.2s;">📋 คัดลอกโค้ด</button>
+                <button data-on-click="copyReferralCode()" style="margin-top: 10px; background: var(--cream); color: #000; border: none; padding: 6px 16px; border-radius: 20px; font-weight: 700; cursor: pointer; transition: 0.2s;">📋 คัดลอกโค้ด</button>
             </div>
             <div style="display: flex; justify-content: space-around; background: #0D2218; padding: 1rem; border-radius: 12px; border: 1px solid #1E543C;">
                 <div>
@@ -3035,7 +3036,7 @@
                 </div>
             </div>
             <div class="modal-foot" style="justify-content: center;">
-                <button class="btn-cancel" onclick="closeReferralModal()">ปิดหน้าต่าง</button>
+                <button class="btn-cancel" data-on-click="closeReferralModal()">ปิดหน้าต่าง</button>
             </div>
         </div>
     </div>
@@ -3045,9 +3046,9 @@
         <div class="modal-box">
             <div class="modal-head">
                 <h3 id="modalHeading">เพิ่มเมนู MAXMUXSIX</h3>
-                <button class="btn-close" onclick="closeCrudModal()">&times;</button>
+                <button class="btn-close" data-on-click="closeCrudModal()">&times;</button>
             </div>
-            <form id="productForm" onsubmit="saveProduct(event)">
+            <form id="productForm" data-on-submit="saveProduct(event)">
                 <input type="hidden" id="editItemId">
                 
                 <div class="form-row">
@@ -3088,7 +3089,7 @@
 
                 <div class="form-row">
                     <label>หรืออัปโหลดรูปภาพสินค้าจากเครื่อง</label>
-                    <input type="file" id="itemImageFile" accept="image/*" onchange="previewImageUpload(event)">
+                    <input type="file" id="itemImageFile" accept="image/*" data-on-change="previewImageUpload(event)">
                 </div>
 
                 <div class="form-row">
@@ -3097,7 +3098,7 @@
                 </div>
 
                 <div class="modal-foot">
-                    <button type="button" class="btn-cancel" onclick="closeCrudModal()">ยกเลิก</button>
+                    <button type="button" class="btn-cancel" data-on-click="closeCrudModal()">ยกเลิก</button>
                     <button type="submit" class="btn-save" id="btnSubmitForm">บันทึกข้อมูล</button>
                 </div>
             </form>
@@ -3109,7 +3110,7 @@
         <div class="modal-box">
             <div class="modal-head">
                 <h3>🛒 ตะกร้าสินค้าของคุณ</h3>
-                <button class="btn-close" onclick="closeCartModal()">&times;</button>
+                <button class="btn-close" data-on-click="closeCartModal()">&times;</button>
             </div>
             
             <div id="cartItemsContainer" class="cart-items-list"></div>
@@ -3118,14 +3119,14 @@
                 <label>🏷️ โค้ดส่วนลด (Promo Code)</label>
                 <div class="coupon-input-group">
                     <input type="text" id="couponCodeInput" placeholder="พิมพ์ MAX10 เพื่อลด 10%">
-                    <button type="button" class="btn-apply-coupon" onclick="applyCoupon()">ใช้โค้ด</button>
+                    <button type="button" class="btn-apply-coupon" data-on-click="applyCoupon()">ใช้โค้ด</button>
                 </div>
                 <small id="couponMessage" style="display:block; margin-top: 4px; font-weight: 600;"></small>
             </div>
 
             <div class="ecom-box">
                 <label>🛵 ช่องทางการจัดส่ง</label>
-                <select id="shippingMethodSelect" onchange="calculateTotalOrder()">
+                <select id="shippingMethodSelect" data-on-change="calculateTotalOrder()">
                     <option value="50">จัดส่งด่วน Grab / Lineman (กทม. & ปริมณฑล) (+50 บาท)</option>
                     <option value="85">จัดส่งควบคุมอุณหภูมิ Inter Express ทั่วประเทศ (+85 บาท)</option>
                     <option value="0">รับหน้าร้านด้วยตนเอง (ฟรี 0 บาท)</option>
@@ -3155,8 +3156,8 @@
             <div id="crossSellContainer"></div>
 
             <div class="modal-foot">
-                <button class="btn-cancel" onclick="closeCartModal()">เลือกสินค้าต่อ</button>
-                <button class="btn-save" id="btnProceedCheckout" onclick="proceedToPayment()">ไปชำระเงิน →</button>
+                <button class="btn-cancel" data-on-click="closeCartModal()">เลือกสินค้าต่อ</button>
+                <button class="btn-save" id="btnProceedCheckout" data-on-click="proceedToPayment()">ไปชำระเงิน →</button>
             </div>
         </div>
     </div>
@@ -3166,7 +3167,7 @@
         <div class="modal-box">
             <div class="modal-head">
                 <h3>💳 ชำระเงินผ่าน PromptPay QR</h3>
-                <button class="btn-close" onclick="closePaymentModal()">&times;</button>
+                <button class="btn-close" data-on-click="closePaymentModal()">&times;</button>
             </div>
 
             <div class="demo-notice" role="note" style="border: 2px solid #D00000; border-radius: 10px; margin-bottom: 12px;">🧪 เว็บตัวอย่าง ไม่มีการขายหรือจัดส่งจริง ห้ามโอนเงิน</div>
@@ -3202,7 +3203,7 @@
                 <small style="color: #666;">ชื่อบัญชี: MAXMUXSIX ข้าวหลามเตาถ่าน</small>
             </div>
 
-            <form id="checkoutForm" onsubmit="confirmOrder(event)">
+            <form id="checkoutForm" data-on-submit="confirmOrder(event)">
                 <div class="form-row">
                     <label>ชื่อ-นามสกุล ผู้รับสินค้า *</label>
                     <input type="text" id="custName" placeholder="เช่น สมชาย ใจเร้าใจ" required>
@@ -3224,7 +3225,7 @@
                     <input type="file" id="custSlip" accept="image/*" style="padding: 6px;">
                 </div>
                 <div class="modal-foot">
-                    <button type="button" class="btn-cancel" onclick="backToCart()">← กลับตะกร้า</button>
+                    <button type="button" class="btn-cancel" data-on-click="backToCart()">← กลับตะกร้า</button>
                     <button type="submit" class="btn-save">✅ แจ้งชำระเงินและสั่งซื้อ</button>
                 </div>
             </form>
@@ -3236,11 +3237,11 @@
         <div class="modal-box">
             <div class="modal-head">
                 <h3>📦 ประวัติคำสั่งซื้อ & ติดตามสถานะ</h3>
-                <button class="btn-close" onclick="closeOrderHistoryModal()">&times;</button>
+                <button class="btn-close" data-on-click="closeOrderHistoryModal()">&times;</button>
             </div>
             <div id="orderHistoryContainer"></div>
             <div class="modal-foot">
-                <button type="button" class="btn-cancel" onclick="closeOrderHistoryModal()">ปิด</button>
+                <button type="button" class="btn-cancel" data-on-click="closeOrderHistoryModal()">ปิด</button>
             </div>
         </div>
     </div>
@@ -3250,7 +3251,7 @@
         <div class="modal-box" style="max-width: 560px;">
             <div class="modal-head">
                 <h3>🎯 ค้นหาข้าวหลามสไตล์คุณ</h3>
-                <button class="btn-close" onclick="closeQuizModal()">&times;</button>
+                <button class="btn-close" data-on-click="closeQuizModal()">&times;</button>
             </div>
             <div id="quizFormArea"></div>
             <div id="quizResultArea" style="display: none;"></div>
@@ -3262,7 +3263,7 @@
         <div class="modal-box email-modal-box">
             <div class="modal-head">
                 <h3>📬 อีเมลต้อนรับสมาชิกใหม่ (Welcome Email)</h3>
-                <button class="btn-close" onclick="closeWelcomeEmailModal()">&times;</button>
+                <button class="btn-close" data-on-click="closeWelcomeEmailModal()">&times;</button>
             </div>
             
             <div class="email-meta-card">
@@ -3281,13 +3282,13 @@
             <div class="email-view-toolbar">
                 <div class="email-view-toggle">
                     <span style="font-size:0.85rem; color:#8BA89B; margin-right:4px; align-self:center;">มุมมอง:</span>
-                    <button class="email-btn-view active" id="viewBtnDesktop" onclick="setEmailViewMode('desktop')">💻 จอคอม (600px)</button>
-                    <button class="email-btn-view" id="viewBtnMobile" onclick="setEmailViewMode('mobile')">📱 มือถือ (380px)</button>
+                    <button class="email-btn-view active" id="viewBtnDesktop" data-on-click="setEmailViewMode('desktop')">💻 จอคอม (600px)</button>
+                    <button class="email-btn-view" id="viewBtnMobile" data-on-click="setEmailViewMode('mobile')">📱 มือถือ (380px)</button>
                 </div>
                 <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-                    <button class="btn-consent-accept" style="padding: 6px 14px; font-size: 0.82rem;" onclick="copyWelcomeCoupon()">📋 คัดลอกโค้ด WELCOME10</button>
-                    <button class="btn-nav-action" style="padding: 6px 12px; font-size: 0.82rem;" onclick="printWelcomeEmail()">🖨️ พิมพ์ / PDF</button>
-                    <button class="btn-nav-action" style="padding: 6px 12px; font-size: 0.82rem; border-color: #38BDF8; color: #38BDF8;" onclick="openRealEmailSettingsModal()">⚙️ ตั้งค่าส่งอีเมลจริง</button>
+                    <button class="btn-consent-accept" style="padding: 6px 14px; font-size: 0.82rem;" data-on-click="copyWelcomeCoupon()">📋 คัดลอกโค้ด WELCOME10</button>
+                    <button class="btn-nav-action" style="padding: 6px 12px; font-size: 0.82rem;" data-on-click="printWelcomeEmail()">🖨️ พิมพ์ / PDF</button>
+                    <button class="btn-nav-action" style="padding: 6px 12px; font-size: 0.82rem; border-color: #38BDF8; color: #38BDF8;" data-on-click="openRealEmailSettingsModal()">⚙️ ตั้งค่าส่งอีเมลจริง</button>
                 </div>
             </div>
 
@@ -3298,8 +3299,8 @@
                     <span id="quickKeyStatusBadge" style="font-weight: 700; margin-left: 6px; color: #FAA307;">กำลังตรวจสอบ...</span>
                 </div>
                 <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-                    <button class="btn-nav-action" style="padding: 5px 12px; font-size: 0.82rem; border-color: #38BDF8; color: #38BDF8;" onclick="openRealEmailSettingsModal()">⚙️ ใส่ / แก้ไข Access Key</button>
-                    <button class="btn-order" id="btnQuickResend" style="padding: 5px 14px; font-size: 0.82rem;" onclick="resendCurrentEmailReal()">🚀 ส่งเข้าอีเมลนี้ทันที</button>
+                    <button class="btn-nav-action" style="padding: 5px 12px; font-size: 0.82rem; border-color: #38BDF8; color: #38BDF8;" data-on-click="openRealEmailSettingsModal()">⚙️ ใส่ / แก้ไข Access Key</button>
+                    <button class="btn-order" id="btnQuickResend" style="padding: 5px 14px; font-size: 0.82rem;" data-on-click="resendCurrentEmailReal()">🚀 ส่งเข้าอีเมลนี้ทันที</button>
                 </div>
             </div>
 
@@ -3310,7 +3311,7 @@
 
             <div class="modal-foot" style="margin-top: 14px; justify-content: space-between;">
                 <span style="font-size: 0.82rem; color: #8BA89B;">💡 สร้างจากเทมเพลต <code>subscribe_welcome_email.html</code> พร้อมข้อมูลสมาชิกไดนามิก</span>
-                <button type="button" class="btn-cancel" onclick="closeWelcomeEmailModal()">ปิดหน้าต่าง</button>
+                <button type="button" class="btn-cancel" data-on-click="closeWelcomeEmailModal()">ปิดหน้าต่าง</button>
             </div>
         </div>
     </div>
@@ -3320,15 +3321,15 @@
         <div class="modal-box" style="max-width: 600px;">
             <div class="modal-head">
                 <h3>📬 กล่องข้อความอีเมลของฉัน</h3>
-                <button class="btn-close" onclick="closeEmailInboxModal()">&times;</button>
+                <button class="btn-close" data-on-click="closeEmailInboxModal()">&times;</button>
             </div>
             <p style="font-size: 0.85rem; color: #8BA89B; margin-bottom: 10px;">
                 รวมอีเมลต้อนรับและข้อความข่าวสารทั้งหมดที่ระบบส่งหาคุณ
             </p>
             <div id="inboxListContainer" class="inbox-list"></div>
             <div class="modal-foot" style="margin-top: 16px; justify-content: space-between;">
-                <button type="button" class="btn-nav-action" style="font-size:0.85rem; border-color: #38BDF8; color: #38BDF8;" onclick="closeEmailInboxModal(); openRealEmailSettingsModal();">⚙️ ตั้งค่าส่งอีเมลจริง</button>
-                <button type="button" class="btn-cancel" onclick="closeEmailInboxModal()">ปิด</button>
+                <button type="button" class="btn-nav-action" style="font-size:0.85rem; border-color: #38BDF8; color: #38BDF8;" data-on-click="closeEmailInboxModal(); openRealEmailSettingsModal();">⚙️ ตั้งค่าส่งอีเมลจริง</button>
+                <button type="button" class="btn-cancel" data-on-click="closeEmailInboxModal()">ปิด</button>
             </div>
         </div>
     </div>
@@ -3338,7 +3339,7 @@
         <div class="modal-box" style="max-width: 620px;">
             <div class="modal-head">
                 <h3>⚙️ ตั้งค่าระบบส่งอีเมลจริง (Real Email Delivery)</h3>
-                <button class="btn-close" onclick="closeRealEmailSettingsModal()">&times;</button>
+                <button class="btn-close" data-on-click="closeRealEmailSettingsModal()">&times;</button>
             </div>
             
             <p style="font-size: 0.88rem; color: #C0D8CC; margin-bottom: 1rem; line-height: 1.5;">
@@ -3351,14 +3352,14 @@
                 </label>
                 <div style="display: flex; flex-direction: column; gap: 8px;">
                     <label style="display: flex; align-items: flex-start; gap: 10px; font-size: 0.9rem; cursor: pointer; background: #0A1C14; padding: 12px 14px; border-radius: 8px; border: 2px solid #10B981;">
-                        <input type="radio" name="emailProviderRadio" value="gas" id="radioGas" onchange="switchProviderView('gas')">
+                        <input type="radio" name="emailProviderRadio" value="gas" id="radioGas" data-on-change="switchProviderView('gas')">
                         <div>
                             <strong style="color: #34D399; font-size: 0.95rem;">⭐ วิธีที่ 1: Google Apps Script (แนะนำที่สุด! ฟรี 24 ชม. ไม่ต้องรัน Python ไม่ต้องเปิดคอม)</strong><br>
                             <span style="color: #C0D8CC; font-size: 0.82rem;">ส่งผ่าน Google Cloud โดยตรง ใช้ Gmail ของคุณเอง ส่งอีเมลดีไซน์ HTML สีดำ-ทอง พร้อมรูปสินค้า 100% ปิดคอมก็ส่งได้ตลอดเวลา</span>
                         </div>
                     </label>
                     <label style="display: flex; align-items: flex-start; gap: 10px; font-size: 0.9rem; cursor: pointer; background: #0A1C14; padding: 10px 12px; border-radius: 8px; border: 1px solid #1E543C;">
-                        <input type="radio" name="emailProviderRadio" value="web3forms" id="radioWeb3Forms" onchange="switchProviderView('web3forms')">
+                        <input type="radio" name="emailProviderRadio" value="web3forms" id="radioWeb3Forms" data-on-change="switchProviderView('web3forms')">
                         <div>
                             <strong style="color: #38BDF8;">🌐 วิธีที่ 3: Web3Forms API</strong><br>
                             <span style="color: #8BA89B; font-size: 0.8rem;">ส่งตรงจากหน้าเว็บ (สรุปข้อความฟอร์มเข้าเมลเจ้าของเว็บ ไม่รองรับดีไซน์ HTML กราฟิก)</span>
@@ -3384,7 +3385,7 @@
                     <label style="font-size: 0.85rem; color: #FAA307; font-weight: 700; display: block; margin-bottom: 4px;">
                         🔗 Web App URL ของ Google Apps Script:
                     </label>
-                    <input type="text" id="settingGasUrl" placeholder="วาง Web App URL ที่ลงท้ายด้วย /exec เช่น https://script.google.com/macros/s/.../exec" oninput="autoSaveGasUrl(this.value)" style="width: 100%; padding: 10px 12px; background: #0A1C14; border: 2px solid #1E543C; border-radius: 8px; color: var(--cream); font-size: 0.85rem; font-family: monospace;">
+                    <input type="text" id="settingGasUrl" placeholder="วาง Web App URL ที่ลงท้ายด้วย /exec เช่น https://script.google.com/macros/s/.../exec" data-on-input="autoSaveGasUrl(this.value)" style="width: 100%; padding: 10px 12px; background: #0A1C14; border: 2px solid #1E543C; border-radius: 8px; color: var(--cream); font-size: 0.85rem; font-family: monospace;">
                 </div>
 
                 <div style="margin-bottom: 10px;">
@@ -3396,10 +3397,10 @@
                 </div>
 
                 <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; margin-bottom: 12px;">
-                    <button type="button" class="btn-nav-action" style="padding: 4px 12px; font-size: 0.8rem;" onclick="testGasConnection()">
+                    <button type="button" class="btn-nav-action" style="padding: 4px 12px; font-size: 0.8rem;" data-on-click="testGasConnection()">
                         🔌 ทดสอบการเชื่อมต่อ URL
                     </button>
-                    <button type="button" class="btn-consent-accept" style="padding: 4px 14px; font-size: 0.8rem;" onclick="saveEmailSettings()">
+                    <button type="button" class="btn-consent-accept" style="padding: 4px 14px; font-size: 0.8rem;" data-on-click="saveEmailSettings()">
                         💾 บันทึก URL
                     </button>
                 </div>
@@ -3411,7 +3412,7 @@
                     </summary>
                     <div style="margin-top: 8px; line-height: 1.6;">
                         1. เข้าเว็บ <a href="https://script.google.com" target="_blank" style="color: #38BDF8; font-weight: 700; text-decoration: underline;">script.google.com</a> แล้วกดปุ่ม <strong>"+ โครงการใหม่" (New project)</strong><br>
-                        2. ลบโค้ดเดิมออกทั้งหมด แล้วกดปุ่ม <button type="button" class="btn-nav-action" style="display: inline-flex; padding: 2px 8px; font-size: 0.75rem;" onclick="copyGasScriptToClipboard()">📋 คัดลอกโค้ดสคริปต์</button> ไปวางแทนที่ (หรือดูในไฟล์ <code>google_apps_script.js</code>)<br>
+                        2. ลบโค้ดเดิมออกทั้งหมด แล้วกดปุ่ม <button type="button" class="btn-nav-action" style="display: inline-flex; padding: 2px 8px; font-size: 0.75rem;" data-on-click="copyGasScriptToClipboard()">📋 คัดลอกโค้ดสคริปต์</button> ไปวางแทนที่ (หรือดูในไฟล์ <code>google_apps_script.js</code>)<br>
                         3. กด <strong>บันทึก (Ctrl + S)</strong><br>
                         4. กดปุ่มสีน้ำเงิน <strong>"ทำให้ใช้งานได้" (Deploy)</strong> > <strong>"การทำให้ใช้งานได้ใหม่" (New deployment)</strong><br>
                         5. เลือกประเภทเป็น <strong>"เว็บแอป" (Web app)</strong> โดยตั้งค่า:<br>
@@ -3430,10 +3431,10 @@
                     </label>
                     <span id="web3formsKeyBadge" style="font-size: 0.8rem; font-weight: 600;"></span>
                 </div>
-                <input type="text" id="settingWeb3FormsKey" placeholder="วาง Access Key ที่ได้จาก web3forms.com ที่นี่..." oninput="autoSaveWeb3FormsKey(this.value)" style="width: 100%; padding: 10px 12px; background: #0A1C14; border: 2px solid #1E543C; border-radius: 8px; color: var(--cream); font-size: 0.9rem; margin-bottom: 8px; font-family: monospace;">
+                <input type="text" id="settingWeb3FormsKey" placeholder="วาง Access Key ที่ได้จาก web3forms.com ที่นี่..." data-on-input="autoSaveWeb3FormsKey(this.value)" style="width: 100%; padding: 10px 12px; background: #0A1C14; border: 2px solid #1E543C; border-radius: 8px; color: var(--cream); font-size: 0.9rem; margin-bottom: 8px; font-family: monospace;">
                 <div style="font-size: 0.82rem; color: #C0D8CC; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; margin-bottom: 8px;">
                     <span>💡 <strong>วิธีรับ Key ฟรี:</strong> เข้า <a href="https://web3forms.com" target="_blank" style="color: #38BDF8; font-weight: 700; text-decoration: underline;">web3forms.com</a> กรอกอีเมลของคุณ แล้วคัดลอก Access Key ในอีเมลมาวางที่นี่</span>
-                    <button type="button" class="btn-consent-accept" style="padding: 4px 14px; font-size: 0.8rem;" onclick="saveEmailSettings()">💾 บันทึก Key</button>
+                    <button type="button" class="btn-consent-accept" style="padding: 4px 14px; font-size: 0.8rem;" data-on-click="saveEmailSettings()">💾 บันทึก Key</button>
                 </div>
                 <div style="background: rgba(234, 179, 8, 0.12); border-left: 3px solid #EAB308; padding: 8px 10px; border-radius: 4px; font-size: 0.78rem; color: #FEF08A; line-height: 1.4;">
                     ℹ️ <strong>ทำไมวิธีนี้ถึงส่งเป็นข้อความธรรมดา?</strong> บริการ Web3Forms ฟรีเป็น Form Collector ที่นำข้อมูลไปจัดลงในตารางข้อความมาตรฐาน จึงไม่สามารถแสดงกราฟิกสีดำทอง กล่องคูปอง และภาพสินค้าของไฟล์ <code>subscribe_welcome_email.html</code> ได้ (แนะนำให้เลือก <strong>วิธีที่ 2 ด้านล่าง</strong> เพื่อส่งแบบสวยงาม 100%)
@@ -3444,14 +3445,14 @@
                 <div style="font-size: 0.85rem; font-weight: 700; color: #38BDF8; margin-bottom: 6px;">🧪 ทดสอบส่งอีเมลจริงทันที</div>
                 <div style="display: flex; gap: 8px;">
                     <input type="email" id="testRecipientEmailInput" placeholder="ระบุอีเมลผู้รับ เช่น yourname@gmail.com" style="flex: 1; padding: 7px 12px; background: #0A1C14; border: 1px solid #1E543C; border-radius: 6px; color: var(--cream); font-size: 0.85rem;">
-                    <button class="btn-order" id="btnTestSendRealEmail" style="padding: 7px 16px; font-size: 0.85rem;" onclick="testSendRealEmailFromSettings()">🚀 ส่งทดสอบ</button>
+                    <button class="btn-order" id="btnTestSendRealEmail" style="padding: 7px 16px; font-size: 0.85rem;" data-on-click="testSendRealEmailFromSettings()">🚀 ส่งทดสอบ</button>
                 </div>
                 <div id="testSendStatusText" style="font-size: 0.8rem; margin-top: 6px;"></div>
             </div>
 
             <div class="modal-foot">
-                <button type="button" class="btn-cancel" onclick="closeRealEmailSettingsModal()">ยกเลิก</button>
-                <button type="button" class="btn-consent-accept" style="padding: 8px 24px;" onclick="saveEmailSettings()">💾 บันทึกการตั้งค่า</button>
+                <button type="button" class="btn-cancel" data-on-click="closeRealEmailSettingsModal()">ยกเลิก</button>
+                <button type="button" class="btn-consent-accept" style="padding: 8px 24px;" data-on-click="saveEmailSettings()">💾 บันทึกการตั้งค่า</button>
             </div>
         </div>
     </div>
@@ -3467,7 +3468,7 @@
                         <small style="color: #4ADE80; font-weight: 600;">🎉 ยืนยันคำสั่งซื้อและจัดส่งเข้าอีเมลเรียบร้อยแล้ว</small>
                     </div>
                 </div>
-                <button class="btn-close" onclick="closeOrderReceiptModal()">&times;</button>
+                <button class="btn-close" data-on-click="closeOrderReceiptModal()">&times;</button>
             </div>
 
             <!-- Email Meta & Dispatch Info -->
@@ -3489,12 +3490,12 @@
             <div class="email-view-toolbar">
                 <div class="email-view-toggle">
                     <span style="font-size:0.85rem; color:#8BA89B; margin-right:4px; align-self:center;">มุมมอง:</span>
-                    <button class="email-btn-view active" id="receiptViewBtnDesktop" onclick="setReceiptViewMode('desktop')">💻 จอคอม (600px)</button>
-                    <button class="email-btn-view" id="receiptViewBtnMobile" onclick="setReceiptViewMode('mobile')">📱 มือถือ (380px)</button>
+                    <button class="email-btn-view active" id="receiptViewBtnDesktop" data-on-click="setReceiptViewMode('desktop')">💻 จอคอม (600px)</button>
+                    <button class="email-btn-view" id="receiptViewBtnMobile" data-on-click="setReceiptViewMode('mobile')">📱 มือถือ (380px)</button>
                 </div>
                 <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-                    <button class="btn-nav-action" style="padding: 6px 12px; font-size: 0.82rem;" onclick="printOrderReceipt()">🖨️ พิมพ์ใบเสร็จ / PDF</button>
-                    <button class="btn-order" style="padding: 6px 14px; font-size: 0.82rem;" id="btnResendOrderEmail" onclick="resendCurrentOrderEmail()">🚀 ส่งซ้ำเข้าอีเมล</button>
+                    <button class="btn-nav-action" style="padding: 6px 12px; font-size: 0.82rem;" data-on-click="printOrderReceipt()">🖨️ พิมพ์ใบเสร็จ / PDF</button>
+                    <button class="btn-order" style="padding: 6px 14px; font-size: 0.82rem;" id="btnResendOrderEmail" data-on-click="resendCurrentOrderEmail()">🚀 ส่งซ้ำเข้าอีเมล</button>
                 </div>
             </div>
 
@@ -3504,8 +3505,8 @@
             </div>
 
             <div class="modal-foot" style="margin-top: 14px; justify-content: space-between;">
-                <button type="button" class="btn-nav-action" style="border-color: #FAA307; color: #FAA307;" onclick="closeOrderReceiptModal(); openOrderHistoryModal();">📦 ตรวจสอบสถานะคำสั่งซื้อ</button>
-                <button type="button" class="btn-cancel" onclick="closeOrderReceiptModal()">ปิดหน้าต่าง / เลือกซื้อต่อ</button>
+                <button type="button" class="btn-nav-action" style="border-color: #FAA307; color: #FAA307;" data-on-click="closeOrderReceiptModal(); openOrderHistoryModal();">📦 ตรวจสอบสถานะคำสั่งซื้อ</button>
+                <button type="button" class="btn-cancel" data-on-click="closeOrderReceiptModal()">ปิดหน้าต่าง / เลือกซื้อต่อ</button>
             </div>
         </div>
     </div>
@@ -3518,7 +3519,7 @@
                     <span style="font-size: 1.3rem;">🎁</span>
                     <h3 style="margin: 0; font-size: 1.15rem; color: var(--flame-yellow);">รับโค้ดส่วนลด 10% (Subscribe)</h3>
                 </div>
-                <button class="btn-close" onclick="closeSubscribeModal()">&times;</button>
+                <button class="btn-close" data-on-click="closeSubscribeModal()">&times;</button>
             </div>
             
             <div style="padding: 1rem 0;">
@@ -3532,7 +3533,7 @@
                     กรอกอีเมลเพื่อรับโค้ดส่วนลด <span style="background:#E85D04; color:#FFF; padding:2px 8px; border-radius:4px; font-weight:700;">WELCOME10</span> ใช้ลดได้ทันทีในออเดอร์แรก <em style="color:#A7F3D0;">(ไม่ต้องสมัครสมาชิก ไม่ต้องล็อกอิน)</em>
                 </p>
 
-                <form onsubmit="handleQuickSubscribe(event, 'modal')">
+                <form data-on-submit="handleQuickSubscribe(event, 'modal')">
                     <div style="margin-bottom: 10px; text-align: left;">
                         <label style="font-size: 0.82rem; color: #FAA307; font-weight: 600; display: block; margin-bottom: 4px;">
                             👤 ชื่อของคุณ (ระบุหรือไม่ก็ได้):
@@ -4185,7 +4186,7 @@
     <div id="cartToastNotification" class="cart-quick-toast" role="status" aria-live="polite"></div>
 
     <!-- Floating Mobile Quick Cart Pill -->
-    <aside id="floatingMobileCart" class="floating-mobile-cart" onclick="openCartModal()" aria-label="เปิดตะกร้าสินค้า">
+    <aside id="floatingMobileCart" class="floating-mobile-cart" data-on-click="openCartModal()" aria-label="เปิดตะกร้าสินค้า">
         <div class="float-cart-icon-wrapper">
             <span>🛒</span>
             <span class="float-cart-badge" id="floatCartBadge">0</span>
@@ -4198,24 +4199,24 @@
     </aside>
 
     <nav class="mobile-bottom-bar" aria-label="Mobile Navigation">
-        <button class="mobile-nav-btn active" id="btnBottomNavHome" onclick="scrollToTop()">
+        <button class="mobile-nav-btn active" id="btnBottomNavHome" data-on-click="scrollToTop()">
             <span class="mobile-nav-icon">🏠</span>
             <span class="mobile-nav-label">หน้าแรก</span>
         </button>
-        <button class="mobile-nav-btn" onclick="focusSearch()">
+        <button class="mobile-nav-btn" data-on-click="focusSearch()">
             <span class="mobile-nav-icon">🔍</span>
             <span class="mobile-nav-label">ค้นหา</span>
         </button>
-        <button class="mobile-nav-btn" onclick="openCartModal()" style="position: relative;">
+        <button class="mobile-nav-btn" data-on-click="openCartModal()" style="position: relative;">
             <span class="mobile-nav-icon">🛒</span>
             <span class="mobile-nav-label">ตะกร้า</span>
             <span class="cart-badge mobile-cart-badge" id="cartCountBottom">0</span>
         </button>
-        <button class="mobile-nav-btn" onclick="openOrderHistoryModal()">
+        <button class="mobile-nav-btn" data-on-click="openOrderHistoryModal()">
             <span class="mobile-nav-icon">📦</span>
             <span class="mobile-nav-label">คำสั่งซื้อ</span>
         </button>
-        <button class="mobile-nav-btn" onclick="toggleMobileMenu()">
+        <button class="mobile-nav-btn" data-on-click="toggleMobileMenu()">
             <span class="mobile-nav-icon">☰</span>
             <span class="mobile-nav-label">เมนู</span>
         </button>
@@ -4225,6 +4226,7 @@
     <script src="assets/vendor/supabase.js"></script>
     <script src="assets/js/cloud-auth.js"></script>
     <script src="assets/js/captcha.js"></script>
+    <script src="assets/js/actions.js"></script>
     <script>
         const defaultMaxmuxsixData = [
             {
@@ -4495,12 +4497,12 @@
                         <div class="user-nav-box">
                             <span>👤</span>
                             <span class="user-nav-name">${escapeStoredText(currentUser.name)}</span>
-                            <button class="btn-nav-action" style="padding: 4px 12px; border-color: var(--flame-yellow); color: var(--flame-yellow);" onclick="openReferralModal()">🤝 ชวนเพื่อน</button>
-                            <button class="btn-nav-action" style="padding: 4px 12px; border-color: #38BDF8; color: #38BDF8;" onclick="openEmailInboxModal()">
+                            <button class="btn-nav-action" style="padding: 4px 12px; border-color: var(--flame-yellow); color: var(--flame-yellow);" data-on-click="openReferralModal()">🤝 ชวนเพื่อน</button>
+                            <button class="btn-nav-action" style="padding: 4px 12px; border-color: #38BDF8; color: #38BDF8;" data-on-click="openEmailInboxModal()">
                                 📧 กล่องอีเมล
                                 <span class="cart-badge" style="background:#0284C7; margin-left:4px; font-size: 0.75rem;">${userEmails.length}</span>
                             </button>
-                            <button class="btn-logout" onclick="handleLogout()">ออกจากระบบ</button>
+                            <button class="btn-logout" data-on-click="handleLogout()">ออกจากระบบ</button>
                         </div>
                     `;
                 }
@@ -4512,11 +4514,11 @@
                                     <div style="font-weight: 700; color: var(--flame-yellow); font-size: 1rem;">👤 ${escapeStoredText(currentUser.name)}</div>
                                     <div style="font-size: 0.8rem; color: #A7F3D0;">${sanitizeHtml(String(currentUser.email || currentUser.phone || ''))}</div>
                                 </div>
-                                <button onclick="handleLogout()" style="background: none; border: 1px solid #EF4444; color: #FCA5A5; padding: 4px 10px; border-radius: 8px; font-size: 0.8rem; cursor: pointer;">ออกจากระบบ</button>
+                                <button data-on-click="handleLogout()" style="background: none; border: 1px solid #EF4444; color: #FCA5A5; padding: 4px 10px; border-radius: 8px; font-size: 0.8rem; cursor: pointer;">ออกจากระบบ</button>
                             </div>
                             <div style="display: flex; gap: 8px; margin-top: 6px;">
-                                <button class="btn-nav-action" style="flex: 1; justify-content: center; padding: 6px 8px; font-size: 0.8rem; border-color: var(--flame-yellow); color: var(--flame-yellow);" onclick="closeMobileMenu(); openReferralModal();">🤝 ชวนเพื่อน</button>
-                                <button class="btn-nav-action" style="flex: 1; justify-content: center; padding: 6px 8px; font-size: 0.8rem; border-color: #38BDF8; color: #38BDF8;" onclick="closeMobileMenu(); openEmailInboxModal();">📧 กล่องอีเมล (${userEmails.length})</button>
+                                <button class="btn-nav-action" style="flex: 1; justify-content: center; padding: 6px 8px; font-size: 0.8rem; border-color: var(--flame-yellow); color: var(--flame-yellow);" data-on-click="closeMobileMenu(); openReferralModal();">🤝 ชวนเพื่อน</button>
+                                <button class="btn-nav-action" style="flex: 1; justify-content: center; padding: 6px 8px; font-size: 0.8rem; border-color: #38BDF8; color: #38BDF8;" data-on-click="closeMobileMenu(); openEmailInboxModal();">📧 กล่องอีเมล (${userEmails.length})</button>
                             </div>
                         </div>
                     `;
@@ -4524,14 +4526,14 @@
             } else {
                 if (area) {
                     area.innerHTML = `
-                        <button class="btn-nav-action" onclick="openAuthModal('login')">
+                        <button class="btn-nav-action" data-on-click="openAuthModal('login')">
                             👤 เข้าสู่ระบบ / สมัครสมาชิก
                         </button>
                     `;
                 }
                 if (mobileArea) {
                     mobileArea.innerHTML = `
-                        <button class="btn-nav-action" style="width: 100%; justify-content: center; padding: 12px; font-size: 0.95rem; margin-bottom: 12px; background: linear-gradient(180deg, #1A4430, #0E281D);" onclick="closeMobileMenu(); openAuthModal('login');">
+                        <button class="btn-nav-action" style="width: 100%; justify-content: center; padding: 12px; font-size: 0.95rem; margin-bottom: 12px; background: linear-gradient(180deg, #1A4430, #0E281D);" data-on-click="closeMobileMenu(); openAuthModal('login');">
                             👤 เข้าสู่ระบบ / สมัครสมาชิก
                         </button>
                     `;
@@ -4927,13 +4929,13 @@
                 html += `
                     <div class="card rec-card">
                         <div class="card-img-wrapper" style="height: 160px;">
-                            <img src="${safeImageAttribute(p.image)}" alt="${escapeStoredText(p.name)}" loading="lazy" onerror="this.onerror=null; this.src='${fallbackImageBase64}';">
+                            <img src="${safeImageAttribute(p.image)}" alt="${escapeStoredText(p.name)}" loading="lazy" data-fallback="${fallbackImageBase64}">
                             ${p.tag ? `<div class="card-ribbon-tag" style="background: var(--success);">${escapeStoredText(p.tag)}</div>` : ''}
                         </div>
                         <div class="card-body" style="padding: 1rem;">
                             <h3 style="font-size: 1.15rem; margin-bottom: 5px; color: var(--cream); font-weight: 700;">${escapeStoredText(p.name)}</h3>
                             <div style="color: var(--flame-yellow); font-weight: 800; font-size: 1.3rem;">${safeDisplayNumber(p.price)} บาท</div>
-                            <button class="btn-order" onclick="addToCart(${htmlJsArg(p.id)})" style="width: 100%; margin-top: 10px;">🛒 เพิ่มลงตะกร้า</button>
+                            <button class="btn-order" data-on-click="addToCart(${htmlJsArg(p.id)})" style="width: 100%; margin-top: 10px;">🛒 เพิ่มลงตะกร้า</button>
                         </div>
                     </div>
                 `;
@@ -5002,7 +5004,7 @@
             const percent = Math.round((quizStep / total) * 100);
 
             const optsHtml = q.options.map((opt, idx) => `
-                <button type="button" class="btn-filter quiz-opt-btn ${quizAnswers[q.id] === idx ? 'active' : ''}" onclick="selectQuizOption(${idx})">
+                <button type="button" class="btn-filter quiz-opt-btn ${quizAnswers[q.id] === idx ? 'active' : ''}" data-on-click="selectQuizOption(${idx})">
                     <span style="font-size: 1.25rem; margin-right: 8px;">${opt.icon || ''}</span>${opt.label}
                 </button>
             `).join('');
@@ -5023,8 +5025,8 @@
                 <h3 style="color: var(--flame-yellow); margin-bottom: 1.2rem; font-size: 1.2rem;">${q.icon || ''} ${q.question}</h3>
                 <div>${optsHtml}</div>
                 <div class="modal-foot" style="justify-content: space-between;">
-                    <button type="button" class="btn-cancel" onclick="${quizStep === 0 ? 'closeQuizModal()' : 'prevQuizStep()'}">${quizStep === 0 ? 'ยกเลิก' : '← ก่อนหน้า'}</button>
-                    <button type="button" class="btn-save" ${answered ? '' : 'disabled style="opacity:0.45; cursor:not-allowed;"'} onclick="nextQuizStep()">${isLast ? 'ดูผลลัพธ์ 🎉' : 'ถัดไป →'}</button>
+                    <button type="button" class="btn-cancel" data-on-click="${quizStep === 0 ? 'closeQuizModal()' : 'prevQuizStep()'}">${quizStep === 0 ? 'ยกเลิก' : '← ก่อนหน้า'}</button>
+                    <button type="button" class="btn-save" ${answered ? '' : 'disabled style="opacity:0.45; cursor:not-allowed;"'} data-on-click="nextQuizStep()">${isLast ? 'ดูผลลัพธ์ 🎉' : 'ถัดไป →'}</button>
                 </div>
             `;
         }
@@ -5104,14 +5106,14 @@
             const cardsHtml = top.map(p => `
                 <div class="card quiz-result-card">
                     <div class="card-img-wrapper" style="height: 150px;">
-                        <img src="${safeImageAttribute(p.image)}" alt="${escapeStoredText(p.name)}" loading="lazy" onerror="this.onerror=null; this.src='${fallbackImageBase64}';">
+                        <img src="${safeImageAttribute(p.image)}" alt="${escapeStoredText(p.name)}" loading="lazy" data-fallback="${fallbackImageBase64}">
                         ${maxScore > 0 && p._score === maxScore ? `<div class="quiz-match-badge">✨ ตรงใจที่สุด</div>` : ''}
                         ${p.tag ? `<div class="card-ribbon-tag">${escapeStoredText(p.tag)}</div>` : ''}
                     </div>
                     <div class="card-body" style="padding: 1rem;">
                         <h3 style="font-size: 1.08rem; color: var(--cream); margin-bottom: 4px;">${escapeStoredText(p.name)}</h3>
                         <div style="color: var(--flame-yellow); font-weight: 800; font-size: 1.2rem; margin-bottom: 10px;">${safeDisplayNumber(p.price)} บาท</div>
-                        <button class="btn-order" style="width: 100%;" onclick="addToCart(${htmlJsArg(p.id)}); closeQuizModal();">🛒 เพิ่มลงตะกร้าเลย</button>
+                        <button class="btn-order" style="width: 100%;" data-on-click="addToCart(${htmlJsArg(p.id)}); closeQuizModal();">🛒 เพิ่มลงตะกร้าเลย</button>
                     </div>
                 </div>
             `).join('');
@@ -5124,8 +5126,8 @@
                 </div>
                 ${cardsHtml || `<p style="text-align: center; color: #8BA89B; padding: 1.5rem 0;">ยังไม่มีเมนูที่ตรงกับความต้องการในขณะนี้ ลองดูเมนูทั้งหมดของเราได้เลย</p>`}
                 <div class="modal-foot" style="justify-content: center; gap: 12px;">
-                    <button type="button" class="btn-cancel" onclick="restartQuiz()">🔄 ทำแบบทดสอบใหม่</button>
-                    <button type="button" class="btn-save" onclick="closeQuizModal()">ปิดหน้าต่าง</button>
+                    <button type="button" class="btn-cancel" data-on-click="restartQuiz()">🔄 ทำแบบทดสอบใหม่</button>
+                    <button type="button" class="btn-save" data-on-click="closeQuizModal()">ปิดหน้าต่าง</button>
                 </div>
             `;
         }
@@ -5161,13 +5163,13 @@
                 const stockBadgeClass = isLowStock ? 'stock-badge stock-low' : 'stock-badge stock-available';
                 const stockIcon = isLowStock ? '⚠️ ใกล้หมด' : '🟢 พร้อมส่ง';
                 const adminButtons = isAdminMode ? `
-                    <button class="btn-act edit" title="แก้ไข" onclick="editProduct(${htmlJsArg(p.id)})">✏️</button>
-                    <button class="btn-act delete" title="ลบ" onclick="deleteProduct(${htmlJsArg(p.id)})">🗑️</button>
+                    <button class="btn-act edit" title="แก้ไข" data-on-click="editProduct(${htmlJsArg(p.id)})">✏️</button>
+                    <button class="btn-act delete" title="ลบ" data-on-click="deleteProduct(${htmlJsArg(p.id)})">🗑️</button>
                 ` : '';
 
                 card.innerHTML = `
                     <div class="card-img-wrapper">
-                        <img src="${safeImageAttribute(p.image)}" alt="${safeName}" loading="lazy" onerror="this.onerror=null; this.src='${fallbackImageBase64}';">
+                        <img src="${safeImageAttribute(p.image)}" alt="${safeName}" loading="lazy" data-fallback="${fallbackImageBase64}">
                         ${safeTag ? `<div class="card-ribbon-tag">${safeTag}</div>` : ''}
                         <div class="${stockBadgeClass}">${stockIcon} คงเหลือ ${safeDisplayNumber(stockCount)} กระบอก</div>
                     </div>
@@ -5181,8 +5183,8 @@
                         <div class="card-footer">
                             <div class="card-price">${safeDisplayNumber(p.price)} <span style="font-size:0.85rem; color:var(--cream);">บาท</span></div>
                             <div class="card-btns">
-                                <button class="btn-order" onclick="addToCart(${htmlJsArg(p.id)})">🛒 สั่งซื้อ</button>
-                                <button class="btn-share-line" title="คัดลอกลิงก์สำหรับใส่ใน LINE OA" onclick="copyLineProductLink(${htmlJsArg(p.id)}, event)">🔗 ลิงก์ LINE</button>
+                                <button class="btn-order" data-on-click="addToCart(${htmlJsArg(p.id)})">🛒 สั่งซื้อ</button>
+                                <button class="btn-share-line" title="คัดลอกลิงก์สำหรับใส่ใน LINE OA" data-on-click="copyLineProductLink(${htmlJsArg(p.id)}, event)">🔗 ลิงก์ LINE</button>
                                 ${adminButtons}
                             </div>
                         </div>
@@ -5202,7 +5204,7 @@
                 toast.className = 'cart-quick-toast';
                 document.body.appendChild(toast);
             }
-            toast.innerHTML = `<span>${sanitizeHtml(message)}</span> <button type="button" onclick="openCartModal()" class="btn-toast-viewcart">ดูตะกร้า →</button>`;
+            toast.innerHTML = `<span>${sanitizeHtml(message)}</span> <button type="button" data-on-click="openCartModal()" class="btn-toast-viewcart">ดูตะกร้า →</button>`;
             toast.classList.add('show');
             if (typeof window !== 'undefined') {
                 if (window._cartToastTimer) clearTimeout(window._cartToastTimer);
@@ -5278,9 +5280,9 @@
                         <div class="cart-item-price">${safeDisplayNumber(item.price)} บาท × ${safeDisplayNumber(item.qty)} = <strong>${safeDisplayNumber(subtotal)}</strong> บาท</div>
                     </div>
                     <div class="qty-controls">
-                        <button class="qty-btn" onclick="changeQty(${htmlJsArg(item.id)}, -1)">-</button>
+                        <button class="qty-btn" data-on-click="changeQty(${htmlJsArg(item.id)}, -1)">-</button>
                         <span>${safeDisplayNumber(item.qty)}</span>
-                        <button class="qty-btn" onclick="changeQty(${htmlJsArg(item.id)}, 1)">+</button>
+                        <button class="qty-btn" data-on-click="changeQty(${htmlJsArg(item.id)}, 1)">+</button>
                     </div>
                 `;
                 listContainer.appendChild(itemRow);
@@ -5316,12 +5318,12 @@
             recommendations.forEach(p => {
                 html += `
                 <div class="cross-sell-item">
-                    <img src="${safeImageAttribute(p.image)}" onerror="this.onerror=null; this.src='${fallbackImageBase64}';" style="width:50px; height:50px; border-radius:8px; object-fit:cover; border:1px solid #23583F;">
+                    <img src="${safeImageAttribute(p.image)}" data-fallback="${fallbackImageBase64}" style="width:50px; height:50px; border-radius:8px; object-fit:cover; border:1px solid #23583F;">
                     <div style="flex:1;">
                         <div style="font-size:0.85rem; font-weight:600; color:var(--cream);">${escapeStoredText(p.name)}</div>
                         <div style="color:var(--flame-yellow); font-size:0.9rem; font-weight:700;">${safeDisplayNumber(p.price)} บาท</div>
                     </div>
-                    <button onclick="addToCart(${htmlJsArg(p.id)}); renderCartItems(); calculateTotalOrder();" style="background:var(--flame-orange); color:#fff; border:1px solid var(--cream); padding:5px 12px; border-radius:20px; cursor:pointer; font-weight:700; font-size:0.85rem; transition:0.2s;">
+                    <button data-on-click="addToCart(${htmlJsArg(p.id)}); renderCartItems(); calculateTotalOrder();" style="background:var(--flame-orange); color:#fff; border:1px solid var(--cream); padding:5px 12px; border-radius:20px; cursor:pointer; font-weight:700; font-size:0.85rem; transition:0.2s;">
                         + เพิ่ม
                     </button>
                 </div>`;
@@ -5509,7 +5511,7 @@
                             <div style="font-size: 0.95rem; font-weight: 700; color: var(--flame-yellow);">
                                 ยอดชำระรวม: ${safeDisplayNumber(ord.total)} บาท
                             </div>
-                            <button class="btn-nav-action" style="padding: 4px 10px; font-size: 0.8rem; border-color: #38BDF8; color: #38BDF8;" onclick="closeOrderHistoryModal(); openOrderReceiptModal(${htmlJsArg(ord.id)})">🧾 ดูใบเสร็จ & อีเมลสรุป</button>
+                            <button class="btn-nav-action" style="padding: 4px 10px; font-size: 0.8rem; border-color: #38BDF8; color: #38BDF8;" data-on-click="closeOrderHistoryModal(); openOrderReceiptModal(${htmlJsArg(ord.id)})">🧾 ดูใบเสร็จ & อีเมลสรุป</button>
                         </div>
                     `;
                     container.appendChild(div);
@@ -5950,8 +5952,8 @@
                         <strong>${escapeStoredText(displayTitle)}</strong><br>
                         ${escapeStoredText(displaySub)}
                     </div>
-                    <button class="email-toast-btn" onclick="${isOrder ? `openOrderReceiptModalFromEmailId(${htmlJsArg(emailId)})` : `openWelcomeEmailModal(${htmlJsArg(emailId)})`}">${isOrder ? 'เปิดดูใบเสร็จ' : 'เปิดดูอีเมล'}</button>
-                    <button class="email-toast-close" onclick="closeEmailToast()">&times;</button>
+                    <button class="email-toast-btn" data-on-click="${isOrder ? `openOrderReceiptModalFromEmailId(${htmlJsArg(emailId)})` : `openWelcomeEmailModal(${htmlJsArg(emailId)})`}">${isOrder ? 'เปิดดูใบเสร็จ' : 'เปิดดูอีเมล'}</button>
+                    <button class="email-toast-close" data-on-click="closeEmailToast()">&times;</button>
                 </div>
             `;
 
@@ -6492,7 +6494,7 @@
                 if (result.success) {
                     statusMeta.innerHTML = `<span style="color:#10B981; font-weight:700;">${sanitizeHtml(String(emailRecord.dispatchStatus))}</span>`;
                 } else {
-                    statusMeta.innerHTML = `<span style="color:#F59E0B;">${sanitizeHtml(String(emailRecord.dispatchStatus))}</span> <button class="btn-nav-action" style="display:inline-flex; padding:2px 8px; font-size:0.75rem; margin-left:6px;" onclick="openRealEmailSettingsModal()">⚙️ ตั้งค่าส่งจริง</button>`;
+                    statusMeta.innerHTML = `<span style="color:#F59E0B;">${sanitizeHtml(String(emailRecord.dispatchStatus))}</span> <button class="btn-nav-action" style="display:inline-flex; padding:2px 8px; font-size:0.75rem; margin-left:6px;" data-on-click="openRealEmailSettingsModal()">⚙️ ตั้งค่าส่งจริง</button>`;
                 }
             }
 
@@ -6987,8 +6989,8 @@ function testRun() {
                         <strong>ใส่โค้ดส่วนลด ${safePromo} สำเร็จ!</strong><br>
                         รับส่วนลด 10% พร้อมสั่งซื้อข้าวหลามเตาถ่านได้ทันที
                     </div>
-                    <button class="email-toast-btn" onclick="scrollToProducts(); closeEmailToast();">เลือกเมนูเลย</button>
-                    <button class="email-toast-close" onclick="closeEmailToast()">&times;</button>
+                    <button class="email-toast-btn" data-on-click="scrollToProducts(); closeEmailToast();">เลือกเมนูเลย</button>
+                    <button class="email-toast-close" data-on-click="closeEmailToast()">&times;</button>
                 </div>
             `;
             setTimeout(closeEmailToast, 8000);
@@ -7125,7 +7127,7 @@ function testRun() {
                         <strong>สวัสดีเพื่อนๆ จาก LINE Official Account!</strong>
                         <span>แวะมาเลือกข้าวหลามเตาถ่านแท้ หรือสั่งจองกระบอกร้อนๆ ได้ทันที 🔥 ใช้โค้ด <b style="color:var(--flame-yellow);">WELCOME10</b> ลด 10%</span>
                     </div>
-                    <button class="btn-close-line-banner" title="ปิดการแจ้งเตือน" onclick="dismissLineBanner()">&times;</button>
+                    <button class="btn-close-line-banner" title="ปิดการแจ้งเตือน" data-on-click="dismissLineBanner()">&times;</button>
                 </div>
             `;
             const header = document.querySelector('header');
@@ -7280,6 +7282,13 @@ function testRun() {
         function escapeStoredText(value) {
             return sanitizeHtml(decodeStoredText(value));
         }
+
+        // Named wrappers for markup actions: data-on-* attributes may only call plain functions (assets/js/actions.js).
+        function openJsonUpload() { document.getElementById('uploadJsonInput').click(); }
+        function cancelMemberEdit() { if (!membersBusy) resetMemberEditor(); }
+        function loadMembersNextPage() { loadMembers(membersPage + 1); }
+        function loadMembersPrevPage() { loadMembers(membersPage - 1); }
+        function openStoreMap() { window.open('https://maps.google.com/?q=13.2798,100.9328', '_blank', 'noopener'); }
 
         function htmlJsArg(value) {
             return sanitizeHtml(JSON.stringify(String(value ?? '')));
