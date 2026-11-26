@@ -130,6 +130,14 @@ test('page handlers pass the form token and reset it after the attempt', async (
     assert.deepEqual(resets, ['login', 'register', 'reset']);
 });
 
+test('the published auth config has a Turnstile site key', () => {
+    const source = fs.readFileSync(path.join(__dirname, '..', '..', 'auth-config.js'), 'utf8');
+    const window = {};
+    new Function('window', source)(window);
+    // Cloudflare's test keys start with 1x/2x/3x; real site keys start with 0x4 and are shorter than secret keys.
+    assert.match(window.MAXMUXSIX_AUTH_CONFIG.turnstileSiteKey, /^0x4[A-Za-z0-9_-]{15,25}$/);
+});
+
 test('page has a captcha slot per form, loads the module and allows Turnstile in CSP', () => {
     const html = fs.readFileSync(path.join(__dirname, '..', '..', 'index.html'), 'utf8');
     for (const form of ['login', 'register', 'reset']) assert.ok(html.includes(`id="captcha-${form}"`), form);

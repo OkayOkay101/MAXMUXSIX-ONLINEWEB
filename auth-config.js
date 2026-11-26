@@ -6,5 +6,5 @@ window.MAXMUXSIX_AUTH_CONFIG = Object.freeze({
     redirectUrl: 'https://okayokay101.github.io/MAXMUXSIX-ONLINEWEB/',
     // Cloudflare Turnstile SITE key (public). Empty = captcha off.
     // Publish the site with this key BEFORE turning CAPTCHA on in Supabase, or nobody can sign in.
-    turnstileSiteKey: ''
+    turnstileSiteKey: '0x4AAAAAAGTS3jm-E4yU4CzM'
 });
