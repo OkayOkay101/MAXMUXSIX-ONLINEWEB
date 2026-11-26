@@ -3,7 +3,7 @@ const assert = require('node:assert/strict');
 
 const config = {
     projectUrl: 'https://lxvxffrexegvqzeojztw.supabase.co',
-    siteUrl: 'https://okayokay101.github.io/MAXMUXSIX-ONLINEWEB/'
+    siteUrl: 'https://maxmuxsix-demo.vercel.app/'
 };
 const load = () => import('../../supabase/functions/send-auth-email/messages.mjs');
 function fixture(action = 'signup') {
@@ -167,7 +167,7 @@ for (const email of ['buyer@example.test,other@example.test', 'buyer@example.tes
 }
 
 for (const field of ['redirect_to', 'site_url']) {
-    for (const value of ['https://evil.example.test/', 'http://okayokay101.github.io/MAXMUXSIX-ONLINEWEB/', `${config.siteUrl}?next=https://evil.example.test`, `${config.siteUrl}#other`, '', undefined]) {
+    for (const value of ['https://evil.example.test/', 'http://maxmuxsix-demo.vercel.app/', `${config.siteUrl}?next=https://evil.example.test`, `${config.siteUrl}#other`, '', undefined]) {
         test(`${field} rejects a non-allowlisted value ${String(value)}`, async () => {
             const payload = fixture(); payload.email_data[field] = value;
             await rejects(payload, 'INVALID_AUTH_URL');

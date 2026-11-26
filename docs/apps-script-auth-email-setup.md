@@ -19,7 +19,7 @@ Controller ตรวจแบบ read-only พบ Google/Supabase login แล�
 | `AUTH_GAS_RELAY_SECRET` | Supabase Edge Function Secrets | ข้อความเดียวกับ `AUTH_RELAY_SECRET` ทุก byte; HMAC ใช้ UTF-8 ของข้อความ ไม่ decode base64 |
 | `AUTH_GAS_URL` | Supabase Edge Function Secrets | URL deployment ใหม่รูป `https://script.google.com/macros/s/<deployment-id>/exec` ไม่มี query/hash/custom port |
 | `SEND_EMAIL_HOOK_SECRET` | Supabase Edge Function Secrets | signing secret อีกตัวจาก Supabase รูป `v1,whsec_<base64>`; ใช้ค่าเดียวกับ Send Email Hook ทุก byte |
-| `SITE_URL` | Supabase Edge Function Secrets | `https://okayokay101.github.io/MAXMUXSIX-ONLINEWEB/` ต้องตรงรวม `/` ท้าย |
+| `SITE_URL` | Supabase Edge Function Secrets | `https://maxmuxsix-demo.vercel.app/` ต้องตรงรวม `/` ท้าย |
 
 Endpoint hook คือ `https://lxvxffrexegvqzeojztw.supabase.co/functions/v1/send-auth-email` และ project URL ในโค้ดตรึงเป็น `https://lxvxffrexegvqzeojztw.supabase.co` ไม่ตั้ง service-role key สำหรับ runbook นี้ Gateway JWT ปิดเฉพาะ function ใหม่นี้ตาม `supabase/config.toml`; ทุก POST ยังต้องผ่าน Standard Webhooks signature ห้ามใช้ publishable key แทนลายเซ็น ห้ามนำ secret ไปใส่ frontend, source, query string, shell arguments, transcript หรือ screenshots
 
@@ -112,7 +112,7 @@ try {
 import { Webhook } from 'standardwebhooks';
 import { randomUUID } from 'node:crypto';
 const endpoint = 'https://lxvxffrexegvqzeojztw.supabase.co/functions/v1/send-auth-email';
-const site = 'https://okayokay101.github.io/MAXMUXSIX-ONLINEWEB/';
+const site = 'https://maxmuxsix-demo.vercel.app/';
 const authExternalUrl = 'https://lxvxffrexegvqzeojztw.supabase.co';
 const secret = process.env.AUTH_PROBE_HOOK_SECRET;
 const recipient = process.env.AUTH_TEST_RECIPIENT;
@@ -183,7 +183,7 @@ Remove-Item Env:AUTH_PROBE_LABEL -ErrorAction SilentlyContinue
 
 เปิดได้เมื่อ review/security authorization, Google consent, deployment, negative tests และ probes/receipt ทั้งสี่ผ่านครบ Controller ตรวจ URI/signing-secret association และยืนยัน action กับผู้ใช้ก่อนกด enable/save Send Email Hook ที่ endpoint ระบุ อ่านกลับ enabled state อีกครั้ง คง Confirm Email ON, Secure Email Change ON และ URL/OTP settings เดิม ไม่แก้ account ที่มีอยู่
 
-1. ผู้ใช้เลือก plus alias ใหม่ที่ควบคุมและยินยอมสมัคร แล้วสร้างรหัสผ่าน/ยอมรับเงื่อนไขด้วยตนเองในหน้า signup ของ [เว็บที่อนุมัติ](https://okayokay101.github.io/MAXMUXSIX-ONLINEWEB/) ผ่าน private browser session เปิดบัญชีสมาชิก → สมัครสมาชิกใหม่ → กรอกฟอร์ม/consent → สมัครสมาชิกและยืนยันอีเมล Controller ไม่สร้างรหัสผ่านแทนหรือรับรหัสในแชต ส่ง signup **ครั้งเดียว** (เมลที่ 5) ห้าม resend อัตโนมัติ
+1. ผู้ใช้เลือก plus alias ใหม่ที่ควบคุมและยินยอมสมัคร แล้วสร้างรหัสผ่าน/ยอมรับเงื่อนไขด้วยตนเองในหน้า signup ของ [เว็บที่อนุมัติ](https://maxmuxsix-demo.vercel.app/) ผ่าน private browser session เปิดบัญชีสมาชิก → สมัครสมาชิกใหม่ → กรอกฟอร์ม/consent → สมัครสมาชิกและยืนยันอีเมล Controller ไม่สร้างรหัสผ่านแทนหรือรับรหัสในแชต ส่ง signup **ครั้งเดียว** (เมลที่ 5) ห้าม resend อัตโนมัติ
 2. ผู้ใช้ยืนยัน receipt แล้วเปิด link ส่วนตัว ตรวจ host/project ของ Auth verify และ redirect กลับ approved URL, login/session สำเร็จ ตรวจ identity ผ่าน Supabase `auth.getUser()` ใน flow ของแอป/หน้าที่เชื่อม session แล้ว ไม่เชื่อเพียง localStorage หรือ UI label และตรวจ profile ของ user ID เดียวกันภายใต้สิทธิ์บัญชีทดสอบ จดเพียง match yes/no ไม่คัดลอก JWT, URL fragment/query, email หรือ profile PII หากยังไม่มีทางตรวจ authenticated identity/profile ที่เชื่อถือได้ ให้หยุด gate ไม่อ้าง E2E ผ่าน
 3. ในหน้าเข้าสู่ระบบ → ลืมรหัสผ่าน? → กรอก alias ใหม่นี้ → ส่งลิงก์ตั้งรหัสผ่านใหม่ **ครั้งเดียว** (เมลที่ 6) ผู้ใช้เปิด link, กรอกรหัสผ่านใหม่/ยืนยัน/consent และกดบันทึกรหัสผ่านแบบส่วนตัว จากนั้น login ใหม่และตรวจ authenticated identity/profile match เช่นเดิม หากต้องการทดลอง login failure ก่อนยืนยันหรือขั้นตอนอื่นที่เสี่ยงส่งเพิ่ม ให้ controller ตรวจ mail budget ก่อน
 4. จด signup/recovery status, timing ที่สังเกตได้, receipt, private link completion และ identity/profile match แยกกัน ไม่เก็บ token/password/header/body Existing customer accounts ไม่ถูกเปลี่ยน/ลบ; บัญชีทดสอบใหม่ไม่ถูกลบอัตโนมัติ

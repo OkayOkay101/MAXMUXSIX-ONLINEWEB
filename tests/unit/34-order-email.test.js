@@ -122,7 +122,7 @@ test('relay failure is reported honestly without leaking details', async () => {
 
 test('signed relay export reuses the auth mail envelope and requires confirmation', async () => {
     const { sendRelayMessages } = await import('../../supabase/functions/send-auth-email/relay.mjs');
-    const config = { projectUrl: 'https://lxvxffrexegvqzeojztw.supabase.co', siteUrl: 'https://okayokay101.github.io/MAXMUXSIX-ONLINEWEB/',
+    const config = { projectUrl: 'https://lxvxffrexegvqzeojztw.supabase.co', siteUrl: 'https://maxmuxsix-demo.vercel.app/',
         relaySecret: 'fixture', gasUrl: 'https://script.google.com/macros/s/fixture/exec', upstreamTimeoutMs: 3500 };
     const message = { messageId: 'primary', to: 'a@example.com', subject: 's', htmlBody: '<p>h</p>', body: 'b' };
     let envelope;

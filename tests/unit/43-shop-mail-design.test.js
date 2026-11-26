@@ -4,7 +4,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { createAppInstance } = require('../helpers/app-loader');
 
-const SITE = 'https://okayokay101.github.io/MAXMUXSIX-ONLINEWEB/';
+const SITE = 'https://maxmuxsix-demo.vercel.app/';
 const MEMBER = '11111111-1111-4111-8111-111111111111';
 const MIGRATION = fs.readFileSync(path.resolve(__dirname, '../../supabase/migrations/202611260002_shop_orders.sql'), 'utf8');
 // The catalog the database is seeded with.
@@ -40,7 +40,7 @@ async function send(body, result) {
         })
     });
     const response = await handler(new Request('https://p.supabase.co/functions/v1/order-email', {
-        method: 'POST', headers: { Origin: 'https://okayokay101.github.io', Authorization: 'Bearer valid' }, body: JSON.stringify(body)
+        method: 'POST', headers: { Origin: 'https://maxmuxsix-demo.vercel.app', Authorization: 'Bearer valid' }, body: JSON.stringify(body)
     }));
     return { status: response.status, sent, created };
 }

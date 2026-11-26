@@ -56,3 +56,7 @@ _agent/
 # Agent execution scratch ledgers (not application data)
 .superpowers/
 
+
+# Vercel build output
+public/
+.vercel

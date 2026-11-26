@@ -1,6 +1,6 @@
 // Server-built order/welcome mail. The browser supplies product ids and quantities only:
 // the database prices and stores the order; recipient, subject and markup are decided here.
-import { escapeHtml, receiptHtml, welcomeHtml } from './templates.mjs';
+import { DEMO_NOTICE, escapeHtml, receiptHtml, welcomeHtml } from './templates.mjs';
 
 const REQUEST_LIMIT = 8192;
 // The signed relay rejects envelopes over 32 KiB; leave room for the timestamp, id and signature.
@@ -71,7 +71,7 @@ const relayBytes = message => new TextEncoder().encode(JSON.stringify(JSON.strin
 
 // Takes the first layout that fits. The unstyled copy is the last resort so a mail is never lost to its size.
 function compose(to, name, subject, lines, siteUrl, layouts) {
-    const text = [`สวัสดีคุณ ${name}`, ...lines];
+    const text = [DEMO_NOTICE, `สวัสดีคุณ ${name}`, ...lines];
     const message = { messageId: 'primary', to, subject, body: [...text, siteUrl, SHOP].join('\n') };
     for (const layout of layouts) {
         const styled = { ...message, htmlBody: layout() };

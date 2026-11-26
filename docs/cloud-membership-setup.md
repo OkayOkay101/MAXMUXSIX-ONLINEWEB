@@ -7,7 +7,7 @@
 1. เข้า [Supabase Dashboard](https://supabase.com/dashboard) ด้วยบัญชีของเจ้าของร้าน เลือก New project ตั้งชื่อ MAXMUXSIX เลือก region ที่เหมาะสม เก็บรหัสฐานข้อมูลไว้ส่วนตัว ตรวจแผนบริการ/ค่าใช้จ่ายก่อนยืนยัน
 2. Authentication → Providers เปิด Email และ **Confirm email** ห้ามปิดเพื่อแก้ปัญหาส่งอีเมล กำหนดรหัสผ่านขั้นต่ำ 8 ตัวอักษร
 3. URL Configuration ตั้ง Site URL และเพิ่ม Redirect URL แบบเจาะจง:
-   `https://okayokay101.github.io/MAXMUXSIX-ONLINEWEB/`
+   `https://maxmuxsix-demo.vercel.app/`
    ไม่ใส่ wildcard ของเว็บไซต์อื่น ใช้ HTTPS จริง ไม่ใช้ไฟล์ `file://` สำหรับอีเมลยืนยัน/กู้รหัสผ่าน
 4. ตั้ง Custom SMTP สำหรับลูกค้าจริง พร้อม From address และ DNS SPF/DKIM/DMARC ตามผู้ให้บริการ Supabase SMTP เริ่มต้นจำกัดผู้รับ/ปริมาณและไม่ใช่บริการ production ดู [เอกสาร SMTP](https://supabase.com/docs/guides/auth/auth-smtp)
 5. ปรับ Auth rate limits ให้เหมาะกับร้าน เปิดดู Auth logs เมื่อส่งเมลล้มเหลว ไม่พึ่ง browser rate limit เป็นมาตรการหลัก โค้ดชุดนี้ยังไม่ได้ใส่ CAPTCHA widget; ถ้าเปิด CAPTCHA ฝั่ง Supabase ต้องเพิ่ม widget และส่ง captchaToken ในเว็บด้วย มิฉะนั้นสมัคร/กู้รหัสผ่านจะถูกปฏิเสธ
@@ -34,7 +34,7 @@ Migration ไม่ import บัญชี local เก่า และออก
 window.MAXMUXSIX_AUTH_CONFIG = Object.freeze({
     url: 'https://YOUR_PROJECT_REF.supabase.co',
     publishableKey: 'sb_publishable_YOUR_PUBLIC_KEY',
-    redirectUrl: 'https://okayokay101.github.io/MAXMUXSIX-ONLINEWEB/'
+    redirectUrl: 'https://maxmuxsix-demo.vercel.app/'
 });
 ```
 
@@ -49,7 +49,7 @@ window.MAXMUXSIX_AUTH_CONFIG = Object.freeze({
 ```powershell
 supabase login
 supabase link --project-ref YOUR_PROJECT_REF
-supabase secrets set SITE_URL=https://okayokay101.github.io/MAXMUXSIX-ONLINEWEB/
+supabase secrets set SITE_URL=https://maxmuxsix-demo.vercel.app/
 supabase functions deploy admin-users --project-ref YOUR_PROJECT_REF
 ```
 
@@ -134,7 +134,7 @@ Unit tests ใช้ provider fixture; ฐานข้อมูลใช้ PGli
 - Security advisor: private admin table ไม่มี policy โดยตั้งใจ (client deny-all); RPC สมาชิก 3 รายการใช้ SECURITY DEFINER โดยตั้งใจ ตรวจ `auth.uid()` และกำหนด search_path ว่าง อีกคำเตือนเป็น event-trigger function `public.rls_auto_enable()` ที่แพลตฟอร์มมีอยู่เดิม ยังไม่ได้แก้ไขสิทธิ์ส่วนนี้ ดู [advisor สำหรับ anonymous definer](https://supabase.com/docs/guides/database/database-linter?lint=0028_anon_security_definer_function_executable)
 - Performance advisor แจ้ง referred_by index ยังไม่ถูกใช้ เนื่องจากยังไม่มีสมาชิก ไม่ลบดัชนีที่จำเป็นต่อ referral lookup
 - Browser fixtures override config เสมอ รวมกรณีไม่มี config และบล็อก network ไปยัง hosted Supabase อื่น เพื่อไม่ส่งข้อมูล fixture ไปโปรเจกต์จริงหลังกรอก config
-- เจ้าของเข้าสู่ Dashboard และยืนยัน URL โดยตรงแล้ว ตั้ง Site URL และ Redirect URL แบบเจาะจงเป็น `https://okayokay101.github.io/MAXMUXSIX-ONLINEWEB/` (1 รายการ ไม่มี wildcard), บันทึกนโยบายรหัสผ่านขั้นต่ำ 8 ผ่าน UI และคง Confirm email เปิดไว้
+- เจ้าของเข้าสู่ Dashboard และยืนยัน URL โดยตรงแล้ว ตั้ง Site URL และ Redirect URL แบบเจาะจงเป็น `https://maxmuxsix-demo.vercel.app/` (1 รายการ ไม่มี wildcard), บันทึกนโยบายรหัสผ่านขั้นต่ำ 8 ผ่าน UI และคง Confirm email เปิดไว้
 - สร้างค่า `SITE_URL` ผ่าน Dashboard แล้ว deploy `admin-users` version 1 สถานะ ACTIVE ด้วย MCP; `verify_jwt=false` โดยตรวจ Auth.getUser และสิทธิ์ private role ใน handler ทุกคำขอ ไม่ใช่ anonymous admin
 - ทดสอบ Edge Function บน Deno/gateway จริง: origin เว็บที่อนุญาต OPTIONS=204, anonymous POST=401, token ปลอม POST=401, origin อื่น POST=403 ไม่มีการเพิ่ม/ลบผู้ใช้หรือส่งอีเมลจริง
 - ผู้ใช้แจ้ง "ไม่ต้องสร้าง" บริการส่งเมลเพิ่ม จึงไม่เปิด Custom SMTP ไม่สมัครบริการ และไม่ปิด Confirm email เพื่อหลบข้อจำกัด Default SMTP ส่งอีเมลได้เฉพาะอีเมลในทีมโปรเจกต์ จึงยังไม่พร้อมรับสมัครลูกค้าทั่วไป ดู [ข้อจำกัด SMTP](https://supabase.com/docs/guides/auth/auth-smtp)
