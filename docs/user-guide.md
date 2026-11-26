@@ -23,6 +23,8 @@ Note: Storefront browsing, cart, and coupons work standalone in the browser. Mem
 
 ![Storefront](../store_front.jpg)
 
+![Demo storefront with menu and search](images/05-demo-banner-desktop.jpg)
+
 ## 2. Add items to the cart
 
 **Goal:** Put one or more products into your cart.
@@ -35,6 +37,8 @@ Note: Storefront browsing, cart, and coupons work standalone in the browser. Mem
 **Result:** The cart lists each product you added and calculates the subtotal.
 
 **Checkout:** Click `"ไปชำระเงิน →"`. The payment dialog is a demo only—do not transfer money.
+
+![Demo payment dialog](images/02-payment-modal.jpg)
 
 ## 3. Apply a coupon code
 
@@ -69,6 +73,8 @@ Note: Storefront browsing, cart, and coupons work standalone in the browser. Mem
 **Result:** Once your email is confirmed, you can sign in.
 
 **If it fails:** If the email format is invalid, the form shows `"กรุณากรอกอีเมลให้ถูกต้อง"`. Correct the email and submit again.
+
+![Membership sign-up dialog](images/03-register-captcha-localhost.jpg)
 
 ## 5. Sign in
 
