@@ -5,13 +5,13 @@ const path = require('node:path');
 
 const load = () => JSON.parse(fs.readFileSync(path.join(__dirname, '..', '..', 'vercel.json'), 'utf8'));
 
-test('vercel serves the public build and does not auto deploy from git', () => {
+test('vercel serves the public build and allows auto deploy from git', () => {
     const cfg = load();
     assert.equal(cfg.framework, null);
     assert.equal(cfg.installCommand, '');
     assert.equal(cfg.buildCommand, 'node scripts/build-public.js');
     assert.equal(cfg.outputDirectory, 'public');
-    assert.equal(cfg.git.deploymentEnabled, false);
+    assert.notEqual(cfg.git?.deploymentEnabled, false);
 });
 
 test('framing and sniffing protection are real HTTP headers', () => {
@@ -20,4 +20,7 @@ test('framing and sniffing protection are real HTTP headers', () => {
     assert.equal(headers['X-Frame-Options'], 'DENY');
     assert.equal(headers['Content-Security-Policy'], "frame-ancestors 'none'");
     assert.equal(headers['X-Content-Type-Options'], 'nosniff');
+    assert.equal(headers['Referrer-Policy'], 'no-referrer');
+    assert.equal(headers['Permissions-Policy'], 'camera=(), microphone=(), geolocation=()');
+    assert.equal(headers['Strict-Transport-Security'], 'max-age=31536000; includeSubDomains');
 });
