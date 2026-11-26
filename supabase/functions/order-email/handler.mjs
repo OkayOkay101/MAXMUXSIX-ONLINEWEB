@@ -1,19 +1,31 @@
 // Server-built order/welcome mail. The browser supplies product ids and quantities only:
 // the database prices and stores the order; recipient, subject and markup are decided here.
+import { escapeHtml, receiptHtml, welcomeHtml } from './templates.mjs';
+
 const REQUEST_LIMIT = 8192;
+// The signed relay rejects envelopes over 32 KiB; leave room for the timestamp, id and signature.
+const MAIL_BYTES = 32 * 1024 - 300;
 const SHOP = 'MAXMUXSIX ข้าวหลามเตาถ่าน';
 
-const escapeHtml = value => String(value).replace(/[&<>"']/g, c =>
-    ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
-const oneLine = value => String(value).replace(/[\x00-\x1f\x7f]+/g, ' ').trim().slice(0, 100);
+const flatten = value => String(value).replace(/[\x00-\x1f\x7f]+/g, ' ').trim();
+const oneLine = value => flatten(value).slice(0, 100);
 const isRecord = value => value !== null && typeof value === 'object' && !Array.isArray(value);
 const hasKeys = (value, keys) => isRecord(value) && Object.keys(value).length === keys.length &&
     keys.every(key => Object.hasOwn(value, key));
 const integer = (value, min, max) => Number.isInteger(value) && value >= min && value <= max;
 
+// Who and where to deliver, as typed at checkout. Shown in the mail to the member only; not stored.
+const DELIVERY_LIMITS = { name: 100, phone: 30, address: 1000 };
+const validDelivery = value => hasKeys(value, Object.keys(DELIVERY_LIMITS)) &&
+    Object.entries(DELIVERY_LIMITS).every(([key, max]) => typeof value[key] === 'string' && value[key].length <= max);
+
 // Shape check only. Products, prices, coupon and shipping are decided by server_create_order.
 function parseOrder(order) {
-    const valid = hasKeys(order, ['id', 'items', 'shipping', 'coupon']) &&
+    const keys = ['id', 'items', 'shipping', 'coupon'];
+    // Pages loaded before delivery details were added send only the first four keys.
+    const withDelivery = isRecord(order) && Object.hasOwn(order, 'delivery');
+    const valid = hasKeys(order, withDelivery ? [...keys, 'delivery'] : keys) &&
+        (!withDelivery || validDelivery(order.delivery)) &&
         typeof order.id === 'string' && /^MAX-\d{6}$/.test(order.id) &&
         Array.isArray(order.items) && integer(order.items.length, 1, 20) &&
         order.items.every(item => hasKeys(item, ['id', 'qty']) && typeof item.id === 'string' &&
@@ -23,26 +35,41 @@ function parseOrder(order) {
     return valid ? order : null;
 }
 
-function compose(to, name, subject, lines, siteUrl) {
+// Bytes this message adds to the relay envelope, where the payload is a JSON string inside JSON.
+const relayBytes = message => new TextEncoder().encode(JSON.stringify(JSON.stringify({ version: 1, messages: [message] }))).length;
+
+// Takes the first layout that fits. The unstyled copy is the last resort so a mail is never lost to its size.
+function compose(to, name, subject, lines, siteUrl, layouts) {
     const text = [`สวัสดีคุณ ${name}`, ...lines];
-    return {
-        messageId: 'primary', to, subject,
-        body: [...text, siteUrl, SHOP].join('\n'),
-        htmlBody: '<div style="font-family:sans-serif;color:#222;line-height:1.6">' +
-            text.map(line => `<p style="margin:4px 0">${escapeHtml(line)}</p>`).join('') +
-            `<p><a href="${escapeHtml(siteUrl)}">เปิดร้าน</a></p><p>${SHOP}</p></div>`
-    };
+    const message = { messageId: 'primary', to, subject, body: [...text, siteUrl, SHOP].join('\n') };
+    for (const layout of layouts) {
+        const styled = { ...message, htmlBody: layout() };
+        if (relayBytes(styled) <= MAIL_BYTES) return styled;
+    }
+    return { ...message, htmlBody: '<div style="font-family:sans-serif;color:#222;line-height:1.6">' +
+        text.map(line => `<p style="margin:4px 0">${escapeHtml(line)}</p>`).join('') +
+        `<p><a href="${escapeHtml(siteUrl)}">เปิดร้าน</a></p><p>${SHOP}</p></div>` };
 }
 
-function orderMessage(to, name, order, siteUrl) {
+const mailDate = date => new Intl.DateTimeFormat('th-TH', { timeZone: 'Asia/Bangkok', year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }).format(date);
+
+function orderMessage(to, name, order, delivery, siteUrl) {
+    const customer = {
+        email: to,
+        name: flatten(delivery?.name ?? '') || name,
+        phone: flatten(delivery?.phone ?? ''),
+        address: flatten(delivery?.address ?? '')
+    };
+    const view = { siteUrl, orderId: order.id, dateText: mailDate(new Date()), customer, order };
     return compose(to, name, `ยืนยันคำสั่งซื้อ #${order.id} - MAXMUXSIX`, [
         `คำสั่งซื้อ #${order.id}`,
         ...order.items.map(item => `${item.name} x${item.qty} = ${item.qty * item.price} บาท`),
         `ยอดสินค้า ${order.subtotal} บาท`,
         `ส่วนลด ${order.discountAmount} บาท`,
         `ค่าจัดส่ง ${order.shippingCost} บาท`,
-        `ยอดรวม ${order.total} บาท`
-    ], siteUrl);
+        `ยอดรวม ${order.total} บาท`,
+        ...(delivery ? [`ผู้รับ: ${customer.name} ${customer.phone}`, `ที่อยู่จัดส่ง: ${customer.address}`] : [])
+    ], siteUrl, [true, false].map(images => () => receiptHtml(view, { images })));
 }
 
 function welcomeMessage(to, name, referralCode, siteUrl) {
@@ -50,7 +77,7 @@ function welcomeMessage(to, name, referralCode, siteUrl) {
         'ขอบคุณที่สมัครสมาชิก MAXMUXSIX',
         'โค้ดส่วนลด 10%: WELCOME10',
         `รหัสแนะนำเพื่อนของคุณ: ${referralCode}`
-    ], siteUrl);
+    ], siteUrl, [() => welcomeHtml({ siteUrl, name, referralCode })]);
 }
 
 export function createOrderMailHandler({ backend, sendMail, siteUrl }) {
@@ -75,15 +102,17 @@ export function createOrderMailHandler({ backend, sendMail, siteUrl }) {
             let input = null;
             try { if (raw.length <= REQUEST_LIMIT) input = JSON.parse(raw); } catch { /* invalid() below */ }
             const name = oneLine(profile.name || 'สมาชิก MAXMUXSIX');
-            let message, order;
+            let message, order, delivery;
             if (hasKeys(input, ['kind']) && input.kind === 'welcome') {
                 message = welcomeMessage(actor.email, name, oneLine(profile.referral_code), siteUrl);
             } else if (hasKeys(input, ['kind', 'order']) && input.kind === 'order') {
-                const requested = parseOrder(input.order);
-                if (!requested) return invalid();
+                const parsed = parseOrder(input.order);
+                if (!parsed) return invalid();
+                const { delivery: typed, ...requested } = parsed;
+                delivery = typed;
                 order = await backend.createOrder(actor.id, requested);
                 if (!order) return response(409, { error: 'บันทึกคำสั่งซื้อไม่ได้ กรุณาตรวจสอบรายการแล้วสั่งใหม่' });
-                message = orderMessage(actor.email, name, order, siteUrl);
+                message = orderMessage(actor.email, name, order, delivery, siteUrl);
             } else return invalid();
             // The slot is claimed before sending: an unknown delivery outcome still counts.
             if (!await backend.claimSend(actor.id, input.kind)) return response(429, { error: 'ส่งอีเมลครบจำนวนต่อวันแล้ว กรุณาลองใหม่พรุ่งนี้' });

@@ -139,8 +139,13 @@
                 return fail('ส่งอีเมลจริงได้เฉพาะอีเมลของบัญชีสมาชิกที่เข้าสู่ระบบอยู่');
             }
             if (kind === 'order' && !order) return fail('ไม่พบคำสั่งซื้อที่ต้องการส่ง');
+            // Where to deliver, for the receipt only, cut to the server's limits.
+            const typed = (value, max) => String(value || '').slice(0, max);
+            const delivery = order && (order.name || order.phone || order.address)
+                ? { delivery: { name: typed(order.name, 100), phone: typed(order.phone, 30), address: typed(order.address, 1000) } } : {};
             // Prices stay in the browser: the shop database prices the order from ids and quantities.
             const body = kind === 'order' ? { kind, order: {
+                ...delivery,
                 id: order.id, items: order.items.map(item => ({ id: String(item.id || ''), qty: Number(item.qty) })),
                 // Orders saved before shippingMethod existed only know the fee.
                 shipping: order.shippingMethod || shippingCode(order.shippingCost),

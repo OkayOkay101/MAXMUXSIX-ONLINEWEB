@@ -103,7 +103,8 @@ test('sendMail uses the order-email function and reports the verified recipient'
     const result = await f.service.sendMail('order', 'BUYER@example.com', order);
     assert.equal(result.success, true);
     assert.match(result.message, /buyer@example\.com/);
-    assert.deepEqual(calls, [['order-email', { kind: 'order', order: { id: 'MAX-123456', items: [{ id: '1', qty: 2 }], shipping: 'express', coupon: '' } }]]);
+    // Delivery details go along for the receipt; prices, totals and the user id still stay out.
+    assert.deepEqual(calls, [['order-email', { kind: 'order', order: { delivery: { name: 'x', phone: '081', address: 'private' }, id: 'MAX-123456', items: [{ id: '1', qty: 2 }], shipping: 'express', coupon: '' } }]]);
     await f.service.sendMail('welcome', 'buyer@example.com');
     assert.deepEqual(calls[1], ['order-email', { kind: 'welcome' }]);
 });

@@ -5719,7 +5719,7 @@
             return html;
         }
 
-        function sendWelcomeEmail(user) {
+        function sendWelcomeEmail(user, onResult) {
             const emailHtml = generateWelcomeEmailHtml(user);
             const emailRecord = {
                 id: 'EML-' + Date.now(),
@@ -5743,6 +5743,7 @@
             // ส่งอีเมลจริงผ่าน Provider ที่เลือก (Google Apps Script หรือ Web3Forms)
             dispatchRealEmail(emailRecord).then(res => {
                 reportEmailResult(res);
+                if (onResult) onResult(res);
             });
 
             // แสดง Toast แจ้งเตือนส่งอีเมล
@@ -5782,7 +5783,7 @@
             const rl = checkRateLimit('subscribe');
             if (!rl.allowed) {
                 logSecurityEvent('subscribe_blocked', email);
-                showEmailToast(rl.message);
+                alert(rl.message);
                 return;
             }
             recordRateLimitAttempt('subscribe');
@@ -5816,12 +5817,14 @@
             localStorage.setItem('maxmuxsix_subscribers', JSON.stringify(subscribers));
 
             // จัดส่งอีเมลต้อนรับพร้อมโค้ด WELCOME10 เข้าอีเมลจริงทันที
-            const emailRecord = sendWelcomeEmail({
+            // แจ้งว่ากำลังส่งก่อน แล้วอัปเดตตามผลการส่งจริง
+            showSubscribeSuccessFeedback(subRecord);
+            sendWelcomeEmail({
                 id: subRecord.id,
                 email: subRecord.email,
                 name: displayName,
                 referralCode: referralCode
-            });
+            }, res => showSubscribeSuccessFeedback(subRecord, res));
 
             if (submitBtn) {
                 submitBtn.disabled = false;
@@ -5831,22 +5834,25 @@
             if (source === 'modal') {
                 closeSubscribeModal();
             }
-
-            // แสดง Feedback บนหน้าจอ
-            showSubscribeSuccessFeedback(subRecord, emailRecord);
         }
 
-        function showSubscribeSuccessFeedback(subRecord, emailRecord) {
+        function showSubscribeSuccessFeedback(subRecord, result) {
+            const email = `<span style="color:#38BDF8; font-weight:700;">${sanitizeHtml(String(subRecord.email || ''))}</span>`;
+            const mailStatus = !result
+                ? `⏳ กำลังส่งอีเมลต้อนรับไปยัง ${email}`
+                : result.success
+                    ? `ระบบได้จัดส่งอีเมลต้อนรับพร้อมโค้ดส่วนลด <strong>WELCOME10</strong> ไปยัง ${email} เรียบร้อยแล้ว`
+                    : `⚠️ ยังไม่ได้ส่งอีเมลต้อนรับไปยัง ${email}: ${sanitizeHtml(String(result.message || ''))}`;
             const successBox = document.getElementById('subscribeSuccessBox');
             if (successBox) {
                 successBox.style.display = 'inline-block';
                 successBox.innerHTML = `
                     <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px;">
                         <span style="font-size:1.3rem;">🎉</span>
-                        <strong style="color:var(--flame-yellow); font-size:1rem;">สมัครรับข่าวสารและโค้ดลดสำเร็จ!</strong>
+                        <strong style="color:var(--flame-yellow); font-size:1rem;">รับโค้ดส่วนลดแล้ว!</strong>
                     </div>
                     <div>
-                        ระบบได้จัดส่งอีเมลต้อนรับพร้อมโค้ดส่วนลด <strong>WELCOME10</strong> ไปยัง <span style="color:#38BDF8; font-weight:700;">${sanitizeHtml(String(subRecord.email || ''))}</span> เรียบร้อยแล้ว
+                        ${mailStatus}
                     </div>
                     <div style="margin-top:8px; font-size:0.84rem; color:#A7F3D0;">
                         💡 สามารถใช้โค้ด <code>WELCOME10</code> ในการสั่งซื้อเพื่อรับส่วนลด 10% ได้ทันทีครับ
