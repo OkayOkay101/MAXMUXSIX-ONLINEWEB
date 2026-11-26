@@ -1,4 +1,5 @@
 /**
+ * ⚠️ repo นี้มี LINE bot สองไฟล์ ให้เลือกติดตั้งเพียงไฟล์เดียว ในหนึ่งโปรเจกต์ Apps Script (วางทั้งคู่จะชื่อฟังก์ชันชนกัน)
  * =========================================================================
  * 🤖 MAXMUXSIX LINE LOG BOT & BROADCAST SYSTEM (Google Apps Script)
  * =========================================================================
@@ -448,7 +449,7 @@ function updateBroadcastStatus(ss, status, detail) {
     const sheet = ss.getSheetByName("Broadcast");
     if (!sheet) return;
     const nowStr = Utilities.formatDate(new Date(), "Asia/Bangkok", "dd/MM/yyyy HH:mm:ss");
-    sheet.getRange("B7").setValue(`${status} (${nowStr}) - ${detail}`);
+    sheet.getRange("B7").setValue(safeCell(`${status} (${nowStr}) - ${detail}`));
   } catch (e) {}
 }
 
@@ -582,11 +583,24 @@ function safeCell(value) {
   return typeof value === "string" && value !== "-" && /^[=+\-@\t\r]/.test(value) ? "'" + value : value;
 }
 
+function constantTimeEqual(a, b) {
+  if (typeof a !== "string" || typeof b !== "string") return false;
+  let diff = a.length ^ b.length;
+  const len = Math.max(a.length, b.length);
+  for (let i = 0; i < len; i++) {
+    const ca = i < a.length ? a.charCodeAt(i) : 0;
+    const cb = i < b.length ? b.charCodeAt(i) : 0;
+    diff |= ca ^ cb;
+  }
+  return diff === 0;
+}
+
 // Apps Script cannot read x-line-signature, so the webhook URL carries a secret: .../exec?key=<LINE_WEBHOOK_KEY>
 // Stays closed until the Script Property LINE_WEBHOOK_KEY (32+ characters) is set.
 function isTrustedWebhook(e) {
   const expected = PropertiesService.getScriptProperties().getProperty("LINE_WEBHOOK_KEY") || "";
-  return expected.length >= 32 && Boolean(e && e.parameter) && e.parameter.key === expected;
+  const provided = e && e.parameter && typeof e.parameter.key === "string" ? e.parameter.key : "";
+  return expected.length >= 32 && constantTimeEqual(provided, expected);
 }
 
 /**

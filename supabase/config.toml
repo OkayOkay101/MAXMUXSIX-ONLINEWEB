@@ -5,6 +5,11 @@ project_id = "maxmuxsix-onlineweb"
 [functions.admin-users]
 verify_jwt = false
 
+# Handler explicitly calls Auth.getUser(jwt) and enforces per-member and global daily limits.
+# Gateway legacy JWT verification does not support publishable keys.
+[functions.order-email]
+verify_jwt = false
+
 # Auth hooks run before sessions; Standard Webhooks verification is mandatory.
 [functions.send-auth-email]
 verify_jwt = false
