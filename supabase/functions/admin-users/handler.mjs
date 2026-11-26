@@ -1,5 +1,37 @@
 const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const pageSize = 25;
+const REQUEST_LIMIT = 4096;
+
+async function readBoundedText(request, limit) {
+    const contentLength = request.headers.get('content-length');
+    if (contentLength && /^[0-9]+$/.test(contentLength) && Number(contentLength) > limit) {
+        try { Promise.resolve(request.body?.cancel()).catch(() => {}); } catch { /* best effort */ }
+        return null;
+    }
+    if (!request.body) return '';
+    const reader = request.body.getReader();
+    const decoder = new TextDecoder('utf-8', { fatal: true });
+    let bytes = 0;
+    let text = '';
+    let finished = false;
+    try {
+        while (true) {
+            const { value, done } = await reader.read();
+            if (done) { finished = true; break; }
+            bytes += value.byteLength;
+            if (bytes > limit) return null;
+            text += decoder.decode(value, { stream: true });
+        }
+        return text + decoder.decode();
+    } catch {
+        return null;
+    } finally {
+        if (!finished) {
+            try { Promise.resolve(reader.cancel()).catch(() => {}); } catch { /* best effort */ }
+        }
+        try { reader.releaseLock(); } catch { /* best effort */ }
+    }
+}
 
 export function createHandler({ backend, siteUrl }) {
     const origin = new URL(siteUrl).origin;
@@ -17,10 +49,10 @@ export function createHandler({ backend, siteUrl }) {
             if (!actor || !actor.email_confirmed_at) return response(401, { error: 'กรุณาเข้าสู่ระบบและยืนยันอีเมล' });
             const [roles, ownProfiles] = await Promise.all([backend.adminIds([actor.id]), backend.getProfiles([actor.id])]);
             if (!roles.includes(actor.id) || !ownProfiles.some(p => p.id === actor.id && p.consent_at)) return response(403, { error: 'เฉพาะผู้ดูแลร้านเท่านั้น' });
-            if (Number(request.headers.get('content-length')) > 4096) return response(400, { error: 'ข้อมูลไม่ถูกต้อง' });
-            const raw = await request.text();
+            const raw = await readBoundedText(request, REQUEST_LIMIT);
+            if (raw === null) return response(400, { error: 'ข้อมูลไม่ถูกต้อง' });
             let input;
-            try { input = raw.length <= 4096 ? JSON.parse(raw) : null; } catch (_) { input = null; }
+            try { input = JSON.parse(raw); } catch (_) { input = null; }
             if (!input || typeof input !== 'object' || Array.isArray(input)) return response(400, { error: 'ข้อมูลไม่ถูกต้อง' });
             if (input.action === 'list') {
                 const page = input.page === undefined ? 1 : input.page;

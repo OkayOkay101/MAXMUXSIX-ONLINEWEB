@@ -65,6 +65,18 @@
             min-height: 100vh;
         }
 
+        /* Demo notice: always visible, no close control */
+        .demo-notice {
+            background: #FFE066;
+            color: #3D0000;
+            font-size: 0.9rem;
+            font-weight: 800;
+            line-height: 1.5;
+            text-align: center;
+            padding: 8px 12px;
+            border-bottom: 3px solid #D00000;
+        }
+
         /* Header Navigation */
         header {
             background: #0D2218;
@@ -2459,6 +2471,8 @@
 </head>
 <body>
 
+    <div id="demoBanner" class="demo-notice" role="note">🧪 เว็บตัวอย่าง ไม่มีการขายหรือจัดส่งจริง ห้ามโอนเงิน</div>
+
     <div class="promo-banner">
         🔥 สั่งซื้อวันนี้ ใส่โค้ด <span class="promo-code-tag">MAX10</span> หรือลูกค้าใหม่ใช้ <span class="promo-code-tag">WELCOME10</span> รับส่วนลดทันที 10%!
         <button onclick="openSubscribeModal()" style="background: var(--flame-orange); color: #FFF; border: none; padding: 2px 10px; border-radius: 20px; font-size: 0.8rem; font-weight: 700; cursor: pointer; margin-left: 8px; transition: 0.2s;">
@@ -3153,6 +3167,8 @@
                 <h3>💳 ชำระเงินผ่าน PromptPay QR</h3>
                 <button class="btn-close" onclick="closePaymentModal()">&times;</button>
             </div>
+
+            <div class="demo-notice" role="note" style="border: 2px solid #D00000; border-radius: 10px; margin-bottom: 12px;">🧪 เว็บตัวอย่าง ไม่มีการขายหรือจัดส่งจริง ห้ามโอนเงิน</div>
 
             <div class="qr-section">
                 <div class="pp-logo">พร้อมเพย์ (PromptPay)</div>
@@ -6471,6 +6487,29 @@
   ALLOWED_FROM_NAME: "MAXMUXSIX ข้าวหลามเตาถ่าน"
 };
 
+function constantTimeEqual(a, b) {
+  if (typeof a !== "string" || typeof b !== "string") return false;
+  var diff = a.length ^ b.length;
+  var len = Math.max(a.length, b.length);
+  for (var i = 0; i < len; i++) {
+    var ca = i < a.length ? a.charCodeAt(i) : 0;
+    var cb = i < b.length ? b.charCodeAt(i) : 0;
+    diff |= ca ^ cb;
+  }
+  return diff === 0;
+}
+
+function isValidSingleRecipient(value) {
+  if (typeof value !== "string" || value.length === 0 || value.length > 100 || /[\\s,;<>()\\x00-\\x1f\\x7f]/.test(value)) {
+    return false;
+  }
+  var parts = value.split("@");
+  return parts.length === 2 &&
+    parts[0].length > 0 && parts[0].length <= 64 &&
+    /^[a-zA-Z0-9!#$%&'*+\\-/=?^_\`{|}~]+(?:\\.[a-zA-Z0-9!#$%&'*+\\-/=?^_\`{|}~]+)*$/.test(parts[0]) &&
+    /^[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+$/.test(parts[1]);
+}
+
 // 🔑 หมุนรหัสลับ: เลือกฟังก์ชันนี้แล้วกด "เรียกใช้" (Run) ในหน้า Apps Script
 // รหัสใหม่จะถูกเก็บใน Script Properties (ORDER_RELAY_TOKEN) เท่านั้น ห้ามนำไปใส่ในโค้ดหรือหน้าเว็บ
 function rotateRelayToken() {
@@ -6481,25 +6520,35 @@ function rotateRelayToken() {
 
 function doPost(e) {
   var lock = LockService.getScriptLock();
-  lock.tryLock(15000);
+  var acquired = false;
 
   try {
-    var data = {};
-    if (e && e.postData && e.postData.contents) {
-      try {
-        data = JSON.parse(e.postData.contents);
-      } catch (parseError) {
-        data = e.parameter || {};
-      }
-    } else if (e && e.parameter) {
-      data = e.parameter;
+    acquired = lock.tryLock(15000);
+    if (!acquired) {
+      return makeJsonResponse({
+        status: "error",
+        success: false,
+        message: "ระบบกำลังประมวลผลคำขออื่นอยู่ กรุณาลองใหม่อีกครั้ง"
+      });
     }
 
-    // 🔒 1. ตรวจสอบรหัสลับ (Secret Token) ป้องกันบุคคลภายนอกแอบใช้ส่งสแปม
-    var clientToken = data.token || (e && e.parameter && e.parameter.token) || "";
+    var data = {};
+    if (e && e.postData && typeof e.postData.contents === "string") {
+      try {
+        var parsed = JSON.parse(e.postData.contents);
+        if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) {
+          data = parsed;
+        }
+      } catch (parseError) {
+        data = {};
+      }
+    }
+
+    // 🔒 1. ตรวจสอบรหัสลับ (Secret Token) จาก POST body เท่านั้น (ไม่รับจาก query string)
+    var clientToken = typeof data.token === "string" ? data.token : "";
     // ปิดไว้เป็นค่าเริ่มต้น: ถ้ายังไม่ได้ตั้งรหัส หรือรหัสสั้นเกินไป จะปฏิเสธทุกคำขอ
     var relayToken = PropertiesService.getScriptProperties().getProperty("ORDER_RELAY_TOKEN") || "";
-    if (relayToken.length < 32 || clientToken !== relayToken) {
+    if (relayToken.length < 32 || !constantTimeEqual(clientToken, relayToken)) {
       return makeJsonResponse({
         status: "error",
         success: false,
@@ -6518,13 +6567,13 @@ function doPost(e) {
     }
 
     var to = (data.to || data.email || "").toString().trim();
-    var subject = (data.subject || "MAXMUXSIX ข้าวหลามเตาถ่าน").toString().trim();
-    var htmlContent = data.html || data.htmlContent || "";
+    var subject = (data.subject || SECURITY_CONFIG.ALLOWED_FROM_NAME).toString().replace(/[\\x00-\\x1f\\x7f]+/g, " ").trim();
+    var htmlContent = typeof data.html === "string" ? data.html : (typeof data.htmlContent === "string" ? data.htmlContent : "");
     var textContent = (data.text || data.textContent || "ขอบคุณสำหรับการสั่งซื้อกับ MAXMUXSIX").toString().trim();
-    var fromName = (data.fromName || SECURITY_CONFIG.ALLOWED_FROM_NAME || "MAXMUXSIX ข้าวหลามเตาถ่าน").toString().trim();
+    var fromName = SECURITY_CONFIG.ALLOWED_FROM_NAME;
 
-    // 🛡️ 3. ตรวจสอบความถูกต้องของอีเมลผู้รับ
-    if (!to || to.indexOf("@") === -1 || to.length > 100) {
+    // 🛡️ 3. ตรวจสอบความถูกต้องของอีเมลผู้รับ (รับเฉพาะ 1 อีเมลเดี่ยว ป้องกัน header/multi-recipient injection)
+    if (!isValidSingleRecipient(to)) {
       return makeJsonResponse({
         status: "error",
         success: false,
@@ -6533,6 +6582,9 @@ function doPost(e) {
     }
 
     // 🛡️ 4. ป้องกัน Payload ขนาดใหญ่เกินปกติ
+    if (!subject) {
+      subject = SECURITY_CONFIG.ALLOWED_FROM_NAME;
+    }
     if (subject.length > SECURITY_CONFIG.MAX_SUBJECT_LEN) {
       subject = subject.substring(0, SECURITY_CONFIG.MAX_SUBJECT_LEN);
     }
@@ -6547,7 +6599,7 @@ function doPost(e) {
     // ถ้าไม่มี HTML ให้แปลง text เป็น HTML แบบง่าย
     if (!htmlContent && textContent) {
       htmlContent = '<div style="font-family: sans-serif; padding: 16px; color: #222;">' +
-        textContent.replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\\n/g, "<br>") +
+        textContent.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\\n/g, "<br>") +
         '</div>';
     }
 
@@ -6573,25 +6625,23 @@ function doPost(e) {
     return makeJsonResponse({
       status: "error",
       success: false,
-      message: "เกิดข้อผิดพลาดในการส่งอีเมล: " + err.toString()
+      message: "เกิดข้อผิดพลาดในการส่งอีเมล กรุณาลองใหม่ภายหลัง"
     });
   } finally {
-    lock.releaseLock();
+    if (acquired) {
+      try {
+        lock.releaseLock();
+      } catch (ignored) {}
+    }
   }
 }
 
 function doGet(e) {
-  var remaining = 0;
-  try {
-    remaining = MailApp.getRemainingDailyQuota();
-  } catch (ignored) {}
-
   return makeJsonResponse({
     status: "online",
     service: "MAXMUXSIX Email Web App Service",
     timestamp: new Date().toISOString(),
-    remainingDailyQuota: remaining,
-    message: "ระบบส่งอีเมลคลาวด์ของ MAXMUXSIX ทำงานปกติ 24 ชั่วโมง พร้อมรับคำสั่งส่งอีเมลจากหน้าเว็บครับ"
+    message: "ระบบส่งอีเมลคลาวด์ของ MAXMUXSIX ทำงานปกติ 24 ชั่วโมง พร้อมรับคำสั่งส่งอีเมลจากระบบเซิร์ฟเวอร์ครับ"
   });
 }
 
@@ -6600,6 +6650,7 @@ function makeJsonResponse(data) {
     .setMimeType(ContentService.MimeType.JSON);
 }
 
+// ฟังก์ชันสำหรับกด "เรียกใช้" (Run) ใน Google Apps Script เพื่อขอสิทธิ์เข้าถึง (Authorization) หรือทดสอบสถานะ
 function testRun() {
   var quota = 0;
   try {

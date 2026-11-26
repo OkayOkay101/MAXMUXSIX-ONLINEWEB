@@ -14,6 +14,37 @@ const hasKeys = (value, keys) => isRecord(value) && Object.keys(value).length ==
     keys.every(key => Object.hasOwn(value, key));
 const integer = (value, min, max) => Number.isInteger(value) && value >= min && value <= max;
 
+async function readBoundedText(request, limit) {
+    const contentLength = request.headers.get('content-length');
+    if (contentLength && /^[0-9]+$/.test(contentLength) && Number(contentLength) > limit) {
+        try { Promise.resolve(request.body?.cancel()).catch(() => {}); } catch { /* best effort */ }
+        return null;
+    }
+    if (!request.body) return '';
+    const reader = request.body.getReader();
+    const decoder = new TextDecoder('utf-8', { fatal: true });
+    let bytes = 0;
+    let text = '';
+    let finished = false;
+    try {
+        while (true) {
+            const { value, done } = await reader.read();
+            if (done) { finished = true; break; }
+            bytes += value.byteLength;
+            if (bytes > limit) return null;
+            text += decoder.decode(value, { stream: true });
+        }
+        return text + decoder.decode();
+    } catch {
+        return null;
+    } finally {
+        if (!finished) {
+            try { Promise.resolve(reader.cancel()).catch(() => {}); } catch { /* best effort */ }
+        }
+        try { reader.releaseLock(); } catch { /* best effort */ }
+    }
+}
+
 // Who and where to deliver, as typed at checkout. Shown in the mail to the member only; not stored.
 const DELIVERY_LIMITS = { name: 100, phone: 30, address: 1000 };
 const validDelivery = value => hasKeys(value, Object.keys(DELIVERY_LIMITS)) &&
@@ -97,10 +128,10 @@ export function createOrderMailHandler({ backend, sendMail, siteUrl }) {
             const profile = await backend.getProfile(actor.id);
             if (!profile?.consent_at) return response(403, { error: 'กรุณายอมรับข้อกำหนดสมาชิกก่อน' });
             const invalid = () => response(400, { error: 'ข้อมูลไม่ถูกต้อง' });
-            if (Number(request.headers.get('content-length')) > REQUEST_LIMIT) return invalid();
-            const raw = await request.text();
+            const raw = await readBoundedText(request, REQUEST_LIMIT);
+            if (raw === null) return invalid();
             let input = null;
-            try { if (raw.length <= REQUEST_LIMIT) input = JSON.parse(raw); } catch { /* invalid() below */ }
+            try { input = JSON.parse(raw); } catch { /* invalid() below */ }
             const name = oneLine(profile.name || 'สมาชิก MAXMUXSIX');
             let message, order, delivery;
             if (hasKeys(input, ['kind']) && input.kind === 'welcome') {
