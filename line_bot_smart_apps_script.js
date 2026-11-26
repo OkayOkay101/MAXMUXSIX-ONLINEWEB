@@ -729,9 +729,19 @@ function handleUserMessage(ss, replyToken, userId, text) {
   }
 
   // 2. ตรวจสอบขั้นตอนการคุยต่อเนื่อง (Multi-Step Conversation)
-  const state = getUserState(ss, userId);
+  let state = getUserState(ss, userId);
+  if (state && state.step && isStateExpired(state)) {
+    clearUserState(ss, userId);
+    state = null;
+  }
   if (state && state.step) {
-    if (/^ORDER_STEP_[123]_/.test(state.step)) logChat(ss, userId, text, "ORDER_FLOW: " + state.step);
+    if (ORDER_STEPS.hasOwnProperty(state.step)) {
+      logChat(ss, userId, text, "ORDER_FLOW: " + state.step);
+      if (!ORDER_STEPS[state.step].accepts(text)) {
+        handleOffStepMessage(ss, replyToken, userId, text, state.step);
+        return;
+      }
+    }
     const isStepHandled = handleMultiStepFlow(ss, replyToken, userId, text, state);
     if (isStepHandled) return;
   }
@@ -790,14 +800,7 @@ function matchSmartIntents(text) {
       messages: [{
         type: "text",
         text: "🛒 เริ่มต้นการสั่งซื้อ/สั่งจองล่วงหน้า\n\nกรุณาเลือกชุดสินค้าที่ต้องการได้เลยครับ 👇",
-        quickReply: {
-          items: [
-            { type: "action", action: { type: "message", label: "คลาสสิก (3 กระบอก)", text: "ชุดคลาสสิก (3 กระบอก)" } },
-            { type: "action", action: { type: "message", label: "ครอบครัว (5 กระบอก)", text: "ชุดครอบครัว (5 กระบอก)" } },
-            { type: "action", action: { type: "message", label: "ชุดจุใจ (10 กระบอก)", text: "ชุดจุใจ (10 กระบอก)" } },
-            { type: "action", action: { type: "message", label: "❌ ยกเลิก", text: "ยกเลิก" } }
-          ]
-        }
+        quickReply: getOrderStepQuickReply("ORDER_STEP_1_SELECT_PRODUCT")
       }]
     };
   }
@@ -945,6 +948,71 @@ function matchSmartIntents(text) {
   return null;
 }
 
+// =========================================================================
+// ขั้นตอนสั่งซื้อ: รูปแบบคำตอบที่รับ ปุ่ม และอายุของสถานะ
+// =========================================================================
+
+const ORDER_STATE_TTL_MS = 30 * 60 * 1000;
+
+const ORDER_STEPS = {
+  ORDER_STEP_1_SELECT_PRODUCT: {
+    accepts: text => /^(ชุด)?(คลาสสิก|ครอบครัว|จุใจ)(\s*\(\d+ กระบอก\))?$/.test(text),
+    prompt: "กรุณาเลือกชุดสินค้า: คลาสสิก ครอบครัว หรือจุใจ (กดปุ่มด้านล่างได้เลยครับ) 👇",
+    buttons: [
+      { type: "message", label: "คลาสสิก (3 กระบอก)", text: "ชุดคลาสสิก (3 กระบอก)" },
+      { type: "message", label: "ครอบครัว (5 กระบอก)", text: "ชุดครอบครัว (5 กระบอก)" },
+      { type: "message", label: "ชุดจุใจ (10 กระบอก)", text: "ชุดจุใจ (10 กระบอก)" }
+    ]
+  },
+  ORDER_STEP_2_QUANTITY: {
+    accepts: text => /^[1-9]\d?(\s*ชุด)?$/.test(text),
+    prompt: "กรุณาระบุจำนวนเป็นตัวเลข 1-99 เช่น \"2 ชุด\" 👇",
+    buttons: [
+      { type: "message", label: "1 ชุด", text: "1 ชุด" },
+      { type: "message", label: "2 ชุด", text: "2 ชุด" },
+      { type: "message", label: "3 ชุด", text: "3 ชุด" },
+      { type: "message", label: "5 ชุด (ส่งฟรี)", text: "5 ชุด" }
+    ]
+  },
+  ORDER_STEP_3_CONTACT_INFO: {
+    // เบอร์โทร 9-10 หลักขึ้นต้นด้วย 0, พิกัดจากปุ่มแชร์ หรือรับเอง
+    accepts: text => text === "รับเองที่หน้าร้าน" || text.indexOf("พิกัด: ") === 0 ||
+      /(^|\D)0([ -]?\d){8,9}(?!\d)/.test(text),
+    prompt: "🧪 เว็บตัวอย่าง: กรุณาใช้ข้อมูลสมมติ ส่งชื่อผู้รับ เบอร์โทร และที่อยู่ หรือแชร์พิกัด 👇",
+    buttons: [
+      { type: "location", label: "📍 แชร์พิกัดที่อยู่" },
+      { type: "message", label: "รับเองที่หน้าร้าน", text: "รับเองที่หน้าร้าน" }
+    ]
+  }
+};
+
+function getOrderStepQuickReply(step) {
+  const buttons = ORDER_STEPS[step].buttons.concat({ type: "message", label: "❌ ยกเลิก", text: "ยกเลิก" });
+  return { items: buttons.map(action => ({ type: "action", action: action })) };
+}
+
+function isStateExpired(state) {
+  const updatedAt = new Date(state.updatedAt || NaN).getTime();
+  return !(Date.now() - updatedAt <= ORDER_STATE_TTL_MS);
+}
+
+// ข้อความที่ไม่ใช่คำตอบของขั้น: ตอบคำถามที่รู้จัก แล้วถามขั้นเดิมอีกครั้งโดยไม่แตะสถานะ
+function handleOffStepMessage(ss, replyToken, userId, text, step) {
+  const intentResult = matchSmartIntents(text);
+  if (intentResult && intentResult.startFlow === "ORDER_FLOW") {
+    sendLineReply(replyToken, intentResult.messages);
+    setUserState(ss, userId, "ORDER_STEP_1_SELECT_PRODUCT", {});
+    return;
+  }
+  const faqAnswer = intentResult ? null : searchFaqFromSheet(ss, text);
+  const answers = intentResult ? intentResult.messages : (faqAnswer ? [{ type: "text", text: faqAnswer }] : []);
+  sendLineReply(replyToken, answers.concat({
+    type: "text",
+    text: ORDER_STEPS[step].prompt,
+    quickReply: getOrderStepQuickReply(step)
+  }));
+}
+
 // Flow การสั่งซื้อต่อเนื่อง
 function handleMultiStepFlow(ss, replyToken, userId, text, state) {
   const step = state.step;
@@ -957,15 +1025,7 @@ function handleMultiStepFlow(ss, replyToken, userId, text, state) {
     sendLineReply(replyToken, [{
       type: "text",
       text: `รับทราบครับ: คุณเลือก "${text}" 🎋\n\nต้องการรับจำนวนกี่ชุดดีครับ? สามารถกดเลือกหรือพิมพ์ระบุได้เลยครับ`,
-      quickReply: {
-        items: [
-          { type: "action", action: { type: "message", label: "1 ชุด", text: "1 ชุด" } },
-          { type: "action", action: { type: "message", label: "2 ชุด", text: "2 ชุด" } },
-          { type: "action", action: { type: "message", label: "3 ชุด", text: "3 ชุด" } },
-          { type: "action", action: { type: "message", label: "5 ชุด (ส่งฟรี)", text: "5 ชุด" } },
-          { type: "action", action: { type: "message", label: "❌ ยกเลิก", text: "ยกเลิก" } }
-        ]
-      }
+      quickReply: getOrderStepQuickReply("ORDER_STEP_2_QUANTITY")
     }]);
     return true;
   }
@@ -977,13 +1037,7 @@ function handleMultiStepFlow(ss, replyToken, userId, text, state) {
     sendLineReply(replyToken, [{
       type: "text",
       text: `บันทึกจำนวน "${text}" แล้วครับ ✅\n\n🧪 เว็บตัวอย่าง: กรุณาใช้ข้อมูลสมมติเท่านั้น\n\nรบกวนแจ้ง "ชื่อผู้รับ + เบอร์โทร + ที่อยู่จัดส่ง" (หรือกดปุ่มแชร์พิกัด) ได้เลยครับ 👇`,
-      quickReply: {
-        items: [
-          { type: "action", action: { type: "location", label: "📍 แชร์พิกัดที่อยู่" } },
-          { type: "action", action: { type: "message", label: "รับเองที่หน้าร้าน", text: "รับเองที่หน้าร้าน" } },
-          { type: "action", action: { type: "message", label: "❌ ยกเลิก", text: "ยกเลิก" } }
-        ]
-      }
+      quickReply: getOrderStepQuickReply("ORDER_STEP_3_CONTACT_INFO")
     }]);
     return true;
   }
@@ -1159,7 +1213,7 @@ function getUserState(ss, userId) {
       if (data[i][0] === userId) {
         let payload = {};
         try { payload = JSON.parse(data[i][2] || "{}"); } catch (e) {}
-        return { step: data[i][1], data: payload, rowIndex: i + 1 };
+        return { step: data[i][1], data: payload, updatedAt: data[i][3], rowIndex: i + 1 };
       }
     }
   } catch (err) {}

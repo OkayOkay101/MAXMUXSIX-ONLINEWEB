@@ -10,7 +10,7 @@ const DEMO = 'เว็บตัวอย่าง';
 function createBot({ fetchThrows = false, failSheet = null, state = null } = {}) {
     const errors = [];
     const replies = [];
-    const rows = { Chat_History: [], Orders: [], User_State: state ? [['U1', state, '{}', 'now']] : [] };
+    const rows = { Chat_History: [], Orders: [], User_State: state ? [['U1', state, '{}', new Date()]] : [] };
     const sheet = name => ({
         appendRow: row => {
             if (name === failSheet) throw new Error('sheet down');
@@ -46,7 +46,7 @@ test('a failed LINE reply still records the message and the order step', () => {
 
 test('an order that could not be saved is not reported as saved', () => {
     const bot = createBot({ failSheet: 'Orders', state: 'ORDER_STEP_3_CONTACT_INFO' });
-    bot.say('ข้อมูลทดสอบ');
+    bot.say('ข้อมูลทดสอบ 0800000000');
     assert.doesNotMatch(bot.replyText(), /บันทึกคำสั่งซื้อเรียบร้อย/);
     assert.match(bot.replyText(), /บันทึกคำสั่งซื้อไม่สำเร็จ/);
     assert.equal(bot.rows.User_State.length, 1, 'the member can retry the last step');
@@ -76,7 +76,7 @@ test('the smart bot never asks for money or real details, and promises nothing i
     assert.match(contact.replyText(), /ข้อมูลสมมติ/);
 
     const done = createBot({ state: 'ORDER_STEP_3_CONTACT_INFO' });
-    done.say('ข้อมูลทดสอบ');
+    done.say('ข้อมูลทดสอบ 0800000000');
     assert.ok(done.replyText().includes(DEMO));
     assert.doesNotMatch(done.replyText(), /เลขพัสดุ|บัญชีโอนเงิน/);
     assert.doesNotMatch(String(done.rows.Orders[0][5]), /สลิป/);
