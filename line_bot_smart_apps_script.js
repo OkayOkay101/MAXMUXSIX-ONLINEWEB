@@ -399,8 +399,8 @@ function getLineQuotaDetails() {
 function buildBroadcastMessages(draft) {
   const messages = [];
 
-  // 1. ถ้ามีรูปภาพ ให้สร้าง Image Message
-  if (draft.imageUrl && /^https?:\/\//i.test(draft.imageUrl)) {
+  // 1. ถ้ามีรูปภาพ ให้สร้าง Image Message (ต้องเป็น https:// ตามข้อกำหนด LINE)
+  if (draft.imageUrl && /^https:\/\//i.test(draft.imageUrl)) {
     messages.push({
       type: "image",
       originalContentUrl: draft.imageUrl,

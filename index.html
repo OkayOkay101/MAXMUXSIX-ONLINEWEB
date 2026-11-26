@@ -3592,6 +3592,7 @@
         .brand-title { font-size: 32px !important; }
         h1.hero-title { font-size: 22px !important; line-height: 30px !important; }
         .promo-code-text { font-size: 26px !important; letter-spacing: 4px !important; }
+    }
     </style>
 </head>
 <body style="margin:0; padding:0; background-color:#0A0704;">
@@ -4683,8 +4684,17 @@
             });
         }
 
+        function clearSavedEmailSecrets() {
+            if (typeof emailSettings === 'object' && emailSettings) {
+                delete emailSettings.gasToken;
+                delete emailSettings.web3formsKey;
+                try { localStorage.setItem('maxmuxsix_email_settings', JSON.stringify(emailSettings)); } catch (_) {}
+            }
+        }
+
         async function handleLogout() {
             if (!confirm('คุณต้องการออกจากระบบบนเครื่องนี้หรือไม่?')) return;
+            clearSavedEmailSecrets();
             try { await membership.logout(); showMembershipToast('ออกจากระบบบนเครื่องนี้แล้ว'); }
             catch (error) { showMembershipToast(error.message); }
         }
@@ -5710,8 +5720,20 @@
                 cart = [];
                 orders = [];
                 sentEmails = [];
+                clearSavedEmailSecrets();
                 syncStorage();
                 applyFilters();
+            }
+        }
+
+        function safeWebsiteUrl(rawUrl) {
+            const fallback = 'https://maxmuxsix-demo.vercel.app/';
+            try {
+                const parsed = new URL(String(rawUrl || '').trim());
+                if (parsed.protocol !== 'https:') return fallback;
+                return sanitizeHtml(parsed.toString());
+            } catch (_) {
+                return fallback;
             }
         }
 
@@ -5728,7 +5750,7 @@
             // แทนที่ตัวแปรไดนามิกในเนื้อหาอีเมล (พร้อม sanitize ป้องกัน XSS)
             const userName = escapeStoredText(user.name || 'สมาชิกร้าน MAXMUXSIX');
             const userRefCode = sanitizeHtml(user.referralCode || 'MAX1000');
-            const websiteUrl = (window.emailSettings && window.emailSettings.websiteUrl) || 'https://maxmuxsix-demo.vercel.app/';
+            const websiteUrl = safeWebsiteUrl(window.emailSettings && window.emailSettings.websiteUrl);
             
             html = html.replace(/{{USER_NAME}}/g, userName);
             html = html.replace(/{{REFERRAL_CODE}}/g, userRefCode);
@@ -5972,7 +5994,7 @@
                 });
             }
 
-            const websiteUrl = (window.emailSettings && window.emailSettings.websiteUrl) || 'https://maxmuxsix-demo.vercel.app/';
+            const websiteUrl = safeWebsiteUrl(window.emailSettings && window.emailSettings.websiteUrl);
             html = html.replace(/{{WEBSITE_URL}}/g, websiteUrl);
             html = html.replace(/{{ORDER_ID}}/g, sanitizeHtml(order.id || ''));
             html = html.replace(/{{ORDER_DATE}}/g, sanitizeHtml(order.date || new Date().toLocaleString('th-TH')));
@@ -6312,7 +6334,8 @@
             }
 
             // 1. ส่งผ่าน Google Apps Script (Cloud 24 ชม. ไม่ต้องรันเซิร์ฟเวอร์บนเครื่อง)
-            const targetSiteUrl = (emailSettings && emailSettings.websiteUrl) || 'https://maxmuxsix-demo.vercel.app/';
+            const targetSiteUrl = safeWebsiteUrl(emailSettings && emailSettings.websiteUrl);
+            const DEMO_NOTICE = 'เว็บตัวอย่าง ไม่มีการขายหรือจัดส่งจริง ห้ามโอนเงิน';
             if (emailSettings.provider === 'gas') {
                 const gasUrl = (emailSettings.gasUrl || '').trim();
                 if (!gasUrl) {
@@ -6323,7 +6346,6 @@
                     };
                 } else {
                     try {
-                        const DEMO_NOTICE = 'เว็บตัวอย่าง ไม่มีการขายหรือจัดส่งจริง ห้ามโอนเงิน';
                         const GITHUB_ASSET_BASE = 'https://raw.githubusercontent.com/OkayOkay101/MAXMUXSIX-ONLINEWEB/main/';
                         let cloudHtml = (emailRecord.htmlContent || '')
                             .replace(/src=["'](max_\d+\.jpg)["']/gi, `src="${GITHUB_ASSET_BASE}$1"`)
