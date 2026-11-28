@@ -11,7 +11,7 @@
     <!-- Security Headers -->
     <meta http-equiv="Content-Security-Policy" content="
         default-src 'self';
-        script-src 'self' 'sha256-HQx0zTmzown/evcw+5nYom/KyF/uDpC7xIJSLruKVSE=' https://challenges.cloudflare.com;
+        script-src 'self' 'sha256-Mx1QoSXX3lQryEXEgdQ6r5OOyXw30iPt5Qi2c9ayQKI=' https://challenges.cloudflare.com;
         frame-src https://challenges.cloudflare.com;
         style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.gstatic.com;
         font-src 'self' https://fonts.gstatic.com;
@@ -4352,10 +4352,11 @@
         let membersEditingId = null;
         let memberEditorFocus = null;
         let sentEmails = JSON.parse(localStorage.getItem('maxmuxsix_sent_emails')) || [];
-        const DEFAULT_GAS_URL = 'https://script.google.com/macros/s/AKfycbz-wK7x3pHtmdtcoxjIjNImAqNJcBXFDb0yYGnaQ5QzIK5vDhxLVIaJ6XzlVAcjsQQp/exec';
+        // The Google Apps Script deployment URL is a secret: it must be entered by an
+        // admin in the email settings and kept out of source control and localStorage.
         let emailSettings = JSON.parse(localStorage.getItem('maxmuxsix_email_settings')) || {
             provider: 'gas',
-            gasUrl: DEFAULT_GAS_URL,
+            gasUrl: '',
             gasToken: '',
             web3formsKey: '',
             websiteUrl: 'https://maxmuxsix-demo.vercel.app/'
@@ -4377,9 +4378,10 @@
         if (!emailSettings.websiteUrl) {
             emailSettings.websiteUrl = 'https://maxmuxsix-demo.vercel.app/';
         }
-        if (emailSettings.gasUrl === undefined || !emailSettings.gasUrl) {
-            emailSettings.gasUrl = DEFAULT_GAS_URL;
+        if (typeof emailSettings.gasUrl !== 'string') {
+            emailSettings.gasUrl = '';
         }
+        emailSettings.gasUrl = emailSettings.gasUrl.trim();
 
         // ==========================================
         // 🔒 โหมดผู้ดูแลร้าน (Admin Mode Control)
