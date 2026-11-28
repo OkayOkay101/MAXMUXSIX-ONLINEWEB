@@ -11,7 +11,7 @@
     <!-- Security Headers -->
     <meta http-equiv="Content-Security-Policy" content="
         default-src 'self';
-        script-src 'self' 'sha256-Mx1QoSXX3lQryEXEgdQ6r5OOyXw30iPt5Qi2c9ayQKI=' https://challenges.cloudflare.com;
+        script-src 'self' 'sha256-pEJ+Jx6h/gzx7DkCoYZuB5KWyWV2UwBWzbTzRVOylWQ=' https://challenges.cloudflare.com;
         frame-src https://challenges.cloudflare.com;
         style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.gstatic.com;
         font-src 'self' https://fonts.gstatic.com;
@@ -4381,7 +4381,11 @@
         if (typeof emailSettings.gasUrl !== 'string') {
             emailSettings.gasUrl = '';
         }
-        emailSettings.gasUrl = emailSettings.gasUrl.trim();
+        emailSettings.gasUrl = safeGasUrl(emailSettings.gasUrl);
+        if (emailSettings.gasUrl === '') {
+            // Never keep a non-GAS URL in storage: the browser sends the relay token to it.
+            persistEmailSettings();
+        }
 
         // ==========================================
         // 🔒 โหมดผู้ดูแลร้าน (Admin Mode Control)
@@ -5744,6 +5748,13 @@
             }
         }
 
+        // Only a Google Apps Script deployment URL is accepted. A tampered
+        // localStorage value must never receive the relay token.
+        function safeGasUrl(rawUrl) {
+            const value = typeof rawUrl === 'string' ? rawUrl.trim() : '';
+            return /^https:\/\/script\.google\.com\/macros\/s\/[A-Za-z0-9_-]+\/exec$/.test(value) ? value : '';
+        }
+
         function safeWebsiteUrl(rawUrl) {
             const fallback = 'https://maxmuxsix-demo.vercel.app/';
             try {
@@ -6355,12 +6366,12 @@
             const targetSiteUrl = safeWebsiteUrl(emailSettings && emailSettings.websiteUrl);
             const DEMO_NOTICE = 'เว็บตัวอย่าง ไม่มีการขายหรือจัดส่งจริง ห้ามโอนเงิน';
             if (emailSettings.provider === 'gas') {
-                const gasUrl = (emailSettings.gasUrl || '').trim();
+                const gasUrl = safeGasUrl(emailSettings.gasUrl);
                 if (!gasUrl) {
                     result = {
                         success: false,
                         method: 'Google Apps Script',
-                        message: 'ยังไม่ได้ระบุ Web App URL ของ Google Apps Script (กรุณากด "⚙️ ตั้งค่าส่งจริง" เพื่อวาง URL)'
+                        message: 'Web App URL ของ Google Apps Script ไม่ถูกต้อง กรุณาตรวจสอบว่าเป็นลิงก์ https://script.google.com/macros/s/.../exec'
                     };
                 } else {
                     try {
@@ -6706,16 +6717,16 @@ function testRun() {
 }`;
 
         function autoSaveGasUrl(val) {
-            const url = val.trim();
+            const url = safeGasUrl(val);
             emailSettings.gasUrl = url;
             persistEmailSettings();
             const badge = document.getElementById('gasStatusBadge');
             if (badge) {
-                if (url.includes('script.google.com')) {
+                if (url) {
                     badge.style.background = '#065F46';
                     badge.style.color = '#34D399';
                     badge.textContent = '🟢 บันทึก URL แล้ว';
-                } else if (url.length > 0) {
+                } else if (typeof val === 'string' && val.trim().length > 0) {
                     badge.style.background = '#92400E';
                     badge.style.color = '#FCD34D';
                     badge.textContent = '⚠️ ตรวจสอบ URL';
@@ -6860,8 +6871,12 @@ function testRun() {
             }
 
             const keyVal = document.getElementById('settingWeb3FormsKey') ? document.getElementById('settingWeb3FormsKey').value.trim() : '';
-            const gasVal = document.getElementById('settingGasUrl') ? document.getElementById('settingGasUrl').value.trim() : '';
+            const gasVal = safeGasUrl(document.getElementById('settingGasUrl') ? document.getElementById('settingGasUrl').value : '');
             const tokenVal = document.getElementById('settingGasToken') ? document.getElementById('settingGasToken').value.trim() : (emailSettings.gasToken || '');
+            if (tokenVal && tokenVal.length < 32) {
+                alert('⚠️ รหัสลับ ORDER_RELAY_TOKEN ต้องยาวอย่างน้อย 32 ตัวอักษร');
+                return;
+            }
 
             emailSettings = {
                 provider: chosen,
@@ -6898,7 +6913,13 @@ function testRun() {
             if (emailSettings.provider === 'gas') {
                 const gasInput = document.getElementById('settingGasUrl');
                 if (gasInput && gasInput.value.trim()) {
-                    emailSettings.gasUrl = gasInput.value.trim();
+                    const parsed = safeGasUrl(gasInput.value);
+                    if (!parsed) {
+                        alert('⚠️ Web App URL ไม่ถูกต้อง ต้องเป็นลิงก์ https://script.google.com/macros/s/.../exec เท่านั้น');
+                        gasInput.focus();
+                        return;
+                    }
+                    emailSettings.gasUrl = parsed;
                     persistEmailSettings();
                 }
                 if (!emailSettings.gasUrl) {
