@@ -38,6 +38,14 @@ test('autoSaveGasUrl never persists a non-GAS URL', () => {
     assert.equal(JSON.parse(store.local.maxmuxsix_email_settings).gasUrl, VALID);
 });
 
+test('invalid partial input does not destroy the last valid gasUrl', () => {
+    const { app, state, store } = createAppInstance();
+    app.autoSaveGasUrl(VALID);
+    app.autoSaveGasUrl('https://script.google.com/macros/s/part');
+    assert.equal(state.emailSettings.gasUrl, '');
+    assert.equal(JSON.parse(store.local.maxmuxsix_email_settings).gasUrl, VALID);
+});
+
 test('a tampered gasUrl cannot receive the relay token', async () => {
     let fetched = 0;
     const { app, state } = createAppInstance({ globals: { fetch: async () => { fetched++; return { json: async () => ({ status: 'success' }) }; } } });

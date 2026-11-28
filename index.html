@@ -11,7 +11,7 @@
     <!-- Security Headers -->
     <meta http-equiv="Content-Security-Policy" content="
         default-src 'self';
-        script-src 'self' 'sha256-pEJ+Jx6h/gzx7DkCoYZuB5KWyWV2UwBWzbTzRVOylWQ=' https://challenges.cloudflare.com;
+        script-src 'self' 'sha256-j851j6BMGllTZp7Gpo2NnjL0VAG7XsyBVEwp283Kfto=' https://challenges.cloudflare.com;
         frame-src https://challenges.cloudflare.com;
         style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.gstatic.com;
         font-src 'self' https://fonts.gstatic.com;
@@ -6717,9 +6717,15 @@ function testRun() {
 }`;
 
         function autoSaveGasUrl(val) {
-            const url = safeGasUrl(val);
-            emailSettings.gasUrl = url;
-            persistEmailSettings();
+            const raw = typeof val === 'string' ? val.trim() : '';
+            const url = safeGasUrl(raw);
+            if (url || raw === '') {
+                emailSettings.gasUrl = url;
+                persistEmailSettings();
+            } else {
+                // Invalid partial input: keep the last valid URL in storage while typing.
+                emailSettings.gasUrl = '';
+            }
             const badge = document.getElementById('gasStatusBadge');
             if (badge) {
                 if (url) {
@@ -6871,7 +6877,12 @@ function testRun() {
             }
 
             const keyVal = document.getElementById('settingWeb3FormsKey') ? document.getElementById('settingWeb3FormsKey').value.trim() : '';
-            const gasVal = safeGasUrl(document.getElementById('settingGasUrl') ? document.getElementById('settingGasUrl').value : '');
+            const rawGas = document.getElementById('settingGasUrl') ? document.getElementById('settingGasUrl').value.trim() : '';
+            const gasVal = safeGasUrl(rawGas);
+            if (chosen === 'gas' && rawGas && !gasVal) {
+                alert('⚠️ Web App URL ไม่ถูกต้อง ต้องเป็นลิงก์ https://script.google.com/macros/s/.../exec เท่านั้น');
+                return;
+            }
             const tokenVal = document.getElementById('settingGasToken') ? document.getElementById('settingGasToken').value.trim() : (emailSettings.gasToken || '');
             if (tokenVal && tokenVal.length < 32) {
                 alert('⚠️ รหัสลับ ORDER_RELAY_TOKEN ต้องยาวอย่างน้อย 32 ตัวอักษร');
